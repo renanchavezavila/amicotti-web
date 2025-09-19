@@ -1,17 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Amicotti — Inicio</title>
+
+  <!-- Tailwind (necesario para que se vean los estilos) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- SEO básico -->
   <meta name="description" content="Alimento premium para mascotas. Entrega en Quito y Valles. Pagos: transferencia o efectivo.">
-<link rel="canonical" href="https://amicotti.ecobonsaicraft.com/">
-<meta property="og:title" content="Amicotti — Amigos sanos">
-<meta property="og:description" content="Entrega en Quito y Valles. Compra por WhatsApp.">
-<meta property="og:image" content="https://amicotti.ecobonsaicraft.com/assets/logo.png">
-<meta property="og:type" content="website">
- </head>
+  <link rel="canonical" href="https://amicotti.ecobonsaicraft.com/">
+  <meta property="og:title" content="Amicotti — Amigos sanos">
+  <meta property="og:description" content="Entrega en Quito y Valles. Compra por WhatsApp.">
+  <meta property="og:image" content="https://amicotti.ecobonsaicraft.com/assets/logo.png">
+  <meta property="og:type" content="website">
+</head>
 <body class="bg-white text-slate-800">
   <!-- Cambia solo esta constante en cada archivo -->
-  <script>const WA_PHONE = '593995315716'; /* Reemplaza con el número de Amicotti sin + */</script>
+  <script>
+    const WA_PHONE = '593995315716'; /* Reemplaza con el número de Amicotti sin + */
+  </script>
 
+  <!-- Barra superior -->
   <div class="bg-slate-900 text-slate-100 text-xs">
     <div class="container mx-auto px-4 py-2 flex items-center justify-between gap-4">
       <span>Entrega en Quito y valles</span>
@@ -20,6 +31,7 @@
     </div>
   </div>
 
+  <!-- Header -->
   <header class="border-b">
     <div class="container mx-auto px-4 py-4 flex items-center justify-between">
       <a href="index.html" class="flex items-center gap-3">
@@ -35,6 +47,7 @@
     </div>
   </header>
 
+  <!-- Hero -->
   <main class="container mx-auto px-4 py-12">
     <section class="grid lg:grid-cols-2 gap-10 items-center">
       <div>
@@ -42,49 +55,49 @@
         <p class="text-slate-600 mt-3">Entrega en Quito y valles. Compra por WhatsApp.</p>
         <div class="mt-6 flex gap-3">
           <a href="catalogo.html" class="px-5 py-3 rounded-xl bg-rose-600 text-white">Ver catálogo</a>
-          <a id="waBtn" class="px-5 py-3 rounded-xl border">Escríbenos</a>
+          <a id="waBtn" class="px-5 py-3 rounded-xl border" target="_blank" rel="noopener">Escríbenos</a>
         </div>
       </div>
-      <div class="rounded-2xl bg-slate-50 p-6 shadow-soft">
+      <div class="rounded-2xl bg-slate-50 p-6 shadow">
+        <!-- Placeholder temporal (puedes cambiar a una imagen real cuando la tengas) -->
         <img
-  src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='900'><rect width='100%' height='100%' fill='%23f5f5f5'/><text x='50%' y='50%' font-size='36' font-family='Arial, sans-serif' fill='%23999' text-anchor='middle' dominant-baseline='middle'>Imagen referencial — Amicotti</text></svg>"
-  class="rounded-xl w-full object-cover"
-  alt="Imagen referencial — Amicotti"
-/>
+          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='900'><rect width='100%' height='100%' fill='%23f5f5f5'/><text x='50%' y='50%' font-size='36' font-family='Arial, sans-serif' fill='%23999' text-anchor='middle' dominant-baseline='middle'>Imagen referencial — Amicotti</text></svg>"
+          class="rounded-xl w-full object-cover"
+          alt="Imagen referencial — Amicotti"
+        />
       </div>
     </section>
   </main>
 
+  <!-- Footer -->
   <footer id="contacto" class="container mx-auto px-4 py-10 text-sm border-t">
     <div class="grid sm:grid-cols-3 gap-6">
-      <div><h3 class="font-semibold mb-3">Amicotti</h3><p>Quito — Ecuador.</p></div>
-      <div><h3 class="font-semibold mb-3">Contacto</h3>
+      <div>
+        <h3 class="font-semibold mb-3">Amicotti</h3>
+        <p>Quito — Ecuador.</p>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-3">Contacto</h3>
         <p>WhatsApp: <a id="waFooter" class="text-rose-600" target="_blank" rel="noopener"></a></p>
         <p>Email: <a class="text-rose-600" href="mailto:amicotti.uio@gmail.com">amicotti.uio@gmail.com</a></p>
       </div>
-      <div><h3 class="font-semibold mb-3">Redes</h3><p><a class="text-rose-600" href="#" target="_blank" rel="noopener">Instagram</a> · <a class="text-rose-600" href="#" target="_blank" rel="noopener">Facebook</a></p></div>
+      <div>
+        <h3 class="font-semibold mb-3">Redes</h3>
+        <p>
+          <a class="text-rose-600" href="#" target="_blank" rel="noopener">Instagram</a> ·
+          <a class="text-rose-600" href="#" target="_blank" rel="noopener">Facebook</a>
+        </p>
+      </div>
     </div>
     <p class="text-xs text-slate-500 mt-6">© 2025 Amicotti.</p>
   </footer>
 
+  <!-- Lógica de WhatsApp -->
   <script>
     const waUrl = () => 'https://wa.me/' + WA_PHONE;
     document.getElementById('waTop').href = waUrl();
     const wf = document.getElementById('waFooter'); wf.href = waUrl(); wf.textContent = '+' + WA_PHONE;
     document.getElementById('waBtn').href = waUrl();
   </script>
-  <!doctype html><html lang="es"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Página no encontrada — Amicotti</title>
-<link rel="stylesheet" href="./styles.css">
-</head><body>
-<main class="container mx-auto px-4 py-12">
-  <h1>Ups, no encontramos esa página</h1>
-  <p>Vuelve al inicio o mira nuestro catálogo.</p>
-  <p><a class="btn" href="./index.html">Ir al inicio</a>
-     <a class="btn" href="./catalogo.html" style="margin-left:8px;">Ver catálogo</a></p>
-</main>
-</body></html>
-
 </body>
 </html>
