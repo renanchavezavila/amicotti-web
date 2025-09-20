@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 <html lang="es"> 
-  <style id="catalog-images-tweak">
-  /* Solo para imágenes dentro de tarjetas del catálogo */
+ <style id="catalog-images-tweak">
   article.card img{
-    object-fit: contain !important;   /* evita recortes */
+    object-fit: contain !important;
     width: 100%;
-    height: clamp(14rem, 30vw, 22rem); /* altura responsive aprox. h-40–h-64 */
-    background-color: #f8fafc;        /* similar a slate-50 */
-    padding: .75rem;                  /* p-3 */
-    border-radius: .75rem;            /* redondeo suave */
+    height: 14rem;               /* base (móvil) */
+    background-color: #f8fafc;
+    padding: .75rem;
+    border-radius: .75rem;
+  }
+  @media (min-width: 640px){     /* sm */
+    article.card img{ height: 18rem; }
+  }
+  @media (min-width: 1024px){    /* lg */
+    article.card img{ height: 22rem; }
   }
 </style>
+
 
 <head>
   <meta charset="UTF-8" />
