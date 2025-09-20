@@ -1824,33 +1824,35 @@
         window.open('https://wa.me/' + WA_PHONE + '?text=' + encodeURIComponent(msg), '_blank');
       });
     });
-  </script>
-  // ===== 1) Config =====
-  const PHONE = (typeof WA_PHONE !== 'undefined' ? WA_PHONE : '593995315716'); // fallback
-console.log('catalog script OK. cards:', document.querySelectorAll('article.card[data-id]').length);
-  // Mapa id -> imagen (usa el data-id de cada <article class="card" data-id="...">)
-  // ===== Pegado masivo de imágenes por CSV =====
-// Escribe 1 línea por producto: id, url  (el id debe ser igual a data-id del <article>)
-const CSV_IMAGES = `
+<script>
+(() => {
+  console.log('[Amicotti] catalog script cargado');
+
+  // ===== Config =====
+  const PHONE = (typeof WA_PHONE !== 'undefined' ? WA_PHONE : '593995315716');
+
+  // ===== Pega aquí tus líneas: 1 por producto -> id, url
+  //   id debe ser EXACTAMENTE el mismo que el atributo data-id del <article class="card" ...>
+  //   Puedes usar URLs externas o rutas locales tipo assets/archivo.webp
+  const CSV_IMAGES = `
 royal-babydog-milk-perro, https://cdn.royalcanin-weshare-online.io/fFbCioQBBKJuub5qwvHh/v49/sol-milk-23-babydog-milk-400g-powder-packshot
-royal-babydog-milk-perro,Royal Canin,Babydog Milk,perro,general/seco,unidad:$44.55,https://cdn.royalcanin-weshare-online.io/fFbCioQBBKJuub5qwvHh/v49/sol-milk-23-babydog-milk-400g-powder-packshot
-// royal-puppy-pro-tech-perro, https://tusitio.com/assets/puppy-pro-tech.webp
+royal-starter-mousse-mother-babydog-perro, https://cdn.royalcanin-weshare-online.io/_iISrmsBaxEaPS7LJ8t/v346/shn18-starter-n-can195?w=640&fm=jpg&auto=format,compress
+royal-puppy-pro-tech-perro, https://tusitio.com/assets/puppy-pro-tech.webp
 // agrega más líneas aquí...
 `;
 
-// Construir IMAGE_MAP a partir del CSV (no toques esto)
-const IMAGE_MAP = {};
-CSV_IMAGES
-  .split('\n')
-  .map(l => l.trim())
-  .filter(l => l && !l.startsWith('//'))
-  .forEach(line => {
-    const [id, url] = line.split(/,(.+)/).map(s => (s || '').trim());
-    if (id && url) IMAGE_MAP[id] = url;
-  });
+  // Construimos IMAGE_MAP desde el CSV
+  const IMAGE_MAP = {};
+  CSV_IMAGES
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l && !l.startsWith('//'))
+    .forEach(line => {
+      const [id, url] = line.split(/,(.+)/).map(s => (s || '').trim());
+      if (id && url) IMAGE_MAP[id] = url;
+    });
 
-  const PLACEHOLDER =
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%' height='100%' fill='%23f5f5f5'/><text x='50%' y='50%' font-size='24' font-family='Arial, sans-serif' fill='%23999' text-anchor='middle' dominant-baseline='middle'>Imagen referencial</text></svg>";
+  const PLACEHOLDER = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%' height='100%' fill='%23f5f5f5'/><text x='50%' y='50%' font-size='24' font-family='Arial, sans-serif' fill='%23999' text-anchor='middle' dominant-baseline='middle'>Imagen referencial</text></svg>";
 
   const slugify = (s) => (s || "")
     .toLowerCase()
@@ -1871,60 +1873,70 @@ Nombre y teléfono:
 Pago: [Transferencia/Efectivo]
 Observaciones:`);
 
-  // ===== 2) Aplicar a cada tarjeta =====
-  document.querySelectorAll('article.card[data-id]').forEach(card => {
-    const id    = card.dataset.id    || '';
+  // ===== Lógica por tarjeta
+  const cards = document.querySelectorAll('article.card[data-id]');
+  console.log('[Amicotti] tarjetas encontradas:', cards.length);
+
+  cards.forEach(card => {
+    const id    = card.dataset.id || '';
     const brand = card.dataset.brand || '';
     const name  = card.dataset.name  || card.querySelector('h3')?.textContent?.trim() || '';
 
-    // Imagen
+    // --- Imagen
     const img = card.querySelector('img');
     if (img) {
-      let url = IMAGE_MAP[id];
-      if (!url) {
-        // Fallback por texto si no hay id en el mapa
-        const key = slugify(img.getAttribute('alt') || name);
-        url = IMAGE_MAP[key];
-      }
+      // priorizamos el id exacto; si no, hacemos slug del alt/título
+      const altOrTitle = img.getAttribute('alt') ||
+                         card.querySelector('h3, .title, .name')?.textContent || '';
+      const mapped = IMAGE_MAP[id] || IMAGE_MAP[slugify(altOrTitle)];
+
       const current = (img.getAttribute('src') || '').trim().toLowerCase();
-      img.src = url || (current && current !== 'nan' && current !== '#'
-              ? current
-              : PLACEHOLDER);
+      if (!current || current === 'nan' || current === '#') {
+        img.src = mapped || PLACEHOLDER;
+      }
+
+      // si la URL externa falla (403/404), caemos a placeholder
+      img.onerror = () => { img.onerror = null; img.src = PLACEHOLDER; };
+
       img.loading = 'lazy';
       img.decoding = 'async';
+
+      if (!mapped) (window.__IMAGES_MISSING__ ??= new Set()).add(id);
     }
 
-    // Variantes (botones con data-size / data-price) y botón Comprar
-    const buyBtn   = card.querySelector('.buy, .buy-btn, button.buy');
+    // --- Variantes y botón Comprar
+    const buyBtn   = card.querySelector('.buy, .buy-btn, button.buy, .buy button');
     const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
 
     const getSelected = () =>
-      variants.find(v => v.getAttribute('aria-pressed') === 'true') || variants[0];
+      variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
 
     const updateBuy = () => {
-      const v = getSelected() || {};
-      const size  = v?.dataset?.size  || v?.textContent?.trim() || '';
-      const price = v?.dataset?.price || card.querySelector('.p-price')?.textContent?.trim() || '';
+      const v     = getSelected();
+      const size  = v?.dataset.size  || v?.textContent?.trim() || '';
+      const price = v?.dataset.price || card.querySelector('.p-price')?.textContent?.trim() || '';
       const url   = waLink({brand, name, size, price});
 
       if (!buyBtn) return;
-      if (buyBtn.tagName === 'A') {
-        buyBtn.href = url; buyBtn.target = '_blank'; buyBtn.rel = 'noopener';
-      } else {
-        buyBtn.onclick = () => window.open(url, '_blank', 'noopener');
-      }
+      if (buyBtn.tagName === 'A') { buyBtn.href = url; buyBtn.target = '_blank'; buyBtn.rel = 'noopener'; }
+      else { buyBtn.onclick = () => window.open(url, '_blank', 'noopener'); }
     };
 
     variants.forEach(v => {
       v.addEventListener('click', () => {
-        variants.forEach(x => x.removeAttribute('aria-pressed'));
-        v.setAttribute('aria-pressed','true');
+        variants.forEach(x => { x.classList.remove('active'); x.removeAttribute('aria-pressed'); });
+        v.classList.add('active'); v.setAttribute('aria-pressed','true');
         updateBuy();
       });
     });
 
     updateBuy();
   });
+
+  if (window.__IMAGES_MISSING__ && window.__IMAGES_MISSING__.size) {
+    console.warn('[Amicotti] Faltan imágenes para:', Array.from(window.__IMAGES_MISSING__));
+  }
+})();
 </script>
 
 </body>
