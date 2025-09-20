@@ -1827,7 +1827,7 @@
   </script>
   // ===== 1) Config =====
   const PHONE = (typeof WA_PHONE !== 'undefined' ? WA_PHONE : '593995315716'); // fallback
-
+console.log('catalog script OK. cards:', document.querySelectorAll('article.card[data-id]').length);
   // Mapa id -> imagen (usa el data-id de cada <article class="card" data-id="...">)
   // ===== Pegado masivo de imágenes por CSV =====
 // Escribe 1 línea por producto: id, url  (el id debe ser igual a data-id del <article>)
