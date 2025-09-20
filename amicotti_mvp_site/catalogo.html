@@ -1,22 +1,19 @@
 <!DOCTYPE html>
 <html lang="es"> 
- <style id="catalog-images-tweak">
+ <style>
+  /* Catálogo: imagen más grande y sin recortes */
   article.card img{
-    object-fit: contain !important;
     width: 100%;
-    height: 28rem;               /* base (móvil) */
-    background-color: #f8fafc;
-    padding: .75rem;
-    border-radius: .75rem;
+    height: 260px;          /* súbelo a 280–320 si quieres más grande */
+    object-fit: contain;    /* que no se recorte */
+    background: #f8fafc;    /* fondito claro (opcional) */
+    border-radius: 0.75rem; /* redondeo (opcional, como antes) */
   }
-  @media (min-width: 640px){     /* sm */
-    article.card img{ height: 36rem; }
-  }
-  @media (min-width: 1024px){    /* lg */
-    article.card img{ height: 44rem; }
+  /* En pantallas grandes, hazla aún un poco mayor */
+  @media (min-width: 1024px){
+    article.card img{ height: 300px; }
   }
 </style>
-
 
 <head>
   <meta charset="UTF-8" />
