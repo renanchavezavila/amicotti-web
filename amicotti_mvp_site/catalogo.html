@@ -1839,10 +1839,88 @@
 
     img.loading  = 'lazy';
     img.decoding = 'async';
+   
+  });
+})();
+</script>
+ <script>
+(() => {
+  const PHONE = (typeof WA_PHONE !== 'undefined' && WA_PHONE) || '593995315716';
+
+  const waMsg = ({brand, name, size, price}) => 
+`Hola Amicotti 👋
+Quiero comprar:
+• ${brand||''} ${name||''} ${size||''}
+Precio: ${price||''}
+
+Sector: [Quito/Valles]
+Dirección:
+Nombre y teléfono:
+Pago: [Transferencia/Efectivo]
+Observaciones:`;
+
+  const buildUrl = data => 'https://wa.me/' + PHONE + '?text=' + encodeURIComponent(waMsg(data));
+
+  const toLink = (el, url) => {
+    if (!el) return null;
+    if (el.tagName === 'A') {
+      el.href = url; el.target = '_blank'; el.rel = 'noopener';
+      return el;
+    }
+    // si es <button> o cualquier otro, lo reemplazamos por <a>
+    const a = document.createElement('a');
+    a.innerHTML = el.innerHTML;
+    a.className = el.className || 'buy-btn';
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    el.replaceWith(a);
+    return a;
+  };
+
+  document.querySelectorAll('article.card[data-id]').forEach(card => {
+    const brand = card.dataset.brand || '';
+    const name  = card.dataset.name  || card.querySelector('h3, .title, .name')?.textContent?.trim() || '';
+
+    // variantes posibles
+    const variants = Array.from(card.querySelectorAll('.variant, [data-size], [data-price], .variants button, .variants a'));
+
+    const getSelected = () =>
+      variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
+
+    const current = () => {
+      const v = getSelected();
+      const size  = v?.dataset.size  || v?.textContent?.trim() || '';
+      const price = v?.dataset.price || card.querySelector('.p-price, [data-price-display]')?.textContent?.trim() || '';
+      return { brand, name, size, price };
+    };
+
+    // candidatos a “Comprar”: <a> o <button> cuyo texto contenga "comprar"
+    const buyCandidates = Array.from(card.querySelectorAll('a,button'))
+      .filter(b => /comprar/i.test(b.textContent || ''));
+
+    if (buyCandidates.length === 0) return; // no hay botón en esta card
+
+    // conectar todos los botones de compra de la tarjeta
+    const links = buyCandidates.map(b => toLink(b, buildUrl(current())));
+
+    // actualizar link cuando cambie la variante
+    const update = () => {
+      const url = buildUrl(current());
+      links.forEach(a => { a.href = url; });
+    };
+
+    variants.forEach(v => {
+      v.addEventListener('click', () => {
+        variants.forEach(x => { x.classList.remove('active'); x.removeAttribute('aria-pressed'); });
+        v.classList.add('active'); v.setAttribute('aria-pressed', 'true');
+        update();
+      });
+    });
+
+    update(); // inicial
   });
 })();
 </script>
 
- 
 </body>
+ <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
 </html>
