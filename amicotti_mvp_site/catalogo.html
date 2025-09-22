@@ -14,6 +14,24 @@
     article.card img{ height: 300px; }
   }
 </style>
+<!-- BUSCADOR -->
+<section class="container mx-auto px-4 pt-2 pb-4">
+  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+    <label for="catalog-search" class="sr-only">Buscar en catálogo</label>
+    <input
+      id="catalog-search"
+      type="search"
+      placeholder="Buscar: royal, perro, kitten, 8kg, mousse..."
+      class="w-full sm:max-w-lg rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-rose-500"
+      autocomplete="off"
+    />
+    <button id="catalog-search-clear"
+      class="px-4 py-3 rounded-xl border bg-slate-50 hover:bg-slate-100">
+      Limpiar
+    </button>
+    <span id="catalog-search-count" class="text-sm text-slate-500 sm:ml-auto"></span>
+  </div>
+</section>
 
 <head>
   <meta charset="UTF-8" />
@@ -1918,6 +1936,86 @@ Observaciones:`;
 
     update(); // inicial
   });
+})();
+</script>
+<script>
+(() => {
+  console.log('[Amicotti] Buscador listo');
+
+  const $q      = document.getElementById('catalog-search');
+  const $clear  = document.getElementById('catalog-search-clear');
+  const $count  = document.getElementById('catalog-search-count');
+  const cards   = [...document.querySelectorAll('article.card[data-id]')];
+
+  // Normaliza: minúsculas + sin acentos + colapsa espacios
+  const norm = s => (s || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Indexa cada tarjeta una sola vez
+  cards.forEach(card => {
+    if (card.dataset.index) return;
+    const parts = [
+      card.dataset.id,
+      card.dataset.name,
+      card.dataset.brand,
+      card.dataset.animal,
+      card.querySelector('h3')?.textContent || '',
+      // tamaños / precios visibles
+      [...card.querySelectorAll('.variant,[data-size][data-price]')]
+        .map(v => `${v.dataset.size || ''} ${v.dataset.price || ''} ${v.textContent || ''}`)
+        .join(' ')
+    ];
+    card.dataset.index = norm(parts.join(' '));
+  });
+
+  const updateURL = (q) => {
+    const url = q ? `${location.pathname}?q=${encodeURIComponent(q)}` : location.pathname;
+    history.replaceState(null, '', url);
+  };
+
+  const apply = (query) => {
+    const term = norm(query);
+    let visible = 0;
+
+    cards.forEach(card => {
+      const hit = !term || card.dataset.index.includes(term);
+      card.style.display = hit ? '' : 'none';
+      if (hit) visible++;
+    });
+
+    $count.textContent = `${visible} producto${visible === 1 ? '' : 's'}`;
+    updateURL(query);
+
+    // Mensaje "sin resultados"
+    document.getElementById('emptyMsg')?.remove();
+    if (!visible) {
+      const m = document.createElement('p');
+      m.id = 'emptyMsg';
+      m.className = 'container mx-auto px-4 py-10 text-slate-500';
+      m.textContent = 'No encontramos resultados. Prueba con otra palabra (ej. “kitten”, “8kg”, “mousse”).';
+      // colócalo después del buscador
+      const searchSection = document.querySelector('#catalog-search')?.closest('section');
+      (searchSection?.parentNode || document.body).appendChild(m);
+    }
+  };
+
+  // Debounce sencillo para tecleo
+  let t;
+  const deb = fn => (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), 150); };
+
+  // Lee ?q= de la URL (para compartir búsquedas)
+  const params = new URLSearchParams(location.search);
+  if (params.has('q')) $q.value = decodeURIComponent(params.get('q'));
+
+  // Eventos
+  $q.addEventListener('input', deb(e => apply(e.target.value)));
+  $clear.addEventListener('click', () => { $q.value = ''; apply(''); $q.focus(); });
+
+  // Primera aplicación
+  apply($q.value);
 })();
 </script>
 
