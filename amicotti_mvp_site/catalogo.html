@@ -2018,6 +2018,205 @@ Observaciones:`;
   apply($q.value);
 })();
 </script>
+<!-- Botón flotante del carrito -->
+<button id="cartBtn"
+  class="fixed bottom-5 right-5 z-50 px-4 py-3 rounded-full shadow-lg bg-rose-600 text-white font-semibold flex items-center gap-2">
+  🛒 <span id="cartCount">0</span>
+</button>
+
+<!-- Modal del carrito -->
+<div id="cartModal"
+  class="fixed inset-0 hidden items-end sm:items-center justify-center bg-black/40 z-50">
+  <div class="bg-white w-full sm:max-w-lg rounded-2xl p-4 sm:p-6 shadow-xl">
+    <div class="flex items-center justify-between">
+      <h3 class="text-lg font-semibold">Carrito</h3>
+      <button id="cartClose" class="text-slate-500 hover:text-slate-700">✕</button>
+    </div>
+
+    <div id="cartItems" class="divide-y my-4 max-h-[50vh] overflow-auto"></div>
+
+    <div class="flex items-center justify-between text-sm">
+      <span class="font-semibold">Total</span>
+      <span id="cartTotal" class="font-semibold">$0.00</span>
+    </div>
+
+    <div class="mt-4 flex gap-3">
+      <button id="cartClear" class="px-4 py-2 border rounded-lg">Vaciar</button>
+      <button id="cartCheckout"
+        class="px-4 py-2 bg-rose-600 text-white rounded-lg flex-1">Comprar por WhatsApp</button>
+    </div>
+  </div>
+</div>
+<script>
+(() => {
+  const PHONE = (typeof WA_PHONE !== 'undefined' ? WA_PHONE : '593995315716');
+
+  // --- Helpers de storage
+  const KEY = 'amicotti_cart';
+  const getCart   = () => JSON.parse(localStorage.getItem(KEY) || '[]');
+  const setCart   = (c) => { localStorage.setItem(KEY, JSON.stringify(c)); updateBadge(); };
+  const clearCart = () => setCart([]);
+
+  const money = (n) => '$' + (Number(n || 0).toFixed(2));
+  const parseMoney = (s) => Number(String(s||'').replace(/[^0-9.,-]/g,'').replace(',', '.')) || 0;
+
+  // UI refs
+  const cartBtn      = document.getElementById('cartBtn');
+  const cartCount    = document.getElementById('cartCount');
+  const cartModal    = document.getElementById('cartModal');
+  const cartClose    = document.getElementById('cartClose');
+  const cartItems    = document.getElementById('cartItems');
+  const cartTotal    = document.getElementById('cartTotal');
+  const cartClearBtn = document.getElementById('cartClear');
+  const cartCheckout = document.getElementById('cartCheckout');
+
+  const openCart  = () => cartModal.classList.remove('hidden');
+  const closeCart = () => cartModal.classList.add('hidden');
+
+  // Contador en el botón
+  function updateBadge() {
+    const n = getCart().reduce((s,i)=> s + (i.qty||0), 0);
+    cartCount.textContent = n;
+  }
+
+  // Render del modal
+  function renderCart() {
+    const cart = getCart();
+    cartItems.innerHTML = '';
+    let total = 0;
+
+    if (!cart.length) {
+      cartItems.innerHTML = '<p class="text-sm text-slate-500 py-6 text-center">Tu carrito está vacío.</p>';
+    } else {
+      cart.forEach(item => {
+        const lineTotal = item.qty * parseMoney(item.price);
+        total += lineTotal;
+
+        const row = document.createElement('div');
+        row.className = 'py-3 flex items-center gap-3 justify-between';
+        row.innerHTML = `
+          <div class="min-w-0">
+            <div class="font-medium truncate">${item.brand || ''} ${item.name || ''}</div>
+            <div class="text-xs text-slate-500">${item.size || ''} · ${money(item.price)}</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="qty-down px-2 py-1 border rounded">−</button>
+            <span class="w-8 text-center">${item.qty}</span>
+            <button class="qty-up px-2 py-1 border rounded">+</button>
+            <span class="w-20 text-right font-medium">${money(lineTotal)}</span>
+            <button class="remove text-slate-400 hover:text-rose-600" title="Eliminar">🗑️</button>
+          </div>
+        `;
+
+        row.querySelector('.qty-down').onclick = () => changeQty(item.key, -1);
+        row.querySelector('.qty-up').onclick   = () => changeQty(item.key, +1);
+        row.querySelector('.remove').onclick   = () => removeItem(item.key);
+
+        cartItems.appendChild(row);
+      });
+    }
+
+    cartTotal.textContent = money(total);
+  }
+
+  function changeQty(key, delta) {
+    const cart = getCart();
+    const i = cart.findIndex(it => it.key === key);
+    if (i === -1) return;
+    cart[i].qty = Math.max(1, (cart[i].qty||1) + delta);
+    setCart(cart);
+    renderCart();
+  }
+
+  function removeItem(key) {
+    let cart = getCart().filter(it => it.key !== key);
+    setCart(cart);
+    renderCart();
+  }
+
+  // Construye el texto para WhatsApp con todos los ítems
+  function checkoutWA() {
+    const cart = getCart();
+    if (!cart.length) return;
+
+    const lines = cart.map(it => {
+      const p = parseMoney(it.price);
+      const line = `• ${it.brand || ''} ${it.name || ''} ${it.size ? '('+it.size+') ' : ''}x${it.qty} — ${money(p*it.qty)}`;
+      return line.trim();
+    });
+
+    const total = money(cart.reduce((s,it)=> s + (it.qty * parseMoney(it.price)), 0));
+
+    const msg =
+`Hola Amicotti 👋
+Quiero comprar:
+${lines.join('\n')}
+Total: ${total}
+
+Sector: [Quito/Valles]
+Dirección:
+Nombre y teléfono:
+Pago: [Transferencia/Efectivo]
+Observaciones:`;
+
+    const url = 'https://wa.me/' + PHONE + '?text=' + encodeURIComponent(msg);
+    window.open(url, '_blank', 'noopener');
+  }
+
+  // Agrega botón "Agregar" a cada tarjeta del catálogo
+  function enhanceCards() {
+    document.querySelectorAll('article.card[data-id]').forEach(card => {
+      const buyBtn = card.querySelector('.buy, .buy-btn, button.buy, .buy button');
+      if (!buyBtn) return;
+
+      // crear botón Agregar (si no existe)
+      if (!card.querySelector('.add-to-cart')) {
+        const add = document.createElement('button');
+        add.className = 'add-to-cart px-4 py-2 rounded-xl border text-sm';
+        add.textContent = 'Agregar';
+        buyBtn.parentNode.insertBefore(add, buyBtn); // lo ponemos antes del "Comprar"
+
+        add.addEventListener('click', () => {
+          // Variante seleccionada o 1ª disponible
+          const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
+          const selected = variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
+
+          const item = {
+            id:    card.dataset.id || '',
+            brand: card.dataset.brand || '',
+            name:  card.dataset.name  || '',
+            size:  selected?.dataset?.size || selected?.textContent?.trim() || '',
+            price: selected?.dataset?.price || card.querySelector('.p-price')?.textContent?.trim() || '',
+            qty:   1
+          };
+          item.key = item.id + '|' + (item.size || '');
+
+          // Insertar en carrito (sumar si ya existe key)
+          const cart = getCart();
+          const found = cart.find(it => it.key === item.key);
+          if (found) found.qty += 1; else cart.push(item);
+
+          setCart(cart);
+          renderCart();
+          openCart();
+        });
+      }
+    });
+  }
+
+  // Eventos UI
+  cartBtn.onclick   = openCart;
+  cartClose.onclick = closeCart;
+  cartClearBtn.onclick = () => { clearCart(); renderCart(); };
+  cartCheckout.onclick = checkoutWA;
+  cartModal.addEventListener('click', (e) => { if (e.target === cartModal) closeCart(); });
+
+  // Init
+  enhanceCards();
+  updateBadge();
+  renderCart();
+})();
+</script>
 
 </body>
  <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
