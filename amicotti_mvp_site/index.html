@@ -1,38 +1,41 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Amicotti — Inicio</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Amicotti — Salud y bienestar para tus mascotas</title>
 
-  <!-- Tailwind (necesario para que se vean los estilos) -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- SEO básico -->
-  <meta name="description" content="Alimento premium para mascotas. Entrega en Quito y Valles. Pagos: transferencia o efectivo.">
-  <link rel="canonical" href="https://amicotti.ecobonsaicraft.com/">
-  <meta property="og:title" content="Amicotti — Amigos sanos">
-  <meta property="og:description" content="Entrega en Quito y Valles. Compra por WhatsApp.">
-  <meta property="og:image" content="https://amicotti.ecobonsaicraft.com/assets/logo.png">
-  <meta property="og:type" content="website">
+  <!-- SEO / Social -->
+  <meta name="description" content="Amicotti: salud y bienestar para tus mascotas. Entrega en Quito y Valles. Compra fácil por WhatsApp. Royal Canin y Purina." />
+  <link rel="canonical" href="https://amicotti.ecobonsaicraft.com/" />
+  <meta property="og:title" content="Amicotti — Salud y bienestar para tus mascotas" />
+  <meta property="og:description" content="Entrega en Quito y Valles. Compra por WhatsApp." />
+  <meta property="og:image" content="assets/logo.png" />
+  <meta property="og:type" content="website" />
+
+  <!-- Pequeños utilitarios -->
+  <style>
+    .container{max-width:1180px}
+  </style>
 </head>
 <body class="bg-white text-slate-800">
-  <!-- Cambia solo esta constante en cada archivo -->
-  <script>
-    const WA_PHONE = '593995315716'; /* Reemplaza con el número de Amicotti sin + */
-  </script>
+  <!-- Número global de WhatsApp -->
+  <script>const WA_PHONE = '593995315716';</script>
 
   <!-- Barra superior -->
   <div class="bg-slate-900 text-slate-100 text-xs">
     <div class="container mx-auto px-4 py-2 flex items-center justify-between gap-4">
-      <span>Entrega en Quito y valles</span>
+      <span>Entrega en Quito y Valles</span>
       <span>Pagos: <strong>transferencia bancaria</strong></span>
       <a id="waTop" class="text-rose-300 hover:text-rose-200 underline" target="_blank" rel="noopener">Atención WhatsApp</a>
     </div>
   </div>
 
   <!-- Header -->
-  <header class="border-b">
+  <header class="border-b bg-white/70 backdrop-blur">
     <div class="container mx-auto px-4 py-4 flex items-center justify-between">
       <a href="index.html" class="flex items-center gap-3">
         <img src="assets/logo.png" alt="Amicotti" class="h-10 w-auto" onerror="this.style.display='none'">
@@ -40,64 +43,149 @@
       </a>
       <nav class="hidden md:flex items-center gap-6 text-sm">
         <a class="hover:text-rose-700" href="catalogo.html">Catálogo</a>
-        <a class="hover:text-rose-700" href="#">Royal Canin</a>
-        <a class="hover:text-rose-700" href="#">Purina</a>
+        <a class="hover:text-rose-700" href="catalogo.html?q=royal">Royal Canin</a>
+        <a class="hover:text-rose-700" href="catalogo.html?q=purina">Purina</a>
         <a class="hover:text-rose-700" href="#contacto">Contacto</a>
       </nav>
     </div>
   </header>
 
   <!-- Hero -->
-  <main class="container mx-auto px-4 py-12">
-    <section class="grid lg:grid-cols-2 gap-10 items-center">
+  <section class="container mx-auto px-4 py-12 lg:py-16">
+    <div class="grid lg:grid-cols-2 gap-10 items-center">
       <div>
-        <h1 class="text-3xl font-extrabold leading-tight">Salud y bienestar para tus mascotas</h1>
-        <p class="text-slate-600 mt-3">Entrega en Quito y valles. Compra por WhatsApp.</p>
-        <div class="mt-6 flex gap-3">
-          <a href="catalogo.html?q=royal" class="px-5 py-3 rounded-xl bg-rose-600 text-white">Ver catálogo</a>
-          <a id="waBtn" class="px-5 py-3 rounded-xl border" target="_blank" rel="noopener">Escríbenos</a>
+        <h1 class="text-3xl lg:text-5xl font-extrabold leading-tight">
+          Salud y bienestar <span class="text-rose-600">para tus mascotas</span>
+        </h1>
+        <p class="mt-4 text-slate-600">
+          Entrega rápida en Quito y Valles. Compra por WhatsApp. Productos oficiales Royal Canin y Purina.
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a href="catalogo.html" class="px-5 py-3 rounded-xl bg-rose-600 text-white hover:bg-rose-700">Ver catálogo</a>
+          <a id="ctaWhatsApp" target="_blank" rel="noopener"
+             class="px-5 py-3 rounded-xl border hover:bg-slate-50">Escríbenos</a>
+        </div>
+
+        <!-- Beneficios -->
+        <div class="mt-8 grid sm:grid-cols-3 gap-4">
+          <div class="p-4 rounded-xl border">
+            <div class="font-semibold">Entrega Quito y Valles</div>
+            <div class="text-sm text-slate-500">Rápido y seguro</div>
+          </div>
+          <div class="p-4 rounded-xl border">
+            <div class="font-semibold">Pago seguro</div>
+            <div class="text-sm text-slate-500">Transferencia / efectivo</div>
+          </div>
+          <div class="p-4 rounded-xl border">
+            <div class="font-semibold">Productos oficiales</div>
+            <div class="text-sm text-slate-500">Marcas premium</div>
+          </div>
         </div>
       </div>
-      <div class="rounded-2xl bg-slate-50 p-6 shadow">
-        <!-- Placeholder temporal (puedes cambiar a una imagen real cuando la tengas) -->
-        <img
-          src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='900'><rect width='100%' height='100%' fill='%23f5f5f5'/><text x='50%' y='50%' font-size='36' font-family='Arial, sans-serif' fill='%23999' text-anchor='middle' dominant-baseline='middle'>Imagen referencial — Amicotti</text></svg>"
-          class="rounded-xl w-full object-cover"
-          alt="Imagen referencial — Amicotti"
-        />
-      </div>
-    </section>
-  </main>
 
-  <!-- Footer -->
-  <footer id="contacto" class="container mx-auto px-4 py-10 text-sm border-t">
-    <div class="grid sm:grid-cols-3 gap-6">
-      <div>
-        <h3 class="font-semibold mb-3">Amicotti</h3>
-        <p>Quito — Ecuador.</p>
-      </div>
-      <div>
-        <h3 class="font-semibold mb-3">Contacto</h3>
-        <p>WhatsApp: <a id="waFooter" class="text-rose-600" target="_blank" rel="noopener"></a></p>
-        <p>Email: <a class="text-rose-600" href="mailto:amicotti.uio@gmail.com">amicotti.uio@gmail.com</a></p>
-      </div>
-      <div>
-        <h3 class="font-semibold mb-3">Redes</h3>
-        <p>
-          <a class="text-rose-600" href="#" target="_blank" rel="noopener">Instagram</a> ·
-          <a class="text-rose-600" href="#" target="_blank" rel="noopener">Facebook</a>
-        </p>
+      <!-- Imagen héroe -->
+      <div class="relative">
+        <img
+          src="assets/hero.webp"
+          alt="Amicotti"
+          class="w-full h-[320px] lg:h-[420px] object-contain bg-slate-50 rounded-2xl"
+          onerror="this.src='data:image/svg+xml;utf8,&lt;svg xmlns=%27http://www.w3.org/2000/svg%27 width=%271600%27 height=%27900%27&gt;&lt;rect width=%27100%25%27 height=%27100%25%27 fill=%27%23f5f5f5%27/&gt;&lt;text x=%2750%25%27 y=%2750%25%27 font-size=%2736%27 font-family=%27Arial, sans-serif%27 fill=%27%23999%27 text-anchor=%27middle%27 dominant-baseline=%27middle%27&gt;Imagen referencial — Amicotti&lt;/text&gt;&lt;/svg&gt;'">
       </div>
     </div>
-    <p class="text-xs text-slate-500 mt-6">© 2025 Amicotti.</p>
+  </section>
+
+  <!-- Atajos -->
+  <section class="container mx-auto px-4 pb-8">
+    <h2 class="text-xl font-semibold mb-3">Busca rápido</h2>
+    <div class="flex flex-wrap gap-3">
+      <a href="catalogo.html?q=royal"  class="px-4 py-2 rounded-full border hover:bg-slate-50">Royal Canin</a>
+      <a href="catalogo.html?q=purina" class="px-4 py-2 rounded-full border hover:bg-slate-50">Purina</a>
+      <a href="catalogo.html?q=perro"  class="px-4 py-2 rounded-full border hover:bg-slate-50">Perro</a>
+      <a href="catalogo.html?q=gato"   class="px-4 py-2 rounded-full border hover:bg-slate-50">Gato</a>
+      <a href="catalogo.html?q=puppy"  class="px-4 py-2 rounded-full border hover:bg-slate-50">Puppy</a>
+      <a href="catalogo.html?q=kitten" class="px-4 py-2 rounded-full border hover:bg-slate-50">Kitten</a>
+    </div>
+  </section>
+
+  <!-- Marcas -->
+  <section class="container mx-auto px-4 pb-12">
+    <div class="rounded-2xl border p-5">
+      <h3 class="text-sm font-medium text-slate-500 mb-4">Marcas que trabajamos</h3>
+      <div class="flex flex-wrap items-center gap-6 opacity-80">
+        <img src="assets/logo.png" class="h-10 w-auto" alt="Amicotti">
+        <!-- Agrega logos de marcas si quieres -->
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="container mx-auto px-4 pb-16">
+    <h2 class="text-xl font-semibold mb-4">Preguntas frecuentes</h2>
+    <div class="space-y-3">
+      <details class="p-4 rounded-xl border">
+        <summary class="font-medium cursor-pointer">¿Zonas y tiempos de entrega?</summary>
+        <p class="mt-2 text-slate-600">Quito y Valles. Entrega el mismo día o siguiente hábil según horario de compra.</p>
+      </details>
+      <details class="p-4 rounded-xl border">
+        <summary class="font-medium cursor-pointer">¿Métodos de pago?</summary>
+        <p class="mt-2 text-slate-600">Transferencia o efectivo contra entrega.</p>
+      </details>
+      <details class="p-4 rounded-xl border">
+        <summary class="font-medium cursor-pointer">¿Emiten factura?</summary>
+        <p class="mt-2 text-slate-600">Sí, solicita al confirmar tu pedido por WhatsApp.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contacto" class="border-t">
+    <div class="container mx-auto px-4 py-10 text-sm">
+      <div class="grid sm:grid-cols-3 gap-6">
+        <div>
+          <h3 class="font-semibold mb-3">Amicotti</h3>
+          <p>Quito — Ecuador.</p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-3">Contacto</h3>
+          <p>WhatsApp: <a id="waFooter" class="text-rose-600" target="_blank" rel="noopener"></a></p>
+          <p>Email: <a class="text-rose-600" href="mailto:amicotti.uio@gmail.com">amicotti.uio@gmail.com</a></p>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-3">Redes</h3>
+          <p>
+            <a class="text-rose-600" href="#" target="_blank" rel="noopener">Instagram</a> ·
+            <a class="text-rose-600" href="#" target="_blank" rel="noopener">Facebook</a>
+          </p>
+        </div>
+      </div>
+      <p class="text-xs text-slate-500 mt-6">© 2025 Amicotti.</p>
+    </div>
   </footer>
+
+  <!-- Botón WhatsApp flotante -->
+  <a id="waFloat" target="_blank" rel="noopener"
+     class="fixed right-5 bottom-5 z-50 px-4 py-3 rounded-full bg-rose-600 text-white shadow-lg hover:bg-rose-700">
+    WhatsApp
+  </a>
 
   <!-- Lógica de WhatsApp -->
   <script>
-    const waUrl = () => 'https://wa.me/' + WA_PHONE;
-    document.getElementById('waTop').href = waUrl();
-    const wf = document.getElementById('waFooter'); wf.href = waUrl(); wf.textContent = '+' + WA_PHONE;
-    document.getElementById('waBtn').href = waUrl();
+    const msg = encodeURIComponent(
+`Hola Amicotti 👋
+Quiero información para mi mascota.
+Nombre:
+Sector:
+Consulta:`);
+
+    const waUrl = 'https://wa.me/' + WA_PHONE + '?text=' + msg;
+
+    const linkIds = ['waTop','waFooter','waFloat','ctaWhatsApp'];
+    linkIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.href = waUrl;
+      if (id === 'waFooter') el.textContent = '+' + WA_PHONE;
+    });
   </script>
 </body>
 </html>
