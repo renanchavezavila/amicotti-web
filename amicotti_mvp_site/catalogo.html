@@ -2141,6 +2141,121 @@ Observaciones:`;
   ob.observe(document.body, { childList:true, subtree:true });
 })();
 </script>
+<style>
+  /* Botón flotante carrito */
+  #cartFab{position:fixed;right:1rem;bottom:1rem;z-index:50;display:inline-flex;align-items:center;gap:.5rem;background:#f43f5e;color:#fff;border-radius:9999px;box-shadow:0 10px 20px rgba(244,63,94,.25);padding:.6rem .9rem;cursor:pointer}
+  #cartFab .badge{background:#fff;color:#f43f5e;min-width:1.5rem;text-align:center;border-radius:9999px;font-weight:700;padding:.1rem .4rem}
+  /* Panel */
+  #cartModal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;z-index:60}
+  #cartPanel{position:absolute;right:0;top:0;height:100%;width:min(92vw,420px);background:#fff;box-shadow:-10px 0 30px rgba(0,0,0,.2);display:flex;flex-direction:column}
+  .cart-header,.cart-footer{padding:1rem;border-bottom:1px solid #e5e7eb}
+  .cart-footer{border-top:1px solid #e5e7eb;margin-top:auto}
+  .cart-items{overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.75rem}
+  .cart-item{display:grid;grid-template-columns:1fr auto;gap:.25rem;padding:.6rem .75rem;border:1px solid #e5e7eb;border-radius:.75rem;background:#fff}
+  .cart-item small{color:#6b7280}
+  .qty{display:inline-flex;align-items:center;gap:.25rem;margin-left:.5rem}
+  .qty button{width:1.6rem;height:1.6rem;border-radius:.4rem;border:1px solid #e5e7eb;background:#f8fafc}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;border-radius:.75rem;padding:.6rem .9rem;font-weight:600;border:1px solid transparent}
+  .btn-primary{background:#f43f5e;color:#fff}
+  .btn-muted{background:#f8fafc;color:#0f172a;border-color:#e5e7eb}
+</style>
+
+<!-- FAB del carrito -->
+<div id="cartFab" aria-label="Abrir carrito">🛒 <span id="cartBadge" class="badge">0</span></div>
+
+<!-- Modal del carrito -->
+<div id="cartModal" aria-hidden="true">
+  <aside id="cartPanel">
+    <div class="cart-header" style="display:flex;justify-content:space-between;align-items:center">
+      <strong>Tu carrito</strong>
+      <button id="cartClose" class="btn btn-muted">Cerrar</button>
+    </div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-footer" style="display:grid;gap:.5rem">
+      <div style="display:flex;justify-content:space-between;font-weight:700">
+        <span>Total</span><span id="cartTotal">$0.00</span>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <button id="cartClear" class="btn btn-muted">Vaciar</button>
+        <button id="cartCheckout" class="btn btn-primary">Finalizar por WhatsApp</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const KEY='amicotti_cart';
+  const PHONE=(typeof WA_PHONE!=='undefined' && WA_PHONE) ? WA_PHONE : '593995315716';
+  const $=s=>document.querySelector(s);
+  const fab=$('#cartFab'), modal=$('#cartModal'), close=$('#cartClose');
+  const items=$('#cartItems'), total=$('#cartTotal'), badge=$('#cartBadge');
+  const clearBtn=$('#cartClear'), checkout=$('#cartCheckout');
+
+  const money=n=>'$'+(Math.round((+n||0)*100)/100).toFixed(2);
+  const num=s=>Number(String(s||'').replace(/[^0-9.,-]/g,'').replace(',','.'))||0;
+  const get=()=>JSON.parse(localStorage.getItem(KEY)||'[]');
+  const set=c=>{ localStorage.setItem(KEY,JSON.stringify(c)); refresh(); };
+
+  function refresh(){
+    const cart=get();
+    // badge
+    badge.textContent = cart.reduce((s,i)=>s+(i.qty||0),0);
+    // list + total
+    if(!items||!total) return;
+    items.innerHTML='';
+    let t=0;
+    if(!cart.length){
+      items.innerHTML='<p class="text-slate-500">Tu carrito está vacío.</p>';
+      total.textContent='$0.00'; return;
+    }
+    cart.forEach((it,i)=>{
+      const line=(it.qty||1)*num(it.price); t+=line;
+      const row=document.createElement('div');
+      row.className='cart-item';
+      row.innerHTML=`
+        <div><strong>${it.brand||''} ${it.name||''}</strong><br>
+          <small>${it.size||''} · ${it.price||''}</small>
+        </div>
+        <div style="text-align:right">
+          <div>${money(line)}</div>
+          <div class="qty">
+            <button class="down">−</button>
+            <span>${it.qty||1}</span>
+            <button class="up">+</button>
+            <button class="del" title="Eliminar">🗑️</button>
+          </div>
+        </div>`;
+      row.querySelector('.down').onclick=()=>{const c=get(); c[i].qty=Math.max(1,(c[i].qty||1)-1); set(c);};
+      row.querySelector('.up').onclick  =()=>{const c=get(); c[i].qty=(c[i].qty||1)+1; set(c);};
+      row.querySelector('.del').onclick =()=>{const c=get(); c.splice(i,1); set(c);};
+      items.appendChild(row);
+    });
+    total.textContent=money(t);
+  }
+
+  // Abrir/cerrar
+  fab.onclick = ()=> modal.style.display='block';
+  close.onclick = ()=> modal.style.display='none';
+  modal.addEventListener('click',e=>{ if(e.target===modal) modal.style.display='none'; });
+
+  // Vaciar y checkout
+  clearBtn.onclick = ()=> set([]);
+  checkout.onclick = ()=>{
+    const cart=get(); if(!cart.length){ modal.style.display='block'; return; }
+    const lines = cart.map(i=>`• ${i.brand||''} ${i.name||''} ${i.size||''}  x${i.qty||1}  (${i.price||''})`).join('\n');
+    const total = money(cart.reduce((s,i)=>s+num(i.price)*(i.qty||1),0));
+    const msg = `Hola Amicotti 👋\nQuiero confirmar mi pedido:\n\n${lines}\n\nTotal: ${total}\n\n`+
+                `Sector: [Quito/Valles]\nDirección:\nNombre y teléfono:\n`+
+                `Pago: [Transferencia/Efectivo]\nObservaciones:`;
+    window.open('https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg),'_blank','noopener');
+  };
+
+  // Refresca al cargar y cuando otro script cambie el carrito
+  refresh();
+  window.addEventListener('storage',e=>{ if(e.key===KEY) refresh(); });
+})();
+</script>
 
 
 
