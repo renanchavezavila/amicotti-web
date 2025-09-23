@@ -2170,25 +2170,67 @@ Observaciones:`;
       if (!buyBtn) return;
 
       // crear botón Agregar (si no existe)
-      if (!card.querySelector('.add-to-cart')) {
-        const add = document.createElement('button');
-        add.className = 'add-to-cart px-4 py-2 rounded-xl border text-sm';
-        add.textContent = 'Agregar';
-        buyBtn.parentNode.insertBefore(add, buyBtn); // lo ponemos antes del "Comprar"
+      // === BLOQUE NUEVO: botón "Agregar" con color y feedback ===
+if (!card.querySelector('.add-to-cart')) {
+  const add = document.createElement('button');
+  // estilos con color (rosa por defecto)
+  add.className =
+    'add-to-cart px-4 py-2 rounded-xl text-sm font-medium ' +
+    'border border-rose-300 text-rose-700 bg-rose-50 ' +
+    'hover:bg-rose-600 hover:text-white transition';
+  add.textContent = 'Agregar';
 
-        add.addEventListener('click', () => {
-          // Variante seleccionada o 1ª disponible
-          const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
-          const selected = variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
+  // insertarlo antes del botón "Comprar"
+  buyBtn?.parentNode?.insertBefore(add, buyBtn);
 
-          const item = {
-            id:    card.dataset.id || '',
-            brand: card.dataset.brand || '',
-            name:  card.dataset.name  || '',
-            size:  selected?.dataset?.size || selected?.textContent?.trim() || '',
-            price: selected?.dataset?.price || card.querySelector('.p-price')?.textContent?.trim() || '',
-            qty:   1
-          };
+  add.addEventListener('click', () => {
+    // Variante seleccionada o primera
+    const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
+    const selected = variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
+
+    const item = {
+      id:    card.dataset.id || '',
+      brand: card.dataset.brand || '',
+      name:  card.dataset.name  || '',
+      size:  selected?.dataset?.size || selected?.textContent?.trim() || '',
+      price: selected?.dataset?.price || card.querySelector('.p-price')?.textContent?.trim() || '',
+      qty:   1
+    };
+    item.key = item.id + '|' + (item.size || '');
+
+    const cart = getCart();
+    const found = cart.find(it => it.key === item.key);
+    if (found) found.qty += 1; else cart.push(item);
+    setCart(cart);
+    renderCart();
+
+    // FEEDBACK: cambia a verde "Agregado ✓" y anima el botón del carrito
+    const original = add.textContent;
+    add.disabled = true;
+
+    // quitar estilos rosa
+    add.classList.remove('border-rose-300','text-rose-700','bg-rose-50','hover:bg-rose-600','hover:text-white');
+    // poner estilos verde
+    add.classList.add('bg-emerald-600','text-white','border','border-emerald-600','ring-2','ring-emerald-300');
+    add.textContent = 'Agregado ✓';
+
+    // rebote del botón 🛒 (Tailwind: animate-bounce)
+    const cartBtn = document.getElementById('cartBtn');
+    cartBtn?.classList.add('animate-bounce');
+
+    setTimeout(() => {
+      add.disabled = false;
+      add.textContent = original;
+      add.classList.remove('bg-emerald-600','text-white','border-emerald-600','ring-2','ring-emerald-300');
+      add.classList.add('border-rose-300','text-rose-700','bg-rose-50','hover:bg-rose-600','hover:text-white');
+      cartBtn?.classList.remove('animate-bounce');
+    }, 1200);
+
+    // Si prefieres abrir el carrito automáticamente, descomenta:
+    // openCart();
+  });
+}
+
           item.key = item.id + '|' + (item.size || '');
 
           // Insertar en carrito (sumar si ya existe key)
