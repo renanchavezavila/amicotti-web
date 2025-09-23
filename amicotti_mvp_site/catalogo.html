@@ -2175,6 +2175,68 @@ Observaciones:`;
 })();
 </script>
 <!-- =============== /CARRITO AMICOTTI =============== -->
+<script>
+// HOTFIX: asegurar que "Agregar" exista y sume al carrito
+(() => {
+  const STORAGE_KEY = 'amicotti_cart';
+  const getCart = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const setCart = (c) => localStorage.setItem(STORAGE_KEY, JSON.stringify(c));
+  const badge = document.getElementById('cartBadge');
+  const updateBadge = () => { if (badge) badge.textContent = getCart().reduce((s,i)=> s + (i.qty||0), 0); };
+
+  // 1) Si alguna tarjeta no tiene "Agregar", lo creamos
+  document.querySelectorAll('article.card[data-id]').forEach(card => {
+    if (!card.querySelector('.add-to-cart')) {
+      const buy = card.querySelector('.buy, .buy-btn, a[href*="wa.me"], button.buy');
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'add-to-cart btn btn-outline';
+      add.textContent = 'Agregar';
+      (buy?.parentElement || card).insertBefore(add, buy || null);
+    }
+  });
+
+  // 2) Delegación de eventos: cualquier click en ".add-to-cart"
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.add-to-cart');
+    if (!btn) return;
+
+    const card = btn.closest('article.card[data-id]');
+    if (!card) return;
+
+    const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
+    const sel = variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
+
+    const item = {
+      id:    card.dataset.id || '',
+      brand: card.dataset.brand || '',
+      name:  card.dataset.name || card.querySelector('h3')?.textContent?.trim() || '',
+      size:  sel?.dataset?.size || sel?.textContent?.trim() || '',
+      price: sel?.dataset?.price || card.querySelector('.p-price')?.textContent?.trim() || '',
+      qty:   1
+    };
+    item.key = item.id + '|' + (item.size || '');
+
+    const cart = getCart();
+    const found = cart.find(i => i.key === item.key);
+    if (found) found.qty += 1; else cart.push(item);
+    setCart(cart);
+    updateBadge();
+
+    // feedback visual
+    const prev = btn.textContent;
+    btn.textContent = 'Agregado ✓';
+    btn.classList.remove('btn-outline'); btn.classList.add('btn-primary');
+    setTimeout(() => {
+      btn.textContent = prev;
+      btn.classList.remove('btn-primary'); btn.classList.add('btn-outline');
+    }, 900);
+  });
+
+  // inicializa badge por si ya hay items guardados
+  updateBadge();
+})();
+</script>
 
 
 </body>
