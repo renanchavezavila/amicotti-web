@@ -2018,10 +2018,12 @@ Observaciones:`;
   apply($q.value);
 })();
 </script>
- <!-- =============== CARRITO AMICOTTI (bloque único) =============== -->
+ <!-- =============== CARRITO AMICOTTI (único bloque) =============== -->
 <style>
-  #cartFab{position:fixed;right:1rem;bottom:1rem;z-index:50;display:inline-flex;align-items:center;gap:.5rem;background:#f43f5e;color:#fff;border-radius:9999px;box-shadow:0 10px 20px rgba(244,63,94,.25);padding:.6rem .9rem;cursor:pointer;user-select:none}
+  /* Botón flotante */
+  #cartFab{position:fixed;right:1rem;bottom:1rem;z-index:50;display:inline-flex;align-items:center;gap:.5rem;background:#f43f5e;color:#fff;border-radius:9999px;box-shadow:0 10px 20px rgba(244,63,94,.25);padding:.6rem .9rem;cursor:pointer}
   #cartFab .badge{background:#fff;color:#f43f5e;min-width:1.5rem;text-align:center;border-radius:9999px;font-weight:700;padding:.1rem .4rem}
+  /* Modal */
   #cartModal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;z-index:60}
   #cartPanel{position:absolute;right:0;top:0;height:100%;width:min(92vw,420px);background:#fff;box-shadow:-10px 0 30px rgba(0,0,0,.2);display:flex;flex-direction:column}
   .cart-header,.cart-footer{padding:1rem;border-bottom:1px solid #e5e7eb}
@@ -2039,10 +2041,10 @@ Observaciones:`;
   @keyframes bounce{0%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}60%{transform:translateY(-2px)}}
 </style>
 
-<div id="cartFab" aria-label="Abrir carrito">
-  <span>🛒</span><span class="badge" id="cartBadge">0</span>
-</div>
+<!-- FAB -->
+<div id="cartFab" aria-label="Abrir carrito">🛒 <span class="badge" id="cartBadge">0</span></div>
 
+<!-- MODAL -->
 <div id="cartModal" aria-hidden="true">
   <aside id="cartPanel">
     <div class="cart-header" style="display:flex;justify-content:space-between;align-items:center">
@@ -2055,8 +2057,8 @@ Observaciones:`;
         <span>Total</span><span id="cartTotal">$0.00</span>
       </div>
       <div style="display:flex;gap:.5rem;flex-wrap:wrap">
-        <button id="cartClear" class="btn btn-muted" title="Vaciar carrito">Vaciar</button>
-        <button id="cartCheckout" class="btn btn-primary" title="Enviar por WhatsApp">Finalizar por WhatsApp</button>
+        <button id="cartClear" class="btn btn-muted" title="Vaciar">Vaciar</button>
+        <button id="cartCheckout" class="btn btn-primary" title="WhatsApp">Finalizar por WhatsApp</button>
       </div>
     </div>
   </aside>
@@ -2064,59 +2066,86 @@ Observaciones:`;
 
 <script>
 (() => {
-  const STORAGE_KEY='amicotti_cart';
-  const PHONE=(typeof WA_PHONE!=='undefined' && WA_PHONE) ? WA_PHONE : '593995315716';
+  // ====== Config ======
+  const PHONE = (typeof window.WA_PHONE !== 'undefined' && window.WA_PHONE) ? window.WA_PHONE : '593995315716';
+  const STORAGE_KEY = 'amicotti_cart';
 
-  const getCart=()=>JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
-  const setCart=c=>localStorage.setItem(STORAGE_KEY,JSON.stringify(c));
-  const parseMoney=s=>{if(!s)return 0;const n=String(s).replace(/[^0-9.,-]/g,'').replace(',','.');return parseFloat(n)||0};
-  const fmt=n=>'$'+(Math.round(n*100)/100).toFixed(2);
+  // ====== Storage helpers ======
+  const getCart = () => JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const setCart = (c) => localStorage.setItem(STORAGE_KEY, JSON.stringify(c));
 
-  const fab=document.getElementById('cartFab');
-  const badge=document.getElementById('cartBadge');
-  const modal=document.getElementById('cartModal');
-  const closeBtn=document.getElementById('cartClose');
-  const itemsBox=document.getElementById('cartItems');
-  const totalEl=document.getElementById('cartTotal');
-  const clearBtn=document.getElementById('cartClear');
-  const checkout=document.getElementById('cartCheckout');
+  const parseMoney = s => Number(String(s||'').replace(/[^0-9.,-]/g,'').replace(',','.')) || 0;
+  const fmt = n => '$' + (Math.round((n||0) * 100) / 100).toFixed(2);
 
-  const openCart=()=>{modal.style.display='block'};
-  const closeCart=()=>{modal.style.display='none'};
-  const updateBadge=()=>{const qty=getCart().reduce((a,b)=>a+(b.qty||0),0); badge.textContent=qty};
+  // ====== UI refs ======
+  const fab       = document.getElementById('cartFab');
+  const badge     = document.getElementById('cartBadge');
+  const modal     = document.getElementById('cartModal');
+  const closeBtn  = document.getElementById('cartClose');
+  const itemsBox  = document.getElementById('cartItems');
+  const totalEl   = document.getElementById('cartTotal');
+  const clearBtn  = document.getElementById('cartClear');
+  const checkout  = document.getElementById('cartCheckout');
 
-  const renderCart=()=>{
-    const cart=getCart(); itemsBox.innerHTML=''; let total=0;
-    if(!cart.length){ itemsBox.innerHTML='<p style="color:#64748b">Tu carrito está vacío.</p>'; totalEl.textContent='$0.00'; updateBadge(); return; }
-    cart.forEach((it,idx)=>{
-      const line=parseMoney(it.price)*(it.qty||1); total+=line;
-      const row=document.createElement('div'); row.className='cart-item';
-      row.innerHTML=`
-        <div><div><strong>${it.brand||''} ${it.name||''}</strong></div>
-        <small>${it.size||''} · ${it.price||''}</small></div>
+  const openCart  = () => { modal.style.display = 'block'; };
+  const closeCart = () => { modal.style.display = 'none';  };
+
+  // ====== Render & badge ======
+  const updateBadge = () => badge.textContent = getCart().reduce((a,b)=>a+(b.qty||0),0);
+
+  const renderCart = () => {
+    const cart = getCart();
+    itemsBox.innerHTML = '';
+    let total = 0;
+
+    if (!cart.length) {
+      itemsBox.innerHTML = '<p style="color:#64748b">Tu carrito está vacío.</p>';
+      totalEl.textContent = '$0.00';
+      updateBadge();
+      return;
+    }
+
+    cart.forEach((it, idx) => {
+      const line = parseMoney(it.price) * (it.qty||1);
+      total += line;
+
+      const row = document.createElement('div');
+      row.className = 'cart-item';
+      row.innerHTML = `
+        <div>
+          <div><strong>${it.brand||''} ${it.name||''}</strong></div>
+          <small>${it.size||''} · ${it.price||''}</small>
+        </div>
         <div style="text-align:right">
           <div>${fmt(line)}</div>
           <div class="qty">
-            <button aria-label="Quitar">−</button><span>${it.qty||1}</span>
+            <button aria-label="Quitar">−</button>
+            <span>${it.qty||1}</span>
             <button aria-label="Sumar">+</button>
             <button aria-label="Eliminar" title="Eliminar" style="margin-left:.4rem">🗑️</button>
           </div>
         </div>`;
-      const [minus,,plus,del]=row.querySelectorAll('.qty button');
-      minus.onclick=()=>{const c=getCart(); c[idx].qty=Math.max(1,(c[idx].qty||1)-1); setCart(c); renderCart();};
-      plus.onclick =()=>{const c=getCart(); c[idx].qty=(c[idx].qty||1)+1; setCart(c); renderCart();};
-      del.onclick  =()=>{const c=getCart(); c.splice(idx,1); setCart(c); renderCart();};
+
+      const [minus,,plus,del] = row.querySelectorAll('.qty button');
+      minus.onclick = () => { const c = getCart(); c[idx].qty = Math.max(1,(c[idx].qty||1)-1); setCart(c); renderCart(); };
+      plus.onclick  = () => { const c = getCart(); c[idx].qty = (c[idx].qty||1)+1; setCart(c); renderCart(); };
+      del.onclick   = () => { const c = getCart(); c.splice(idx,1); setCart(c); renderCart(); };
+
       itemsBox.appendChild(row);
     });
-    totalEl.textContent=fmt(total); updateBadge();
+
+    totalEl.textContent = fmt(total);
+    updateBadge();
   };
 
-  const clearCart=()=>{ setCart([]); };
-  const checkoutWA=()=>{
-    const cart=getCart(); if(!cart.length){openCart(); return;}
-    const lines=cart.map(i=>`• ${i.brand||''} ${i.name||''} ${i.size||''} x${i.qty||1} (${i.price||''})`).join('\n');
-    const total=fmt(cart.reduce((a,b)=>a+parseMoney(b.price)*(b.qty||1),0));
-    const msg=`Hola Amicotti 👋
+  // ====== Checkout WA ======
+  const checkoutWA = () => {
+    const cart = getCart();
+    if (!cart.length) { openCart(); return; }
+
+    const lines = cart.map(i => `• ${i.brand||''} ${i.name||''} ${i.size||''}  x${i.qty||1}  (${i.price||''})`).join('\n');
+    const total = fmt(cart.reduce((a,b)=>a + parseMoney(b.price)*(b.qty||1),0));
+    const msg = `Hola Amicotti 👋
 Quiero confirmar mi pedido:
 
 ${lines}
@@ -2128,66 +2157,104 @@ Dirección:
 Nombre y teléfono:
 Pago: [Transferencia/Efectivo]
 Observaciones:`;
-    const url='https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg);
-    window.open(url,'_blank','noopener');
+    window.open('https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg),'_blank','noopener');
   };
 
-  // Añade botón “Agregar” en cada tarjeta
-  const ENH='__amicotti_enhanced__';
-  function enhanceCards(){
-    document.querySelectorAll('article.card[data-id]').forEach(card=>{
-      if(card[ENH]) return; card[ENH]=true;
+  // ====== Inyección de “Agregar” en tarjetas ======
+  const ENHANCED = '__amicotti_enhanced__';
+  function enhanceCards() {
+    document.querySelectorAll('article.card[data-id]').forEach(card => {
+      if (card[ENHANCED]) return;
+      card[ENHANCED] = true;
 
-      let actions=card.querySelector('.actions');
-      if(!actions){
-        actions=document.createElement('div');
-        actions.className='actions mt-3 flex gap-2';
-        const anchor=card.querySelector('.p-price')?.closest('div')||card.querySelector('.variants')||card.querySelector('h3')||card;
-        (anchor.parentNode||card).insertBefore(actions,anchor.nextSibling);
+      // contenedor acciones
+      let actions = card.querySelector('.actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'actions mt-3 flex gap-2';
+        const anchor = card.querySelector('.p-price')?.closest('div') || card.querySelector('.variants') || card.querySelector('h3') || card;
+        (anchor.parentNode || card).insertBefore(actions, anchor.nextSibling);
       }
 
-      let buy=card.querySelector('.buy, .buy-btn, button.buy, .buy button, a[href*="wa.me"]');
-      if(!buy){ buy=document.createElement('a'); buy.className='buy btn btn-primary'; buy.textContent='Comprar'; buy.href='#'; actions.appendChild(buy); }
-      else if(buy.parentElement!==actions){ actions.appendChild(buy); }
+      // localizar/crear "Comprar" (no tocamos su lógica)
+      let buy = card.querySelector('.buy, .buy-btn, button.buy, .buy button, a[href*="wa.me"]');
+      if (!buy) {
+        buy = document.createElement('a');
+        buy.className = 'buy btn btn-primary';
+        buy.textContent = 'Comprar';
+        buy.href = '#';
+        actions.appendChild(buy);
+      } else if (buy.parentElement !== actions) {
+        actions.appendChild(buy);
+      }
 
-      if(!card.querySelector('.add-to-cart')){
-        const add=document.createElement('button');
-        add.type='button'; add.className='add-to-cart btn btn-outline'; add.textContent='Agregar';
-        actions.insertBefore(add,buy);
+      // crear "Agregar" si no existe
+      if (!card.querySelector('.add-to-cart')) {
+        const add = document.createElement('button');
+        add.type = 'button';
+        add.className = 'add-to-cart btn btn-outline';
+        add.textContent = 'Agregar';
+        actions.insertBefore(add, buy);
 
-        add.addEventListener('click',()=>{
-          const variants=Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
-          const selected=variants.find(v=>v.getAttribute('aria-pressed')==='true'||v.classList.contains('active'))||variants[0];
+        add.addEventListener('click', () => {
+          const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
+          const selected = variants.find(v => v.getAttribute('aria-pressed')==='true' || v.classList.contains('active')) || variants[0];
 
-          const item={ id:card.dataset.id||'', brand:card.dataset.brand||'', name:card.dataset.name||card.querySelector('h3')?.textContent?.trim()||'',
-            size:selected?.dataset?.size||selected?.textContent?.trim()||'',
-            price:selected?.dataset?.price||card.querySelector('.p-price')?.textContent?.trim()||'', qty:1 };
-          item.key=item.id+'|'+(item.size||'');
+          const item = {
+            id:    card.dataset.id || '',
+            brand: card.dataset.brand || '',
+            name:  card.dataset.name || card.querySelector('h3')?.textContent?.trim() || '',
+            size:  selected?.dataset?.size || selected?.textContent?.trim() || '',
+            price: selected?.dataset?.price || card.querySelector('.p-price')?.textContent?.trim() || '',
+            qty:   1
+          };
+          item.key = item.id + '|' + (item.size || '');
 
-          const c=getCart(); const found=c.find(i=>i.key===item.key);
-          if(found) found.qty+=1; else c.push(item); setCart(c);
+          const c = getCart();
+          const found = c.find(i => i.key === item.key);
+          if (found) found.qty += 1; else c.push(item);
+          setCart(c);
+          renderCart();
 
-          add.disabled=true; const prev=add.textContent;
-          add.textContent='Agregado ✓'; add.classList.remove('btn-outline'); add.classList.add('btn-primary');
-          fab.classList.add('animate-bounce'); renderCart();
-          setTimeout(()=>{fab.classList.remove('animate-bounce'); add.disabled=false; add.textContent=prev; add.classList.remove('btn-primary'); add.classList.add('btn-outline');},1000);
+          // feedback + rebote FAB
+          const prev = add.textContent;
+          add.disabled = true;
+          add.textContent = 'Agregado ✓';
+          add.classList.remove('btn-outline'); add.classList.add('btn-primary');
+          fab.classList.add('animate-bounce');
+          setTimeout(() => {
+            fab.classList.remove('animate-bounce');
+            add.disabled = false;
+            add.textContent = prev;
+            add.classList.remove('btn-primary'); add.classList.add('btn-outline');
+          }, 900);
         });
       }
     });
   }
 
-  // Eventos base
-  fab.onclick=openCart; closeBtn.onclick=closeCart;
-  clearBtn.onclick=()=>{clearCart(); renderCart();};
-  checkout.onclick=checkoutWA;
-  modal.addEventListener('click',e=>{ if(e.target===modal) closeCart(); });
+  // ====== Eventos base ======
+  fab.onclick      = openCart;
+  closeBtn.onclick = closeCart;
+  clearBtn.onclick = () => { setCart([]); renderCart(); };
+  checkout.onclick = checkoutWA;
+  modal.addEventListener('click', e => { if (e.target === modal) closeCart(); });
 
-  // Init
-  renderCart(); updateBadge(); enhanceCards();
-  new MutationObserver(enhanceCards).observe(document.body,{childList:true,subtree:true});
+  // ====== Boot ======
+  const start = () => { renderCart(); enhanceCards(); updateBadge(); };
+
+  // Esperar a que existan tarjetas + observar cambios (búsqueda/paginación, etc.)
+  const iv = setInterval(() => {
+    if (document.querySelector('article.card[data-id]')) {
+      clearInterval(iv); start();
+      new MutationObserver(() => enhanceCards()).observe(document.body, { childList:true, subtree:true });
+      console.log('[Carrito] botones agregados');
+    }
+  }, 200);
 })();
 </script>
 <!-- =============== /CARRITO AMICOTTI =============== -->
+
 
 </body>
  <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
