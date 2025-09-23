@@ -2093,6 +2093,29 @@ Observaciones:`;
     if (f) f.qty += 1; else c.push(item);
     setCart(c);
     updateBadge(); renderCart();
+   <script>
+// --- EXPOSE: deja disponibles las funciones del carrito para otros scripts ---
+window.getCart = typeof getCart === 'function' ? getCart : () => {
+  try { return JSON.parse(localStorage.getItem('amicotti_cart') || '[]'); } catch { return []; }
+};
+
+// OJO: envolvemos setCart para que SIEMPRE refresque UI
+window.setCart = (cart) => {
+  localStorage.setItem('amicotti_cart', JSON.stringify(cart));
+  if (typeof updateBadge === 'function') updateBadge();
+  if (typeof renderCart === 'function') renderCart();
+};
+
+// También expón por si quieres abrir el panel desde fuera
+if (typeof renderCart === 'function') window.renderCart = renderCart;
+if (typeof updateBadge === 'function') window.updateBadge = updateBadge;
+if (typeof openCart === 'function')    window.openCart = openCart;
+
+// Refresco inicial por si había algo en localStorage
+if (typeof updateBadge === 'function') updateBadge();
+if (typeof renderCart === 'function')  renderCart();
+</script>
+
   }
 
   // Enlaza una sola vez por tarjeta, sin clonar elementos
