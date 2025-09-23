@@ -2020,23 +2020,21 @@ Observaciones:`;
 </script>
 <script>
 (() => {
-  // Evita doble inicialización
-  if (window.__AMICOTTI_CART_PATCH__) return;
-  window.__AMICOTTI_CART_PATCH__ = true;
+  // Evitar dobles
+  if (window.__AMICOTTI_CART_SAFE__) return;
+  window.__AMICOTTI_CART_SAFE__ = true;
 
   const KEY = 'amicotti_cart';
   const $  = s => document.querySelector(s);
-  const $$ = s => Array.from(document.querySelectorAll(s));
-
-  // Referencias UI (ajustan contador y panel si existen)
-  const badge   = $('#cartBadge');
-  const itemsEl = $('#cartItems');
-  const totalEl = $('#cartTotal');
-
   const getCart = () => JSON.parse(localStorage.getItem(KEY) || '[]');
-  const setCart = (c) => { localStorage.setItem(KEY, JSON.stringify(c)); updateBadge(); renderCart(); };
-  const money   = n => '$' + (Number(n||0).toFixed(2));
-  const toNum   = s => Number(String(s||'').replace(/[^0-9.,-]/g,'').replace(',', '.'))||0;
+  const setCart = (c) => localStorage.setItem(KEY, JSON.stringify(c));
+
+  // UI opcional (si existen, se actualizan; si no, no pasa nada)
+  const badge   = document.getElementById('cartBadge');
+  const itemsEl = document.getElementById('cartItems');
+  const totalEl = document.getElementById('cartTotal');
+  const fmt     = n => '$' + (Math.round((+n||0)*100)/100).toFixed(2);
+  const toNum   = s => Number(String(s||'').replace(/[^0-9.,-]/g,'').replace(',', '.')) || 0;
 
   function updateBadge(){
     if (!badge) return;
@@ -2053,17 +2051,16 @@ Observaciones:`;
       return;
     }
     cart.forEach((it, idx) => {
-      const line = (it.qty||1)*toNum(it.price);
+      const line = (it.qty||1) * toNum(it.price);
       total += line;
       const row = document.createElement('div');
       row.className = 'cart-item';
       row.innerHTML = `
-        <div>
-          <div><strong>${it.brand||''} ${it.name||''}</strong></div>
+        <div><strong>${it.brand||''} ${it.name||''}</strong><br>
           <small>${it.size||''} · ${it.price||''}</small>
         </div>
         <div style="text-align:right">
-          <div>${money(line)}</div>
+          <div>${fmt(line)}</div>
           <div class="qty">
             <button class="down">−</button>
             <span>${it.qty||1}</span>
@@ -2071,24 +2068,17 @@ Observaciones:`;
             <button class="del" title="Eliminar">🗑️</button>
           </div>
         </div>`;
-      row.querySelector('.down').onclick = () => qtyChange(idx,-1);
-      row.querySelector('.up').onclick   = () => qtyChange(idx,+1);
-      row.querySelector('.del').onclick  = () => remove(idx);
+      row.querySelector('.down').onclick = () => { const c=getCart(); c[idx].qty=Math.max(1,(c[idx].qty||1)-1); setCart(c); renderCart(); updateBadge(); };
+      row.querySelector('.up').onclick   = () => { const c=getCart(); c[idx].qty=(c[idx].qty||1)+1; setCart(c); renderCart(); updateBadge(); };
+      row.querySelector('.del').onclick  = () => { const c=getCart(); c.splice(idx,1); setCart(c); renderCart(); updateBadge(); };
       itemsEl.appendChild(row);
     });
-    totalEl.textContent = money(total);
-  }
-  function qtyChange(i,d){
-    const c = getCart(); if (!c[i]) return;
-    c[i].qty = Math.max(1,(c[i].qty||1)+d); setCart(c);
-  }
-  function remove(i){
-    const c = getCart(); c.splice(i,1); setCart(c);
+    totalEl.textContent = fmt(total);
   }
 
   function addFromCard(card){
     const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
-    const sel = variants.find(v=>v.getAttribute('aria-pressed')==='true'||v.classList.contains('active')) || variants[0];
+    const sel = variants.find(v => v.getAttribute('aria-pressed')==='true' || v.classList.contains('active')) || variants[0];
     const item = {
       id:    card.dataset.id || '',
       brand: card.dataset.brand || '',
@@ -2099,56 +2089,59 @@ Observaciones:`;
     };
     item.key = item.id + '|' + (item.size || '');
     const c = getCart();
-    const f = c.find(x=>x.key===item.key);
+    const f = c.find(x => x.key === item.key);
     if (f) f.qty += 1; else c.push(item);
     setCart(c);
+    updateBadge(); renderCart();
   }
 
-  // Limpia listeners viejos clonando botones y luego liga UNO propio
-  function wireButtons(){
-    // estandariza y limpia listeners previos
-    $$('.add-to-cart, .btn-add-to-cart').forEach(btn=>{
-      const clone = btn.cloneNode(true);           // sin listeners
-      clone.classList.add('add-to-cart');
-      btn.replaceWith(clone);
-    });
+  // Enlaza una sola vez por tarjeta, sin clonar elementos
+  function bindCard(card){
+    if (!card || card.dataset.cartBound === '1') return;
+    card.dataset.cartBound = '1';
 
-    // crea si falta
-    $$('article.card[data-id]').forEach(card=>{
-      if (!card.querySelector('.add-to-cart')){
-        const buy = card.querySelector('.buy, .buy-btn, a[href*="wa.me"], button.buy');
-        const add = document.createElement('button');
-        add.type='button'; add.textContent='Agregar';
-        add.className='add-to-cart btn btn-outline';
-        (buy?.parentElement || card).insertBefore(add, buy || null);
-      }
-    });
-
-    // enlaza click único
-    $$('.add-to-cart').forEach(btn=>{
-      if (btn.dataset.bound==='1') return;
-      btn.dataset.bound='1';
-      btn.addEventListener('click', e=>{
+    // crea "Agregar" si falta
+    let add = card.querySelector('.add-to-cart');
+    if (!add){
+      const buy = card.querySelector('.buy, .buy-btn, a[href*="wa.me"], button.buy');
+      add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'add-to-cart btn btn-outline';
+      add.textContent = 'Agregar';
+      (buy?.parentElement || card).insertBefore(add, buy || null);
+    }
+    if (!add.dataset.bound){
+      add.dataset.bound = '1';
+      add.addEventListener('click', e => {
         e.preventDefault();
-        const card = btn.closest('article.card[data-id]'); if (!card) return;
         addFromCard(card);
-        const prev = btn.textContent;
-        btn.textContent = 'Agregado ✓';
-        btn.classList.remove('btn-outline'); btn.classList.add('btn-primary');
-        setTimeout(()=>{ btn.textContent = prev; btn.classList.add('btn-outline'); btn.classList.remove('btn-primary'); }, 900);
+        // feedback
+        const prev = add.textContent;
+        add.textContent = 'Agregado ✓';
+        add.classList.remove('btn-outline'); add.classList.add('btn-primary');
+        setTimeout(() => { add.textContent = prev; add.classList.add('btn-outline'); add.classList.remove('btn-primary'); }, 800);
       });
-    });
+    }
   }
 
-  // Init
-  wireButtons();
-  updateBadge();
-  renderCart();
+  // Escaneo inicial
+  document.querySelectorAll('article.card[data-id]').forEach(bindCard);
+  updateBadge(); renderCart();
 
-  // Reaplica si el DOM cambia
-  new MutationObserver(wireButtons).observe(document.body,{childList:true,subtree:true});
+  // Observa SOLO nodos añadidos y liga bindCard a esos nodos
+  const ob = new MutationObserver(muts => {
+    for (const m of muts){
+      for (const n of m.addedNodes){
+        if (!(n instanceof Element)) continue;
+        if (n.matches?.('article.card[data-id]')) bindCard(n);
+        n.querySelectorAll?.('article.card[data-id]').forEach(bindCard);
+      }
+    }
+  });
+  ob.observe(document.body, { childList:true, subtree:true });
 })();
 </script>
+
 
 
 </body>
