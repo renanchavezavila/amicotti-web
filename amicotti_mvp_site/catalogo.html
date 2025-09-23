@@ -2162,75 +2162,94 @@ Observaciones:`;
     const url = 'https://wa.me/' + PHONE + '?text=' + encodeURIComponent(msg);
     window.open(url, '_blank', 'noopener');
   }
+<script>
+function enhanceCards() {
+  document.querySelectorAll('article.card[data-id]').forEach(card => {
+    // 1) Contenedor de acciones (si no existe, lo creamos)
+    let actions = card.querySelector('.actions');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'actions mt-3 flex gap-2';
+      // lo insertamos justo después del bloque de precio/variantes si existe
+      const after = card.querySelector('.p-price')?.closest('div') || card.querySelector('.variants') || card;
+      after.parentNode.insertBefore(actions, after.nextSibling);
+    }
 
-  // Agrega botón "Agregar" a cada tarjeta del catálogo
-  function enhanceCards() {
-    document.querySelectorAll('article.card[data-id]').forEach(card => {
-      const buyBtn = card.querySelector('.buy, .buy-btn, button.buy, .buy button');
-      if (!buyBtn) return;
+    // 2) Localizar o crear "Comprar"
+    let buyBtn = card.querySelector('.buy, .buy-btn, button.buy, .buy button, a[href*="wa.me"]');
+    if (!buyBtn) {
+      // creamos un "Comprar" básico si no existe
+      buyBtn = document.createElement('a');
+      buyBtn.className = 'buy px-4 py-2 rounded-xl bg-rose-600 text-white';
+      buyBtn.textContent = 'Comprar';
+      actions.appendChild(buyBtn);
+    } else if (buyBtn.parentElement !== actions) {
+      // lo movemos dentro de .actions para que quede junto a "Agregar"
+      actions.appendChild(buyBtn);
+    }
 
-      // crear botón Agregar (si no existe)
-      // === BLOQUE NUEVO: botón "Agregar" con color y feedback ===
-if (!card.querySelector('.add-to-cart')) {
-  const add = document.createElement('button');
-  // estilos con color (rosa por defecto)
-  add.className =
-    'add-to-cart px-4 py-2 rounded-xl text-sm font-medium ' +
-    'border border-rose-300 text-rose-700 bg-rose-50 ' +
-    'hover:bg-rose-600 hover:text-white transition';
-  add.textContent = 'Agregar';
+    // 3) Crear "Agregar" si no existe
+    if (!card.querySelector('.add-to-cart')) {
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.className =
+        'add-to-cart px-4 py-2 rounded-xl text-sm font-medium ' +
+        'border border-rose-300 text-rose-700 bg-rose-50 ' +
+        'hover:bg-rose-600 hover:text-white transition';
+      add.textContent = 'Agregar';
 
-  // insertarlo antes del botón "Comprar"
-  buyBtn?.parentNode?.insertBefore(add, buyBtn);
+      // lo insertamos antes de "Comprar"
+      actions.insertBefore(add, buyBtn);
 
-  add.addEventListener('click', () => {
-    // Variante seleccionada o primera
-    const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
-    const selected = variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
+      add.addEventListener('click', () => {
+        // variante seleccionada (o la primera)
+        const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
+        const selected = variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
 
-    const item = {
-      id:    card.dataset.id || '',
-      brand: card.dataset.brand || '',
-      name:  card.dataset.name  || '',
-      size:  selected?.dataset?.size || selected?.textContent?.trim() || '',
-      price: selected?.dataset?.price || card.querySelector('.p-price')?.textContent?.trim() || '',
-      qty:   1
-    };
-    item.key = item.id + '|' + (item.size || '');
+        const item = {
+          id:    card.dataset.id || '',
+          brand: card.dataset.brand || '',
+          name:  card.dataset.name  || card.querySelector('h3')?.textContent?.trim() || '',
+          size:  selected?.dataset?.size || selected?.textContent?.trim() || '',
+          price: selected?.dataset?.price || card.querySelector('.p-price')?.textContent?.trim() || '',
+          qty:   1
+        };
+        item.key = item.id + '|' + (item.size || '');
 
-    const cart = getCart();
-    const found = cart.find(it => it.key === item.key);
-    if (found) found.qty += 1; else cart.push(item);
-    setCart(cart);
-    renderCart();
+        // carrito (usa las funciones globales si existen)
+        const cart = (window.getCart ? getCart() : []);
+        if (cart) {
+          const found = cart.find(i => i.key === item.key);
+          if (found) found.qty += 1; else cart.push(item);
+          window.setCart && setCart(cart);
+          window.renderCart && renderCart();
+        }
 
-    // FEEDBACK: cambia a verde "Agregado ✓" y anima el botón del carrito
-    const original = add.textContent;
-    add.disabled = true;
+        // feedback visual: rosa → verde "Agregado ✓" + rebote del 🛒
+        const original = add.textContent;
+        add.disabled = true;
 
-    // quitar estilos rosa
-    add.classList.remove('border-rose-300','text-rose-700','bg-rose-50','hover:bg-rose-600','hover:text-white');
-    // poner estilos verde
-    add.classList.add('bg-emerald-600','text-white','border','border-emerald-600','ring-2','ring-emerald-300');
-    add.textContent = 'Agregado ✓';
+        add.classList.remove('border-rose-300','text-rose-700','bg-rose-50','hover:bg-rose-600','hover:text-white');
+        add.classList.add('bg-emerald-600','text-white','border','border-emerald-600','ring-2','ring-emerald-300');
+        add.textContent = 'Agregado ✓';
 
-    // rebote del botón 🛒 (Tailwind: animate-bounce)
-    const cartBtn = document.getElementById('cartBtn');
-    cartBtn?.classList.add('animate-bounce');
+        const cartBtn = document.getElementById('cartBtn');
+        cartBtn?.classList.add('animate-bounce');
 
-    setTimeout(() => {
-      add.disabled = false;
-      add.textContent = original;
-      add.classList.remove('bg-emerald-600','text-white','border-emerald-600','ring-2','ring-emerald-300');
-      add.classList.add('border-rose-300','text-rose-700','bg-rose-50','hover:bg-rose-600','hover:text-white');
-      cartBtn?.classList.remove('animate-bounce');
-    }, 1200);
-
-    // Si prefieres abrir el carrito automáticamente, descomenta:
-    // openCart();
+        setTimeout(() => {
+          add.disabled = false;
+          add.textContent = original;
+          add.classList.remove('bg-emerald-600','text-white','border-emerald-600','ring-2','ring-emerald-300');
+          add.classList.add('border-rose-300','text-rose-700','bg-rose-50','hover:bg-rose-600','hover:text-white');
+          cartBtn?.classList.remove('animate-bounce');
+        }, 1200);
+      });
+    }
   });
 }
+</script>
 
+ 
           item.key = item.id + '|' + (item.size || '');
 
           // Insertar en carrito (sumar si ya existe key)
