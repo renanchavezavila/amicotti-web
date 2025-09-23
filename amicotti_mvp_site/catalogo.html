@@ -2278,6 +2278,107 @@ function enhanceCards() {
   renderCart();
 })();
 </script>
+<script>
+(function () {
+  const onceKey = '__cart_enhanced__';
+
+  function enhance() {
+    document.querySelectorAll('article.card[data-id]').forEach(card => {
+      if (card[onceKey]) return;
+      card[onceKey] = true;
+
+      // 1) Contenedor de acciones
+      let actions = card.querySelector('.actions');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'actions mt-3 flex gap-2';
+
+        // lo insertamos tras precio/variantes si existen
+        const anchor =
+          card.querySelector('.p-price')?.closest('div') ||
+          card.querySelector('.variants') ||
+          card.querySelector('h3') ||
+          card;
+
+        (anchor.parentNode || card).insertBefore(actions, anchor.nextSibling);
+      }
+
+      // 2) Localizar/crear "Comprar"
+      let buy = card.querySelector('.buy, .buy-btn, button.buy, .buy button, a[href*="wa.me"]');
+      if (!buy) {
+        buy = document.createElement('a');
+        buy.className = 'buy px-4 py-2 rounded-xl bg-rose-600 text-white';
+        buy.textContent = 'Comprar';
+        buy.href = '#';
+        actions.appendChild(buy);
+      } else if (buy.parentElement !== actions) {
+        actions.appendChild(buy);
+      }
+
+      // 3) Crear "Agregar"
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.className =
+        'add-to-cart px-4 py-2 rounded-xl border border-rose-300 text-rose-700 ' +
+        'bg-rose-50 hover:bg-rose-600 hover:text-white transition';
+      add.textContent = 'Agregar';
+      actions.insertBefore(add, buy);
+
+      // 4) Lógica de agregar (usa helpers si están, si no localStorage)
+      add.addEventListener('click', () => {
+        const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
+        const selected =
+          variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) ||
+          variants[0];
+
+        const item = {
+          id:    card.dataset.id || '',
+          brand: card.dataset.brand || '',
+          name:  card.dataset.name || card.querySelector('h3')?.textContent?.trim() || '',
+          size:  selected?.dataset?.size || selected?.textContent?.trim() || '',
+          price: selected?.dataset?.price || card.querySelector('.p-price')?.textContent?.trim() || '',
+          qty:   1
+        };
+        item.key = item.id + '|' + (item.size || '');
+
+        const get = window.getCart || (() => JSON.parse(localStorage.getItem('amicotti_cart') || '[]'));
+        const set = window.setCart || (c => localStorage.setItem('amicotti_cart', JSON.stringify(c)));
+
+        const cart = get();
+        const found = cart.find(i => i.key === item.key);
+        if (found) found.qty += 1; else cart.push(item);
+        set(cart);
+        window.renderCart && renderCart();
+
+        // feedback verde
+        const original = add.textContent;
+        add.disabled = true;
+        add.classList.remove('border-rose-300','text-rose-700','bg-rose-50','hover:bg-rose-600','hover:text-white');
+        add.classList.add('bg-emerald-600','text-white','border','border-emerald-600');
+        add.textContent = 'Agregado ✓';
+        setTimeout(() => {
+          add.disabled = false;
+          add.textContent = original;
+          add.classList.remove('bg-emerald-600','text-white','border-emerald-600');
+          add.classList.add('border-rose-300','text-rose-700','bg-rose-50','hover:bg-rose-600','hover:text-white');
+        }, 1000);
+      });
+    });
+  }
+
+  // Espera a que haya tarjetas y engancha un observer para futuros cambios
+  const iv = setInterval(() => {
+    const cards = document.querySelectorAll('article.card[data-id]');
+    if (cards.length) {
+      enhance();
+      const ob = new MutationObserver(enhance);
+      ob.observe(document.body, { childList: true, subtree: true });
+      clearInterval(iv);
+      console.log('[Carrito] botones agregados');
+    }
+  }, 300);
+})();
+</script>
 
 </body>
  <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
