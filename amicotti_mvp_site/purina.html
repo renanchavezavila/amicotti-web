@@ -2009,29 +2009,26 @@ Observaciones:`;
 
  <!-- Carga de datos Purina -->
 <script src="./assets/data/products-purina.js"></script>
+
 <script>
 /* Render básico de tarjetas desde PRODUCTS (Purina) */
 (function(){
   const grid = document.getElementById('grid');
   if(!grid || !window.PRODUCTS){ return; }
   grid.innerHTML = '';
-
   const money = n => `$${(Math.round(Number(n||0)*100)/100).toFixed(2)}`;
-
   for(const p of PRODUCTS){
     const min = p.variants?.length ? Math.min(...p.variants.map(v=>Number(v.price)||0)) : 0;
     const variantsHTML = (p.variants||[]).map(v => `
       <button class="btn-outline" data-size="${v.label}" data-price="${money(v.price)}">
         ${v.label} — ${money(v.price)}
       </button>`).join('');
-
     const art = document.createElement('article');
     art.className = 'card group bg-white border rounded-2xl p-4 shadow-soft';
     art.setAttribute('data-id', (p.id||`${p.brand}-${p.name}`).toLowerCase().replace(/[^a-z0-9]+/g,'-'));
     art.setAttribute('data-name', p.name||'');
     art.setAttribute('data-brand', p.brand||'');
     art.setAttribute('data-animal', p.species||'');
-
     art.innerHTML = `
       <img src="${p.image||''}" alt="${p.name||''}" class="rounded-xl w-full h-56 object-contain bg-slate-100">
       <div class="mt-4 space-y-1">
@@ -2048,254 +2045,6 @@ Observaciones:`;
   }
 })();
 </script>
- 
- 
-<!-- ===================== CARRITO AMICOTTI (bloque único) ===================== -->
-<style>
-  /* Botón flotante carrito */
-  #cartFab{
-    position:fixed; right:1rem; bottom:1rem; z-index:50;
-    display:inline-flex; align-items:center; gap:.5rem;
-    background:#f43f5e; color:#fff; border-radius:9999px;
-    box-shadow:0 10px 20px rgba(244,63,94,.25);
-    padding:.6rem .9rem; cursor:pointer; user-select:none;
-  }
-  #cartFab .badge{
-    background:#fff; color:#f43f5e; min-width:1.5rem; text-align:center;
-    border-radius:9999px; font-weight:700; padding:.1rem .4rem;
-  }
-
-  /* Panel/modal */
-  #cartModal{ position:fixed; inset:0; background:rgba(15,23,42,.55); display:none; z-index:60 }
-  #cartPanel{
-    position:absolute; right:0; top:0; height:100%; width:min(92vw,420px);
-    background:#fff; box-shadow:-10px 0 30px rgba(0,0,0,.2); display:flex; flex-direction:column;
-  }
-  .cart-header,.cart-footer{ padding:1rem; border-bottom:1px solid #e5e7eb }
-  .cart-footer{ border-top:1px solid #e5e7eb; margin-top:auto }
-  .cart-items{ overflow:auto; padding:1rem; display:flex; flex-direction:column; gap:.75rem }
-  .cart-item{
-    display:grid; grid-template-columns:1fr auto; gap:.25rem;
-    padding:.6rem .75rem; border:1px solid #e5e7eb; border-radius:.75rem; background:#fff;
-  }
-  .cart-item small{ color:#6b7280 }
-  .qty{ display:inline-flex; align-items:center; gap:.25rem; margin-left:.5rem }
-  .qty button{ width:1.6rem; height:1.6rem; border-radius:.4rem; border:1px solid #e5e7eb; background:#f8fafc }
-
-  /* Botones */
-  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:.35rem;
-        border-radius:.75rem; padding:.6rem .9rem; font-weight:600; border:1px solid transparent }
-  .btn-primary{ background:#f43f5e; color:#fff }
-  .btn-outline{ background:#fff; color:#f43f5e; border-color:#fecdd3 }
-  .btn-muted{ background:#f8fafc; color:#0f172a; border-color:#e5e7eb }
-</style>
-
-<!-- FAB del carrito -->
-<div id="cartFab" aria-label="Abrir carrito">
-  🛒 <span id="cartBadge" class="badge">0</span>
-</div>
-
-<!-- Modal del carrito -->
-<div id="cartModal" aria-hidden="true">
-  <aside id="cartPanel">
-    <div class="cart-header" style="display:flex;justify-content:space-between;align-items:center">
-      <strong>Tu carrito</strong>
-      <button id="cartClose" class="btn btn-muted">Cerrar</button>
-    </div>
-
-    <div id="cartItems" class="cart-items"></div>
-
-    <div class="cart-footer" style="display:grid; gap:.5rem">
-      <div style="display:flex;justify-content:space-between;font-weight:700">
-        <span>Total</span><span id="cartTotal">$0.00</span>
-      </div>
-      <div style="display:flex; gap:.5rem; flex-wrap:wrap">
-        <button id="cartClear" class="btn btn-muted" title="Vaciar carrito">Vaciar</button>
-        <button id="cartCheckout" class="btn btn-primary" title="Enviar por WhatsApp">Finalizar por WhatsApp</button>
-      </div>
-    </div>
-  </aside>
-</div>
-
-<script>
-(() => {
-  // ========= Config =========
-  const KEY   = 'amicotti_cart';
-  const PHONE = (typeof WA_PHONE !== 'undefined' && WA_PHONE) ? String(WA_PHONE) : '593995315716';
-
-  // ========= Utils =========
-  const $ = (s) => document.querySelector(s);
-  const parseMoney = (s) => Number(String(s||'').replace(/[^0-9.,-]/g,'').replace(',', '.')) || 0;
-  const money = (n) => '$' + (Math.round((+n||0) * 100) / 100).toFixed(2);
-
-  // ========= Estado / API global =========
-  const AMICART = (window.AMICART = window.AMICART || {});
-  AMICART.get = () => { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } };
-  AMICART.set = (cart) => { localStorage.setItem(KEY, JSON.stringify(cart)); AMICART.refresh(); };
-  AMICART.add = (item) => {
-    const cart = AMICART.get();
-    const found = cart.find(i => i.key === item.key);
-    if (found) found.qty += (item.qty || 1);
-    else cart.push({ ...item, qty: item.qty || 1 });
-    AMICART.set(cart);
-  };
-
-  // ========= UI refs =========
-  const fab      = $('#cartFab');
-  const badge    = $('#cartBadge');
-  const modal    = $('#cartModal');
-  const closeBtn = $('#cartClose');
-  const itemsBox = $('#cartItems');
-  const totalEl  = $('#cartTotal');
-  const clearBtn = $('#cartClear');
-  const checkout = $('#cartCheckout');
-
-  // ========= Render / abrir-cerrar =========
-  AMICART.refresh = () => {
-    const cart = AMICART.get();
-    // contador
-    badge.textContent = cart.reduce((s,i)=> s + (i.qty || 0), 0);
-
-    // listado + total
-    if (!itemsBox || !totalEl) return;
-    itemsBox.innerHTML = '';
-    let total = 0;
-
-    if (!cart.length) {
-      itemsBox.innerHTML = '<p class="text-slate-500">Tu carrito está vacío.</p>';
-      totalEl.textContent = '$0.00';
-      return;
-    }
-
-    cart.forEach((it, idx) => {
-      const line = (it.qty || 1) * parseMoney(it.price);
-      total += line;
-
-      const row = document.createElement('div');
-      row.className = 'cart-item';
-      row.innerHTML = `
-        <div>
-          <div><strong>${it.brand || ''} ${it.name || ''}</strong></div>
-          <small>${it.size || ''} · ${it.price || ''}</small>
-        </div>
-        <div style="text-align:right">
-          <div>${money(line)}</div>
-          <div class="qty">
-            <button class="down" aria-label="Quitar">−</button>
-            <span>${it.qty || 1}</span>
-            <button class="up" aria-label="Sumar">+</button>
-            <button class="del" aria-label="Eliminar" title="Eliminar" style="margin-left:.4rem">🗑️</button>
-          </div>
-        </div>
-      `;
-      row.querySelector('.down').onclick = () => { const c = AMICART.get(); c[idx].qty = Math.max(1, (c[idx].qty||1) - 1); AMICART.set(c); };
-      row.querySelector('.up').onclick   = () => { const c = AMICART.get(); c[idx].qty = (c[idx].qty||1) + 1; AMICART.set(c); };
-      row.querySelector('.del').onclick  = () => { const c = AMICART.get(); c.splice(idx, 1); AMICART.set(c); };
-
-      itemsBox.appendChild(row);
-    });
-
-    totalEl.textContent = money(total);
-  };
-
-  AMICART.open  = () => { modal.style.display = 'block'; };
-  AMICART.close = () => { modal.style.display = 'none'; };
-
-  // Eventos base
-  fab.onclick = AMICART.open;
-  closeBtn.onclick = AMICART.close;
-  modal.addEventListener('click', e => { if (e.target === modal) AMICART.close(); });
-  clearBtn.onclick = () => AMICART.set([]);
-  checkout.onclick = () => {
-    const cart = AMICART.get();
-    if (!cart.length) { AMICART.open(); return; }
-    const lines = cart.map(i => `• ${i.brand||''} ${i.name||''} ${i.size||''} x${i.qty||1} (${i.price||''})`).join('\n');
-    const total = money(cart.reduce((s,i)=> s + parseMoney(i.price) * (i.qty||1), 0));
-    const msg = `Hola Amicotti 👋
-Quiero confirmar mi pedido:
-
-${lines}
-
-Total: ${total}
-
-Sector: [Quito/Valles]
-Dirección:
-Nombre y teléfono:
-Pago: [Transferencia/Efectivo]
-Observaciones:`;
-    window.open('https://wa.me/' + PHONE + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
-  };
-
-  // Refrescar al cargar y cuando cambie localStorage (otra pestaña)
-  AMICART.refresh();
-  window.addEventListener('storage', e => { if (e.key === KEY) AMICART.refresh(); });
-
-  // ========= Vincular tarjetas (inyecta "Agregar" si falta) =========
-  const bound = new WeakSet();
-
-  function bindCard(card){
-    if (!card || bound.has(card)) return;
-    bound.add(card);
-
-    // Crea botón "Agregar" si no existe
-    let add = card.querySelector('.add-to-cart');
-    if (!add){
-      const buy = card.querySelector('.buy, .buy-btn, a[href*="wa.me"], button.buy');
-      add = document.createElement('button');
-      add.type = 'button';
-      add.className = 'add-to-cart btn btn-outline';
-      add.textContent = 'Agregar';
-      if (buy && buy.parentElement) buy.parentElement.insertBefore(add, buy);
-      else (card.querySelector('.actions') || card).appendChild(add);
-    }
-
-    add.addEventListener('click', () => {
-      // Detectar variante seleccionada (o primera)
-      const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
-      const sel = variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
-
-      // Construir item del carrito
-      const item = {
-        id:    card.dataset.id    || '',
-        brand: card.dataset.brand || '',
-        name:  card.dataset.name  || (card.querySelector('h3, .title, .name')?.textContent || '').trim(),
-        size:  sel?.dataset?.size || (sel?.textContent || '').trim(),
-        price: sel?.dataset?.price || (card.querySelector('.p-price,[data-price-display]')?.textContent || '').trim()
-      };
-      item.key = item.id + '|' + (item.size || '');
-
-      // Guardar y refrescar UI
-      AMICART.add(item);
-
-      // Feedback visual
-      const prev = add.textContent;
-      add.disabled = true;
-      add.textContent = 'Agregado ✓';
-      add.classList.remove('btn-outline'); add.classList.add('btn-primary');
-      setTimeout(() => {
-        add.disabled = false;
-        add.textContent = prev;
-        add.classList.add('btn-outline'); add.classList.remove('btn-primary');
-      }, 900);
-    });
-  }
-
-  // Enlazado inicial + observar nuevas cards
-  document.querySelectorAll('article.card[data-id]').forEach(bindCard);
-  const mo = new MutationObserver(muts => {
-    muts.forEach(m => m.addedNodes.forEach(n => {
-      if (n.nodeType !== 1) return;
-      if (n.matches?.('article.card[data-id]')) bindCard(n);
-      n.querySelectorAll?.('article.card[data-id]').forEach(bindCard);
-    }));
-  });
-  mo.observe(document.body, { childList:true, subtree:true });
-})();
-</script>
-<!-- ===================== /CARRITO AMICOTTI ===================== -->
-
-
-
 
 </body>
  <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
