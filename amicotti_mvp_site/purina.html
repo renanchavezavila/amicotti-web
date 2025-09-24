@@ -1820,40 +1820,232 @@
 (() => {
   console.log('[Amicotti] local images script running');
 
-  const PLACEHOLDER =
-    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%' height='100%' fill='%23f5f5f5'/><text x='50%' y='50%' font-size='24' font-family='Arial, sans-serif' fill='%23999' text-anchor='middle' dominant-baseline='middle'>Imagen referencial</text></svg>";
+ <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Amicotti — Catálogo Purina</title>
 
-  // Extensiones que vamos a probar en orden
-  const EXT = ['webp','jpg','jpeg','png'];
+  <style>
+    /* Catálogo: imagen sin recortes */
+    article.card img{
+      width:100%;
+      height:260px;
+      object-fit:contain;
+      background:#f8fafc;
+      border-radius:.75rem;
+    }
+    @media (min-width:1024px){ article.card img{ height:300px; } }
 
-  document.querySelectorAll('article.card[data-id]').forEach(card => {
-    const id  = (card.dataset.id || '').trim();     // p.ej. royal-babydog-milk-perro
-    const img = card.querySelector('img');
-    if (!img || !id) return;
+    /* utilidades */
+    .container{ max-width:1100px; margin:0 auto; }
+    .shadow-soft{ box-shadow:0 10px 25px rgba(2,6,23,.06) }
+    .btn{ display:inline-flex; align-items:center; justify-content:center; gap:.35rem;
+          border-radius:.75rem; padding:.6rem .9rem; font-weight:600; border:1px solid transparent }
+    .btn-primary{ background:#f43f5e; color:#fff }
+    .btn-outline{ background:#fff; color:#f43f5e; border-color:#fecdd3 }
+    .btn-muted{ background:#f8fafc; color:#0f172a; border-color:#e5e7eb }
+  </style>
+</head>
 
-    const current = (img.getAttribute('src') || '').trim().toLowerCase();
-    if (current && current !== 'nan' && current !== '#') return;
+<body class="bg-white text-slate-900">
 
-    // Probamos assets/<id>.<ext> hasta que una cargue
-    let i = 0;
-    const tryNext = () => {
-      if (i >= EXT.length) { img.src = PLACEHOLDER; return; }
-      img.onerror = () => { i++; tryNext(); };
-      img.src = `assets/${id}.${EXT[i]}`;
+  <!-- BARRA SUPERIOR -->
+  <div style="background:#0f172a;color:#fff;font-size:.82rem">
+    <div class="container" style="display:flex;justify-content:space-between;padding:.5rem 1rem">
+      <div>Entrega en Quito y Valles</div>
+      <a href="https://wa.me/593995315716?text=Hola%20Amicotti%20👋" target="_blank" style="color:#fff;text-decoration:underline">Atención WhatsApp</a>
+    </div>
+  </div>
+
+  <!-- NAV SIMPLE -->
+  <nav class="container" style="display:flex;gap:1rem;align-items:center;padding:1rem">
+    <a href="./index.html" style="font-weight:700">Amicotti</a>
+    <span style="margin-left:auto"></span>
+    <a href="./catalogo.html">Royal Canin</a>
+    <strong>Purina</strong>
+    <a href="./index.html#contacto">Contacto</a>
+  </nav>
+
+  <!-- BUSCADOR -->
+  <section class="container" style="padding:1rem">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+      <label for="catalog-search" class="sr-only">Buscar en catálogo</label>
+      <input id="catalog-search" type="search" placeholder="Buscar: purina, perro, gato, 1.5 kg…" style="flex:1; padding:.8rem 1rem; border:1px solid #e5e7eb; border-radius:.8rem" />
+      <button id="catalog-search-clear" class="btn btn-muted">Limpiar</button>
+      <span id="catalog-search-count" style="min-width:7rem; text-align:right; color:#64748b">0 productos</span>
+    </div>
+  </section>
+
+  <!-- LISTA -->
+  <main class="container" style="padding:0 1rem 2rem 1rem">
+    <h1 class="text-2xl md:text-3xl font-bold" style="margin:.5rem 0 1rem 0">Catálogo Purina</h1>
+    <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- 1) CARGA DE DATOS PURINA (DEBE EXISTIR EL JS DE LA DATA)  -->
+  <!-- ========================================================= -->
+  <script src="./assets/data/products-purina.js"></script>
+
+  <!-- ========================================================= -->
+  <!-- 2) RENDER DESDE PRODUCTS (CREA LAS TARJETAS)              -->
+  <!-- ========================================================= -->
+  <script>
+  (function(){
+    const grid = document.getElementById('grid');
+    if(!grid){ return; }
+    if(!window.PRODUCTS || !Array.isArray(PRODUCTS)){ grid.innerHTML = '<p class="text-slate-500">Sin datos.</p>'; return; }
+
+    const money = n => '$' + (Math.round((Number(n||0))*100)/100).toFixed(2);
+
+    grid.innerHTML = '';
+    for(const p of PRODUCTS){
+      const id  = (p.id || `${p.brand}-${p.name}`).toLowerCase().replace(/[^a-z0-9]+/g,'-');
+      const min = p.variants?.length ? Math.min(...p.variants.map(v=>Number(v.price)||0)) : 0;
+
+      const variantsHTML = (p.variants||[]).map((v,i)=>`
+        <button class="variant btn-outline" data-size="${v.label}" data-price="${money(v.price)}" ${i===0?'aria-pressed="true"':''}>
+          ${v.label} — ${money(v.price)}
+        </button>
+      `).join('');
+
+      const art = document.createElement('article');
+      art.className = 'card group bg-white border rounded-2xl p-4 shadow-soft';
+      art.setAttribute('data-id', id);
+      art.setAttribute('data-name', p.name || '');
+      art.setAttribute('data-brand', p.brand || 'Purina');
+      art.setAttribute('data-animal', p.species || '');
+
+      art.innerHTML = `
+        <img src="${p.image||''}" alt="${p.name||''}">
+        <div class="mt-4 space-y-1">
+          <h3 class="font-semibold">${p.name||''}</h3>
+          <p class="text-sm" style="color:#64748b">${(p.brand||'Purina')} · ${p.species||''}</p>
+          <p class="font-semibold" style="color:#be123c">${min?money(min):''}</p>
+
+          <div class="variants" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.25rem">
+            ${variantsHTML}
+          </div>
+
+          <div class="actions" style="display:flex;gap:.5rem;margin-top:.5rem">
+            <button class="buy btn btn-primary">Comprar</button>
+          </div>
+        </div>
+      `;
+
+      // activar primera variante
+      const vars = art.querySelectorAll('.variant');
+      if(vars.length){
+        vars.forEach(b => b.addEventListener('click', ()=>{
+          vars.forEach(x=>{ x.classList.remove('active'); x.removeAttribute('aria-pressed'); });
+          b.classList.add('active'); b.setAttribute('aria-pressed','true');
+        }));
+      }
+
+      grid.appendChild(art);
+    }
+  })();
+  </script>
+
+  <!-- ========================================================= -->
+  <!-- 3) BUSCADOR (SE EJECUTA DESPUÉS DEL RENDER)               -->
+  <!-- ========================================================= -->
+  <script>
+  (() => {
+    const $q      = document.getElementById('catalog-search');
+    const $clear  = document.getElementById('catalog-search-clear');
+    const $count  = document.getElementById('catalog-search-count');
+    const cards   = [...document.querySelectorAll('article.card[data-id]')];
+
+    const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+
+    // index
+    cards.forEach(card => {
+      const parts = [
+        card.dataset.id, card.dataset.name, card.dataset.brand, card.dataset.animal,
+        card.querySelector('h3')?.textContent || '',
+        [...card.querySelectorAll('.variant,[data-size][data-price]')]
+          .map(v => `${v.dataset.size||''} ${v.dataset.price||''} ${v.textContent||''}`).join(' ')
+      ];
+      card.dataset.index = norm(parts.join(' '));
+    });
+
+    const updateURL = (q) => history.replaceState(null,'', q ? `${location.pathname}?q=${encodeURIComponent(q)}` : location.pathname);
+
+    const apply = (query) => {
+      const term = norm(query), list = document.querySelectorAll('article.card[data-id]');
+      let visible = 0;
+      list.forEach(card=>{
+        const hit = !term || card.dataset.index.includes(term);
+        card.style.display = hit ? '' : 'none';
+        if(hit) visible++;
+      });
+      $count.textContent = `${visible} producto${visible===1?'':'s'}`;
+
+      document.getElementById('emptyMsg')?.remove();
+      if(!visible){
+        const m = document.createElement('p');
+        m.id='emptyMsg';
+        m.className='container';
+        m.style='padding:2rem 1rem;color:#64748b';
+        m.textContent='No encontramos resultados. Prueba con otra palabra (ej. “kitten”, “8kg”, “mousse”).';
+        (document.querySelector('#catalog-search')?.closest('section')?.parentNode || document.body).appendChild(m);
+      }
+      updateURL(query);
     };
-    tryNext();
 
-    img.loading  = 'lazy';
-    img.decoding = 'async';
-   
-  });
-})();
-</script>
- <script>
-(() => {
-  const PHONE = (typeof WA_PHONE !== 'undefined' && WA_PHONE) || '593995315716';
+    // iniciar con ?q=
+    const params = new URLSearchParams(location.search);
+    if(params.has('q')) $q.value = decodeURIComponent(params.get('q'));
 
-  const waMsg = ({brand, name, size, price}) => 
+    let t; const deb = fn => (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),150); };
+    $q.addEventListener('input', deb(e=>apply(e.target.value)));
+    $clear.addEventListener('click', ()=>{ $q.value=''; apply(''); $q.focus(); });
+
+    apply($q.value || '');
+  })();
+  </script>
+
+  <!-- ========================================================= -->
+  <!-- 4) FALLBACK DE IMÁGENES (si falta src usa assets/<id>.*)  -->
+  <!-- ========================================================= -->
+  <script>
+  (() => {
+    const PLACEHOLDER =
+      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%' height='100%' fill='%23f5f5f5'/><text x='50%' y='50%' font-size='24' font-family='Arial, sans-serif' fill='%23999' text-anchor='middle' dominant-baseline='middle'>Imagen referencial</text></svg>";
+
+    const EXT = ['webp','jpg','jpeg','png'];
+
+    document.querySelectorAll('article.card[data-id]').forEach(card => {
+      const id  = (card.dataset.id || '').trim();
+      const img = card.querySelector('img');
+      if(!img || !id) return;
+
+      const current = (img.getAttribute('src') || '').trim().toLowerCase();
+      if(current && current !== 'nan' && current !== '#') return;
+
+      let i = 0;
+      const tryNext = () => {
+        if(i >= EXT.length){ img.src = PLACEHOLDER; return; }
+        img.onerror = () => { i++; tryNext(); };
+        img.src = `assets/${id}.${EXT[i]}`;
+      };
+      tryNext();
+      img.loading = 'lazy'; img.decoding = 'async';
+    });
+  })();
+  </script>
+
+  <!-- ========================================================= -->
+  <!-- 5) “COMPRAR” → WhatsApp (lee variante seleccionada)       -->
+  <!-- ========================================================= -->
+  <script>
+  (() => {
+    const PHONE = (typeof WA_PHONE !== 'undefined' && WA_PHONE) || '593995315716';
+
+    const waMsg = ({brand, name, size, price}) => 
 `Hola Amicotti 👋
 Quiero comprar:
 • ${brand||''} ${name||''} ${size||''}
@@ -1865,187 +2057,239 @@ Nombre y teléfono:
 Pago: [Transferencia/Efectivo]
 Observaciones:`;
 
-  const buildUrl = data => 'https://wa.me/' + PHONE + '?text=' + encodeURIComponent(waMsg(data));
+    const buildUrl = data => 'https://wa.me/' + PHONE + '?text=' + encodeURIComponent(waMsg(data));
 
-  const toLink = (el, url) => {
-    if (!el) return null;
-    if (el.tagName === 'A') {
-      el.href = url; el.target = '_blank'; el.rel = 'noopener';
-      return el;
-    }
-    // si es <button> o cualquier otro, lo reemplazamos por <a>
-    const a = document.createElement('a');
-    a.innerHTML = el.innerHTML;
-    a.className = el.className || 'buy-btn';
-    a.href = url; a.target = '_blank'; a.rel = 'noopener';
-    el.replaceWith(a);
-    return a;
-  };
-
-  document.querySelectorAll('article.card[data-id]').forEach(card => {
-    const brand = card.dataset.brand || '';
-    const name  = card.dataset.name  || card.querySelector('h3, .title, .name')?.textContent?.trim() || '';
-
-    // variantes posibles
-    const variants = Array.from(card.querySelectorAll('.variant, [data-size], [data-price], .variants button, .variants a'));
-
-    const getSelected = () =>
-      variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
-
-    const current = () => {
-      const v = getSelected();
-      const size  = v?.dataset.size  || v?.textContent?.trim() || '';
-      const price = v?.dataset.price || card.querySelector('.p-price, [data-price-display]')?.textContent?.trim() || '';
-      return { brand, name, size, price };
+    const toLink = (el, url) => {
+      if (!el) return null;
+      if (el.tagName === 'A') { el.href = url; el.target = '_blank'; el.rel = 'noopener'; return el; }
+      const a = document.createElement('a');
+      a.innerHTML = el.innerHTML; a.className = el.className || 'buy-btn';
+      a.href = url; a.target = '_blank'; a.rel = 'noopener';
+      el.replaceWith(a);
+      return a;
     };
 
-    // candidatos a “Comprar”: <a> o <button> cuyo texto contenga "comprar"
-    const buyCandidates = Array.from(card.querySelectorAll('a,button'))
-      .filter(b => /comprar/i.test(b.textContent || ''));
+    document.querySelectorAll('article.card[data-id]').forEach(card => {
+      const brand = card.dataset.brand || '';
+      const name  = card.dataset.name  || card.querySelector('h3, .title, .name')?.textContent?.trim() || '';
+      const variants = Array.from(card.querySelectorAll('.variant,[data-size],[data-price],.variants button,.variants a'));
+      const getSelected = () =>
+        variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
 
-    if (buyCandidates.length === 0) return; // no hay botón en esta card
+      const current = () => {
+        const v = getSelected();
+        const size  = v?.dataset.size  || v?.textContent?.trim() || '';
+        const price = v?.dataset.price || card.querySelector('.p-price,[data-price-display]')?.textContent?.trim() || '';
+        return { brand, name, size, price };
+      };
 
-    // conectar todos los botones de compra de la tarjeta
-    const links = buyCandidates.map(b => toLink(b, buildUrl(current())));
+      const buyCandidates = Array.from(card.querySelectorAll('a,button')).filter(b => /comprar/i.test(b.textContent||''));
+      if(!buyCandidates.length) return;
 
-    // actualizar link cuando cambie la variante
-    const update = () => {
-      const url = buildUrl(current());
-      links.forEach(a => { a.href = url; });
-    };
+      const links = buyCandidates.map(b => toLink(b, buildUrl(current())));
+      const update = () => { const url = buildUrl(current()); links.forEach(a => a.href = url); };
 
-    variants.forEach(v => {
-      v.addEventListener('click', () => {
-        variants.forEach(x => { x.classList.remove('active'); x.removeAttribute('aria-pressed'); });
-        v.classList.add('active'); v.setAttribute('aria-pressed', 'true');
-        update();
+      variants.forEach(v => {
+        v.addEventListener('click', () => {
+          variants.forEach(x => { x.classList.remove('active'); x.removeAttribute('aria-pressed'); });
+          v.classList.add('active'); v.setAttribute('aria-pressed','true');
+          update();
+        });
       });
+      update();
     });
+  })();
+  </script>
 
-    update(); // inicial
-  });
-})();
-</script>
-<script>
-(() => {
-  console.log('[Amicotti] Buscador listo');
-
-  const $q      = document.getElementById('catalog-search');
-  const $clear  = document.getElementById('catalog-search-clear');
-  const $count  = document.getElementById('catalog-search-count');
-  const cards   = [...document.querySelectorAll('article.card[data-id]')];
-
-  // Normaliza: minúsculas + sin acentos + colapsa espacios
-  const norm = s => (s || '')
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  // Indexa cada tarjeta una sola vez
-  cards.forEach(card => {
-    if (card.dataset.index) return;
-    const parts = [
-      card.dataset.id,
-      card.dataset.name,
-      card.dataset.brand,
-      card.dataset.animal,
-      card.querySelector('h3')?.textContent || '',
-      // tamaños / precios visibles
-      [...card.querySelectorAll('.variant,[data-size][data-price]')]
-        .map(v => `${v.dataset.size || ''} ${v.dataset.price || ''} ${v.textContent || ''}`)
-        .join(' ')
-    ];
-    card.dataset.index = norm(parts.join(' '));
-  });
-
-  const updateURL = (q) => {
-    const url = q ? `${location.pathname}?q=${encodeURIComponent(q)}` : location.pathname;
-    history.replaceState(null, '', url);
-  };
-
-  const apply = (query) => {
-    const term = norm(query);
-    let visible = 0;
-
-    cards.forEach(card => {
-      const hit = !term || card.dataset.index.includes(term);
-      card.style.display = hit ? '' : 'none';
-      if (hit) visible++;
-    });
-
-    $count.textContent = `${visible} producto${visible === 1 ? '' : 's'}`;
-    updateURL(query);
-
-    // Mensaje "sin resultados"
-    document.getElementById('emptyMsg')?.remove();
-    if (!visible) {
-      const m = document.createElement('p');
-      m.id = 'emptyMsg';
-      m.className = 'container mx-auto px-4 py-10 text-slate-500';
-      m.textContent = 'No encontramos resultados. Prueba con otra palabra (ej. “kitten”, “8kg”, “mousse”).';
-      // colócalo después del buscador
-      const searchSection = document.querySelector('#catalog-search')?.closest('section');
-      (searchSection?.parentNode || document.body).appendChild(m);
+  <!-- ========================================================= -->
+  <!-- 6) CARRITO AMICOTTI (botón flotante + panel)              -->
+  <!-- ========================================================= -->
+  <style>
+    #cartFab{
+      position:fixed; right:1rem; bottom:1rem; z-index:50;
+      display:inline-flex; align-items:center; gap:.5rem;
+      background:#f43f5e; color:#fff; border-radius:9999px;
+      box-shadow:0 10px 20px rgba(244,63,94,.25);
+      padding:.6rem .9rem; cursor:pointer; user-select:none;
     }
-  };
+    #cartFab .badge{
+      background:#fff; color:#f43f5e; min-width:1.5rem; text-align:center;
+      border-radius:9999px; font-weight:700; padding:.1rem .4rem;
+    }
+    #cartModal{ position:fixed; inset:0; background:rgba(15,23,42,.55); display:none; z-index:60 }
+    #cartPanel{ position:absolute; right:0; top:0; height:100%; width:min(92vw,420px);
+      background:#fff; box-shadow:-10px 0 30px rgba(0,0,0,.2); display:flex; flex-direction:column; }
+    .cart-header,.cart-footer{ padding:1rem; border-bottom:1px solid #e5e7eb }
+    .cart-footer{ border-top:1px solid #e5e7eb; margin-top:auto }
+    .cart-items{ overflow:auto; padding:1rem; display:flex; flex-direction:column; gap:.75rem }
+    .cart-item{ display:grid; grid-template-columns:1fr auto; gap:.25rem;
+      padding:.6rem .75rem; border:1px solid #e5e7eb; border-radius:.75rem; background:#fff; }
+    .cart-item small{ color:#6b7280 }
+    .qty{ display:inline-flex; align-items:center; gap:.25rem; margin-left:.5rem }
+    .qty button{ width:1.6rem; height:1.6rem; border-radius:.4rem; border:1px solid #e5e7eb; background:#f8fafc }
+  </style>
 
-  // Debounce sencillo para tecleo
-  let t;
-  const deb = fn => (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), 150); };
+  <div id="cartFab" aria-label="Abrir carrito"> 🛒 <span id="cartBadge" class="badge">0</span></div>
 
-  // Lee ?q= de la URL (para compartir búsquedas)
-  const params = new URLSearchParams(location.search);
-  if (params.has('q')) $q.value = decodeURIComponent(params.get('q'));
+  <div id="cartModal" aria-hidden="true">
+    <aside id="cartPanel">
+      <div class="cart-header" style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Tu carrito</strong>
+        <button id="cartClose" class="btn btn-muted">Cerrar</button>
+      </div>
 
-  // Eventos
-  $q.addEventListener('input', deb(e => apply(e.target.value)));
-  $clear.addEventListener('click', () => { $q.value = ''; apply(''); $q.focus(); });
+      <div id="cartItems" class="cart-items"></div>
 
-  // Primera aplicación
-  apply($q.value);
-})();
-</script>
-
- <!-- Carga de datos Purina -->
-<script src="./assets/data/products-purina.js"></script>
-
-<script>
-/* Render básico de tarjetas desde PRODUCTS (Purina) */
-(function(){
-  const grid = document.getElementById('grid');
-  if(!grid || !window.PRODUCTS){ return; }
-  grid.innerHTML = '';
-  const money = n => `$${(Math.round(Number(n||0)*100)/100).toFixed(2)}`;
-  for(const p of PRODUCTS){
-    const min = p.variants?.length ? Math.min(...p.variants.map(v=>Number(v.price)||0)) : 0;
-    const variantsHTML = (p.variants||[]).map(v => `
-      <button class="btn-outline" data-size="${v.label}" data-price="${money(v.price)}">
-        ${v.label} — ${money(v.price)}
-      </button>`).join('');
-    const art = document.createElement('article');
-    art.className = 'card group bg-white border rounded-2xl p-4 shadow-soft';
-    art.setAttribute('data-id', (p.id||`${p.brand}-${p.name}`).toLowerCase().replace(/[^a-z0-9]+/g,'-'));
-    art.setAttribute('data-name', p.name||'');
-    art.setAttribute('data-brand', p.brand||'');
-    art.setAttribute('data-animal', p.species||'');
-    art.innerHTML = `
-      <img src="${p.image||''}" alt="${p.name||''}" class="rounded-xl w-full h-56 object-contain bg-slate-100">
-      <div class="mt-4 space-y-1">
-        <h3 class="font-semibold">${p.name||''}</h3>
-        <p class="text-sm text-slate-600">${(p.brand||'')} · ${p.species||''}</p>
-        <p class="text-rose-700 font-semibold">${min?money(min):''}</p>
-        <div class="flex flex-wrap gap-2 mt-1" role="list">${variantsHTML}</div>
-        <div class="flex gap-2 mt-2">
-          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+      <div class="cart-footer" style="display:grid; gap:.5rem">
+        <div style="display:flex;justify-content:space-between;font-weight:700">
+          <span>Total</span><span id="cartTotal">$0.00</span>
+        </div>
+        <div style="display:flex; gap:.5rem; flex-wrap:wrap">
+          <button id="cartClear" class="btn btn-muted" title="Vaciar carrito">Vaciar</button>
+          <button id="cartCheckout" class="btn btn-primary" title="Enviar por WhatsApp">Finalizar por WhatsApp</button>
         </div>
       </div>
-    `;
-    grid.appendChild(art);
-  }
-})();
-</script>
+    </aside>
+  </div>
 
+  <script>
+  (() => {
+    const KEY='amicotti_cart';
+    const PHONE = (typeof WA_PHONE!=='undefined' && WA_PHONE) ? String(WA_PHONE) : '593995315716';
+    const $ = s => document.querySelector(s);
+    const parseMoney = s => Number(String(s||'').replace(/[^0-9.,-]/g,'').replace(',', '.')) || 0;
+    const money = n => '$' + (Math.round((+n||0) * 100)/100).toFixed(2);
+
+    const AMICART = (window.AMICART = window.AMICART || {});
+    AMICART.get = () => { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } };
+    AMICART.set = (c) => { localStorage.setItem(KEY, JSON.stringify(c)); AMICART.refresh(); };
+    AMICART.add = (item) => {
+      const cart = AMICART.get();
+      const found = cart.find(i => i.key === item.key);
+      if(found) found.qty += (item.qty||1); else cart.push({...item, qty:item.qty||1});
+      AMICART.set(cart);
+    };
+
+    const fab=$('#cartFab'), badge=$('#cartBadge'), modal=$('#cartModal');
+    const closeBtn=$('#cartClose'), itemsBox=$('#cartItems'), totalEl=$('#cartTotal');
+    const clearBtn=$('#cartClear'), checkout=$('#cartCheckout');
+
+    AMICART.refresh = () => {
+      const cart = AMICART.get();
+      badge.textContent = cart.reduce((s,i)=> s + (i.qty||0), 0);
+
+      if(!itemsBox || !totalEl) return;
+      itemsBox.innerHTML = '';
+      let total = 0;
+
+      if(!cart.length){
+        itemsBox.innerHTML = '<p class="text-slate-500">Tu carrito está vacío.</p>';
+        totalEl.textContent = '$0.00'; return;
+      }
+
+      cart.forEach((it,idx)=>{
+        const line = (it.qty||1) * parseMoney(it.price);
+        total += line;
+        const row = document.createElement('div');
+        row.className='cart-item';
+        row.innerHTML = `
+          <div>
+            <div><strong>${it.brand||''} ${it.name||''}</strong></div>
+            <small>${it.size||''} · ${it.price||''}</small>
+          </div>
+          <div style="text-align:right">
+            <div>${money(line)}</div>
+            <div class="qty">
+              <button class="down" aria-label="Quitar">−</button>
+              <span>${it.qty||1}</span>
+              <button class="up" aria-label="Sumar">+</button>
+              <button class="del" aria-label="Eliminar" title="Eliminar" style="margin-left:.4rem">🗑️</button>
+            </div>
+          </div>`;
+        row.querySelector('.down').onclick = ()=>{ const c=AMICART.get(); c[idx].qty=Math.max(1,(c[idx].qty||1)-1); AMICART.set(c); };
+        row.querySelector('.up').onclick   = ()=>{ const c=AMICART.get(); c[idx].qty=(c[idx].qty||1)+1; AMICART.set(c); };
+        row.querySelector('.del').onclick  = ()=>{ const c=AMICART.get(); c.splice(idx,1); AMICART.set(c); };
+        itemsBox.appendChild(row);
+      });
+
+      totalEl.textContent = money(total);
+    };
+
+    AMICART.open = ()=>{ modal.style.display='block'; };
+    AMICART.close= ()=>{ modal.style.display='none'; };
+    fab.onclick = AMICART.open; closeBtn.onclick=AMICART.close;
+    modal.addEventListener('click', e=>{ if(e.target===modal) AMICART.close(); });
+    clearBtn.onclick = ()=> AMICART.set([]);
+    checkout.onclick = ()=>{
+      const cart=AMICART.get(); if(!cart.length){ AMICART.open(); return; }
+      const lines = cart.map(i=>`• ${i.brand||''} ${i.name||''} ${i.size||''} x${i.qty||1} (${i.price||''})`).join('\n');
+      const total = money(cart.reduce((s,i)=> s + parseMoney(i.price)*(i.qty||1),0));
+      const msg = `Hola Amicotti 👋
+Quiero confirmar mi pedido:
+
+${lines}
+
+Total: ${total}
+
+Sector: [Quito/Valles]
+Dirección:
+Nombre y teléfono:
+Pago: [Transferencia/Efectivo]
+Observaciones:`;
+      window.open('https://wa.me/' + PHONE + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+    };
+
+    // Inyectar botón "Agregar" y enlazar tarjetas
+    const bound = new WeakSet();
+    function bindCard(card){
+      if (!card || bound.has(card)) return; bound.add(card);
+      let add = card.querySelector('.add-to-cart');
+      if(!add){
+        const buy = card.querySelector('.buy, .buy-btn, a[href*="wa.me"], button.buy');
+        add = document.createElement('button');
+        add.type='button'; add.className='add-to-cart btn btn-outline'; add.textContent='Agregar';
+        if(buy && buy.parentElement) buy.parentElement.insertBefore(add,buy);
+        else (card.querySelector('.actions') || card).appendChild(add);
+      }
+      add.addEventListener('click', ()=>{
+        const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
+        const sel = variants.find(v => v.getAttribute('aria-pressed')==='true' || v.classList.contains('active')) || variants[0];
+        const item = {
+          id: card.dataset.id||'',
+          brand: card.dataset.brand||'',
+          name: card.dataset.name|| (card.querySelector('h3,.title,.name')?.textContent||'').trim(),
+          size: sel?.dataset?.size || (sel?.textContent||'').trim(),
+          price: sel?.dataset?.price || (card.querySelector('.p-price,[data-price-display]')?.textContent||'').trim()
+        };
+        item.key = item.id + '|' + (item.size||'');
+        AMICART.add(item);
+
+        const prev = add.textContent;
+        add.disabled = true; add.textContent='Agregado ✓';
+        add.classList.remove('btn-outline'); add.classList.add('btn-primary');
+        setTimeout(()=>{ add.disabled=false; add.textContent=prev; add.classList.add('btn-outline'); add.classList.remove('btn-primary'); }, 900);
+      });
+    }
+
+    document.querySelectorAll('article.card[data-id]').forEach(bindCard);
+    const mo = new MutationObserver(muts => {
+      muts.forEach(m => m.addedNodes.forEach(n => {
+        if(n.nodeType!==1) return;
+        if(n.matches?.('article.card[data-id]')) bindCard(n);
+        n.querySelectorAll?.('article.card[data-id]').forEach(bindCard);
+      }));
+    });
+    mo.observe(document.body,{childList:true,subtree:true});
+
+    AMICART.refresh();
+    window.addEventListener('storage', e=>{ if(e.key===KEY) AMICART.refresh(); });
+  })();
+  </script>
+
+  <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
+</body>
+</html>
+ 
 </body>
  <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
 </html>
