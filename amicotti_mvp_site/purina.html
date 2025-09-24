@@ -1,0 +1,2273 @@
+<!DOCTYPE html>
+<html lang="es"> 
+ <style>
+  /* Catálogo: imagen más grande y sin recortes */
+  article.card img{
+    width: 100%;
+    height: 260px;          /* súbelo a 280–320 si quieres más grande */
+    object-fit: contain;    /* que no se recorte */
+    background: #f8fafc;    /* fondito claro (opcional) */
+    border-radius: 0.75rem; /* redondeo (opcional, como antes) */
+  }
+  /* En pantallas grandes, hazla aún un poco mayor */
+  @media (min-width: 1024px){
+    article.card img{ height: 300px; }
+  }
+</style>
+<!-- BUSCADOR -->
+<section class="container mx-auto px-4 pt-2 pb-4">
+  <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+    <label for="catalog-search" class="sr-only">Buscar en catálogo</label>
+    <input
+      id="catalog-search"
+      type="search"
+      placeholder="Buscar: royal, perro, kitten, 8kg, mousse..."
+      class="w-full sm:max-w-lg rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-rose-500"
+      autocomplete="off"
+    />
+    <button id="catalog-search-clear"
+      class="px-4 py-3 rounded-xl border bg-slate-50 hover:bg-slate-100">
+      Limpiar
+    </button>
+    <span id="catalog-search-count" class="text-sm text-slate-500 sm:ml-auto"></span>
+  </div>
+</section>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Amicotti — Catálogo Purina</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="assets/logo.png" />
+  <style>.container{max-width:1200px} .shadow-soft{box-shadow:0 10px 30px rgba(0,0,0,.06)} .variant.active{background:#fee2e2;border-color:#ef4444}</style>
+</head>
+<body class="bg-white text-slate-800">
+  <script>const WA_PHONE = '593995315716';</script>
+
+  <div class="bg-slate-900 text-slate-100 text-xs">
+    <div class="container mx-auto px-4 py-2 flex items-center justify-between gap-4">
+      <span>Entrega en Quito y valles</span>
+      <span>Pagos: <strong>transferencia bancaria</strong></span>
+      <a id="waTop" class="text-rose-300 hover:text-rose-200 underline" target="_blank" rel="noopener">Atención WhatsApp</a>
+    </div>
+  </div>
+
+  <header class="border-b">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="assets/logo.png" alt="Amicotti" class="h-10 w-auto" onerror="this.style.display='none'">
+        <span class="font-semibold text-xl tracking-tight">Amicotti</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a class="hover:text-rose-700" href="catalogo.html">Catálogo</a>
+        <a class="hover:text-rose-700" href="#">Royal Canin</a>
+        <a class="hover:text-rose-700" href="#">Purina</a>
+        <a class="hover:text-rose-700" href="#contacto">Contacto</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold">Catálogo</h1>
+    <p class="text-slate-600 mt-1">Compra por WhatsApp.</p>
+  </section>
+
+  <main class="container mx-auto px-4 pb-16">
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-puppy-pro-tech-perro" data-name="Puppy Pro Tech" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Puppy Pro Tech" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Puppy Pro Tech</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$62.41</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="300gr" data-price="$62.41">300gr — $62.41</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-babydog-milk-perro" data-name="Babydog Milk" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Babydog Milk" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Babydog Milk</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="unidad (x18)" data-price="$44.55">unidad (x18) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-starter-mousse-mother-babydog-perro" data-name="Starter Mousse Mother &amp; Babydog" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Starter Mousse Mother &amp; Babydog" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Starter Mousse Mother &amp; Babydog</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$7.05</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="195gr (x12)" data-price="$7.05">195gr (x12) — $7.05</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-x-small-puppy-perro" data-name="X-Small Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="X-Small Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">X-Small Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$16.88–$40.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="500gr (x12)" data-price="$16.88">500gr (x12) — $16.88</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$40.09">1.5kg (x6) — $40.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-size-xs-x-small-adult-perro" data-name="Size Xs X-Small Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Size Xs X-Small Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Size Xs X-Small Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$15.09–$35.63</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="500gr (x12)" data-price="$15.09">500gr (x12) — $15.09</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$35.63">1.5kg (x6) — $35.63</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-size-xs-x-small-adult-8-perro" data-name="Size Xs X-Small Adult 8+" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Size Xs X-Small Adult 8+" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Size Xs X-Small Adult 8+</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$15.09–$35.63</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="500gr (x12)" data-price="$15.09">500gr (x12) — $15.09</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$35.63">1.5kg (x6) — $35.63</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-mini-starter-perro" data-name="Mini Starter" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Mini Starter" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Mini Starter</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$22.23</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1kg (x10)" data-price="$22.23">1kg (x10) — $22.23</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-mini-puppy-perro" data-name="Mini Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Mini Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Mini Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$17.77–$66.88</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="800gr (x10)" data-price="$17.77">800gr (x10) — $17.77</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$40.09">2kg (x6) — $40.09</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$62.41">4kg (x4) — $62.41</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$66.88">4kg (x4) — $66.88</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-size-s-mini-adult-perro" data-name="Size S Mini Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Size S Mini Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Size S Mini Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$35.63–$98.12</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$35.63">2kg (x6) — $35.63</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$57.95">4kg (x4) — $57.95</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$62.41">4kg (x4) — $62.41</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="8kg" data-price="$98.12">8kg — $98.12</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-mini-sterilised-perro" data-name="Mini Sterilised" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Mini Sterilised" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Mini Sterilised</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$57.95–$107.05</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$57.95">3kg (x4) — $57.95</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="8kg" data-price="$107.05">8kg — $107.05</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-mini-light-weight-care-perro" data-name="Mini Light Weight Care" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Mini Light Weight Care" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Mini Light Weight Care</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$22.23–$57.95</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1kg (x10)" data-price="$22.23">1kg (x10) — $22.23</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$57.95">3kg (x4) — $57.95</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-mini-dermacomfort-perro" data-name="Mini Dermacomfort" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Mini Dermacomfort" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Mini Dermacomfort</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$22.23–$111.52</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1kg (x10)" data-price="$22.23">1kg (x10) — $22.23</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$57.95">3kg (x4) — $57.95</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="8kg" data-price="$111.52">8kg — $111.52</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-size-s-mini-adult-8-perro" data-name="Size S Mini Adult 8+" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Size S Mini Adult 8+" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Size S Mini Adult 8+</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$35.63</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$35.63">2kg (x6) — $35.63</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-medium-starter-perro" data-name="Medium Starter" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Medium Starter" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Medium Starter</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$17.77–$62.41</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1kg (x10)" data-price="$17.77">1kg (x10) — $17.77</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$62.41">4kg (x4) — $62.41</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-medium-puppy-perro" data-name="Medium Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Medium Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Medium Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$13.30–$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1kg (x10)" data-price="$13.30">1kg (x10) — $13.30</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$44.55">4kg (x4) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-medium-puppy-15k-perro" data-name="Medium Puppy 15K" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Medium Puppy 15K" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Medium Puppy 15K</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$124.91</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="unidad" data-price="$124.91">unidad — $124.91</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-medium-adult-perro" data-name="Medium Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Medium Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Medium Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$40.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$40.09">4kg (x4) — $40.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-medium-adult-15k-perro" data-name="Medium Adult 15K" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Medium Adult 15K" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Medium Adult 15K</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$115.98</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="unidad" data-price="$115.98">unidad — $115.98</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-medium-light-weight-care-perro" data-name="Medium Light Weight Care" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Medium Light Weight Care" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Medium Light Weight Care</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55–$149.90</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$44.55">3kg (x4) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="12kg" data-price="$149.90">12kg — $149.90</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-medium-dermaconfort-perro" data-name="Medium Dermaconfort" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Medium Dermaconfort" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Medium Dermaconfort</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$53.48–$149.90</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$53.48">3kg (x4) — $53.48</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="12kg" data-price="$149.90">12kg — $149.90</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-medium-adult-7-perro" data-name="Medium Adult 7+" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Medium Adult 7+" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Medium Adult 7+</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$40.09–$115.98</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$40.09">4kg (x4) — $40.09</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="15kg" data-price="$115.98">15kg — $115.98</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-maxi-starter-perro" data-name="Maxi Starter" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Maxi Starter" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Maxi Starter</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$53.48–$142.77</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$53.48">4kg (x4) — $53.48</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="15kg" data-price="$142.77">15kg — $142.77</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-maxi-puppy-perro" data-name="Maxi Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Maxi Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Maxi Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$13.30</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1kg (x10)" data-price="$13.30">1kg (x10) — $13.30</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-maxipuppy-perro" data-name="Maxipuppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Maxipuppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Maxipuppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$44.55">4kg (x4) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-maxi-puppy-15k-perro" data-name="Maxi Puppy 15K" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Maxi Puppy 15K" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Maxi Puppy 15K</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$133.84</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="unidad" data-price="$133.84">unidad — $133.84</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-size-l-maxi-adult-perro" data-name="Size L Maxi Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Size L Maxi Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Size L Maxi Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$35.63–$124.91</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$35.63">4kg (x4) — $35.63</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="15kg" data-price="$124.91">15kg — $124.91</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-maxi-light-weight-care-perro" data-name="Maxi Light Weight Care" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Maxi Light Weight Care" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Maxi Light Weight Care</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55–$149.90</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$44.55">3kg (x4) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="12kg" data-price="$149.90">12kg — $149.90</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-maxi-dermacomforte-perro" data-name="Maxi Dermacomforte" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Maxi Dermacomforte" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Maxi Dermacomforte</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$51.70–$149.90</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$51.70">3kg (x4) — $51.70</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="12kg" data-price="$149.90">12kg — $149.90</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-size-maxi-adult-5-perro" data-name="Size Maxi Adult 5+" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Size Maxi Adult 5+" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Size Maxi Adult 5+</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$35.63–$124.91</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$35.63">4kg (x4) — $35.63</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="15kg" data-price="$124.91">15kg — $124.91</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-mini-puppy-x-12-perro" data-name="Mini Puppy X 12" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Mini Puppy X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Mini Puppy X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$35.63</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr" data-price="$35.63">85gr — $35.63</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-mini-adult-x-12-perro" data-name="Mini Adult X 12" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Mini Adult X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Mini Adult X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$35.63</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr" data-price="$35.63">85gr — $35.63</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-medium-puppy-x-10-perro" data-name="Medium Puppy X 10" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Medium Puppy X 10" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Medium Puppy X 10</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$38.30</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="140gr" data-price="$38.30">140gr — $38.30</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-m-edi-um-adult-x-10-perro" data-name="M Edi Um Adult X 10" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="M Edi Um Adult X 10" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">M Edi Um Adult X 10</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$38.30</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="140gr" data-price="$38.30">140gr — $38.30</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-maxi-puppy-x-10-perro" data-name="Maxi Puppy X 10" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Maxi Puppy X 10" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Maxi Puppy X 10</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$38.30</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="140gr" data-price="$38.30">140gr — $38.30</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-max-i-adult-x-10-perro" data-name="Max I Adult X 10" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Max I Adult X 10" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Max I Adult X 10</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$38.30</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="140gr" data-price="$38.30">140gr — $38.30</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-pomeranian-perro" data-name="Pomeranian" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Pomeranian" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Pomeranian</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.90</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$44.90">1.5kg (x6) — $44.90</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-chihuahua-puppy-perro" data-name="Chihuahua Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Chihuahua Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Chihuahua Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$17.77–$42.77</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="500gr (x12)" data-price="$17.77">500gr (x12) — $17.77</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$42.77">1.5kg (x6) — $42.77</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-chihuahua-adult-perro" data-name="Chihuahua Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Chihuahua Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Chihuahua Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$40.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$40.09">1.5kg (x6) — $40.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-yorkshire-terrier-puppy-perro" data-name="Yorkshire Terrier Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Yorkshire Terrier Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Yorkshire Terrier Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$40.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$40.09">1.5kg (x6) — $40.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-yorkshire-terrier-adult-perro" data-name="Yorkshire Terrier Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Yorkshire Terrier Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Yorkshire Terrier Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$35.63–$62.41</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$35.63">1.5kg (x6) — $35.63</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$62.41">3kg (x4) — $62.41</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-poodle-puppy-perro" data-name="Poodle Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Poodle Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Poodle Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$57.95</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$57.95">3kg (x4) — $57.95</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-poodle-adult-perro" data-name="Poodle Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Poodle Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Poodle Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$31.16</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$31.16">1.5kg (x6) — $31.16</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-shih-tzu-puppy-perro" data-name="Shih Tzu Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Shih Tzu Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Shih Tzu Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$49.02</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$49.02">1.5kg (x6) — $49.02</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-shih-tzu-perro" data-name="Shih Tzu" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Shih Tzu" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Shih Tzu</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$15.98</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="500gr (x12)" data-price="$15.98">500gr (x12) — $15.98</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-shih-tzu-adult-perro" data-name="Shih Tzu Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Shih Tzu Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Shih Tzu Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$44.55">1.5kg (x6) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-pug-puppy-perro" data-name="Pug Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Pug Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Pug Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$35.63</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$35.63">1.5kg (x6) — $35.63</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-pug-adult-perro" data-name="Pug Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Pug Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Pug Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$31.16</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$31.16">1.5kg (x6) — $31.16</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-french-bulldog-puppy-perro" data-name="French Bulldog Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="French Bulldog Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">French Bulldog Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$62.41–$165.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$62.41">3kg (x4) — $62.41</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="10kg" data-price="$165.09">10kg — $165.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-french-bulldog-adult-perro" data-name="French Bulldog Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="French Bulldog Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">French Bulldog Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$53.48–$142.77</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$53.48">3kg (x4) — $53.48</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="9kg" data-price="$142.77">9kg — $142.77</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-bulldog-puppy-perro" data-name="Bulldog Puppy" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Bulldog Puppy" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Bulldog Puppy</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$57.95–$178.48</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$57.95">3kg (x4) — $57.95</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="12kg" data-price="$178.48">12kg — $178.48</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-bulldog-adult-perro" data-name="Bulldog Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Bulldog Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Bulldog Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$53.48–$160.63</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$53.48">3kg (x4) — $53.48</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="12kg" data-price="$160.63">12kg — $160.63</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-golden-retriever-adult-perro" data-name="Golden Retriever Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Golden Retriever Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Golden Retriever Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55–$129.38</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$44.55">3kg (x4) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="12kg" data-price="$129.38">12kg — $129.38</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-yorkshire-terrier-adult-perro" data-name="Yorkshire Terrier Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Yorkshire Terrier Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Yorkshire Terrier Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$4.38</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr (x12)" data-price="$4.38">85gr (x12) — $4.38</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-chihuahua-adult-perro" data-name="Chihuahua Adult" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Chihuahua Adult" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Chihuahua Adult</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$4.38</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr (x12)" data-price="$4.38">85gr (x12) — $4.38</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-kitten-persian-gato" data-name="Kitten Persian" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Kitten Persian" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Kitten Persian</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$13.30–$53.48</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$13.30">400gr (x12) — $13.30</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$53.48">2kg (x6) — $53.48</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-persian-gato" data-name="Persian" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Persian" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Persian</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$13.30–$169.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$13.30">400gr (x12) — $13.30</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$44.55">2kg (x6) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="10kg" data-price="$169.55">10kg — $169.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-persian-x-12-gato" data-name="Persian X 12" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Persian X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Persian X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$53.48</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr" data-price="$53.48">85gr — $53.48</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-babycat-milk-gato" data-name="Babycat Milk" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Babycat Milk" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Babycat Milk</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="300gr" data-price="$44.55">300gr — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-mother-babycat-gato" data-name="Mother &amp; Babycat" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Mother &amp; Babycat" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Mother &amp; Babycat</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$10.63–$42.77</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$10.63">400gr (x12) — $10.63</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$42.77">2kg (x6) — $42.77</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-kitten-gato" data-name="Kitten" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Kitten" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Kitten</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$9.73–$40.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$9.73">400gr (x12) — $9.73</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$40.09">2kg (x6) — $40.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-kitten-sterilised-gato" data-name="Kitten Sterilised" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Kitten Sterilised" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Kitten Sterilised</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$13.30–$40.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$13.30">400gr (x12) — $13.30</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$40.09">2kg (x6) — $40.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-sterilised-gato" data-name="Sterilised" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Sterilised" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Sterilised</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$11.52–$133.84</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$11.52">400gr (x12) — $11.52</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$35.63">2kg (x6) — $35.63</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="10kg" data-price="$133.84">10kg — $133.84</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-sensible-gato" data-name="Sensible" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Sensible" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Sensible</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$10.63</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$10.63">400gr (x12) — $10.63</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-sensible33-gato" data-name="Sensible33" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Sensible33" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Sensible33</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$40.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$40.09">2kg (x6) — $40.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-exigent-gato" data-name="Exigent" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Exigent" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Exigent</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$40.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$40.09">2kg (x6) — $40.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-fit-gato" data-name="Fit" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Fit" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Fit</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$8.84–$120.45</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$8.84">400gr (x12) — $8.84</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="10kg" data-price="$120.45">10kg — $120.45</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-fit-32-gato" data-name="Fit 32" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Fit 32" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Fit 32</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$31.16</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$31.16">2kg (x6) — $31.16</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-indoor-7-gato" data-name="Indoor 7+" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Indoor 7+" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Indoor 7+</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$33.84</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$33.84">1.5kg (x6) — $33.84</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-ageing-12-gato" data-name="Ageing 12+" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Ageing 12+" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Ageing 12+</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$52.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$52.09">2kg (x6) — $52.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-hair-skin-gato" data-name="Hair &amp; Skin" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Hair &amp; Skin" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Hair &amp; Skin</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$10.63–$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$10.63">400gr (x12) — $10.63</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$44.55">2kg (x6) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-digestive-care-gato" data-name="Digestive Care" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Digestive Care" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Digestive Care</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$44.55">2kg (x6) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-light-weight-care-gato" data-name="Light Weight Care" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Light Weight Care" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Light Weight Care</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$31.16</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$31.16">1.5kg (x6) — $31.16</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-kitten-instinctive-in-jelly-x-12-gato" data-name="Kitten Instinctive In Jelly X 12" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Kitten Instinctive In Jelly X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Kitten Instinctive In Jelly X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$52.50</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr" data-price="$52.50">85gr — $52.50</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-kitten-sterilised-x-12-gato" data-name="Kitten Sterilised X 12" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Kitten Sterilised X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Kitten Sterilised X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$52.50</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr" data-price="$52.50">85gr — $52.50</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-sterilised-x-12-gato" data-name="Sterilised X 12" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Sterilised X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Sterilised X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$52.50</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr" data-price="$52.50">85gr — $52.50</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-instinctive-x-12-gato" data-name="Instinctive X 12" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Instinctive X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Instinctive X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$52.50</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr" data-price="$52.50">85gr — $52.50</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-instinctive-7-x-12-gato" data-name="Instinctive 7+ X 12" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Instinctive 7+ X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Instinctive 7+ X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$52.50</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr" data-price="$52.50">85gr — $52.50</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-intense-beauty-x-12-gato" data-name="Intense Beauty X 12" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Intense Beauty X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Intense Beauty X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$52.50</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr" data-price="$52.50">85gr — $52.50</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-anallergenic-canine-perro" data-name="Anallergenic Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Anallergenic Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Anallergenic Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$75.80</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3kg (x4)" data-price="$75.80">3kg (x4) — $75.80</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-hypoallergenic-small-dog-perro" data-name="Hypoallergenic Small Dog" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Hypoallergenic Small Dog" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Hypoallergenic Small Dog</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$31.16–$80.27</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1kg (x10)" data-price="$31.16">1kg (x10) — $31.16</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="3.5kg (x4)" data-price="$80.27">3.5kg (x4) — $80.27</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-hypoallergenic-canine-perro" data-name="Hypoallergenic Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Hypoallergenic Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Hypoallergenic Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55–$124.91</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$44.55">2kg (x6) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="7kg" data-price="$124.91">7kg — $124.91</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-diabetic-canine-perro" data-name="Diabetic Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Diabetic Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Diabetic Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$35.63</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$35.63">1.5kg (x6) — $35.63</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-satiety-weight-management-perro" data-name="Satiety Weight Management" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Satiety Weight Management" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Satiety Weight Management</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$35.63–$111.52</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$35.63">1.5kg (x6) — $35.63</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="6kg" data-price="$111.52">6kg — $111.52</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-gastrointestinal-puppy-canine-perro" data-name="Gastrointestinal Puppy Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Gastrointestinal Puppy Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Gastrointestinal Puppy Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$31.16</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1kg (x6)" data-price="$31.16">1kg (x6) — $31.16</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-gastrointestinal-low-fat-canine-perro" data-name="Gastrointestinal Low Fat Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Gastrointestinal Low Fat Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Gastrointestinal Low Fat Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$47.74–$126.00</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$47.74">1.5kg (x6) — $47.74</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="6kg" data-price="$126.00">6kg — $126.00</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-gastrointestinal-canine-perro" data-name="Gastrointestinal Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Gastrointestinal Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Gastrointestinal Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55–$124.91</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$44.55">2kg (x6) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="7.5kg" data-price="$124.91">7.5kg — $124.91</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-hepatic-canine-perro" data-name="Hepatic Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Hepatic Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Hepatic Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$40.09–$136.96</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$40.09">1.5kg (x6) — $40.09</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="7kg" data-price="$136.96">7kg — $136.96</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-early-renal-canine-perro" data-name="Early Renal Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Early Renal Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Early Renal Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55–$139.04</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$44.55">2kg (x6) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="7kg" data-price="$139.04">7kg — $139.04</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-renal-small-dog-perro" data-name="Renal Small Dog" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Renal Small Dog" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Renal Small Dog</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$17.30–$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="500gr (x12)" data-price="$17.30">500gr (x12) — $17.30</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$44.55">1.5kg (x6) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-renal-canine-perro" data-name="Renal Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Renal Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Renal Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55–$120.45</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$44.55">2kg (x6) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="7kg" data-price="$120.45">7kg — $120.45</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-cardiac-canine-perro" data-name="Cardiac Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Cardiac Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Cardiac Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$44.55">2kg (x6) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-calm-canine-perro" data-name="Calm Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Calm Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Calm Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$78.17</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$78.17">4kg (x4) — $78.17</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-urinary-s-o-small-dog-perro" data-name="Urinary S/O Small Dog" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Urinary S/O Small Dog" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Urinary S/O Small Dog</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55–$75.80</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$44.55">1.5kg (x6) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x4)" data-price="$75.80">4kg (x4) — $75.80</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-urinary-canine-perro" data-name="Urinary Canine" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Urinary Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Urinary Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$44.55–$120.45</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$44.55">2kg (x6) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="7.5kg" data-price="$120.45">7.5kg — $120.45</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-urinary-s-o-ageing-7-perro" data-name="Urinary S/O Ageing 7+" data-brand="Royal Canin" data-animal="perro">
+      <img src="nan" alt="Urinary S/O Ageing 7+" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Urinary S/O Ageing 7+</h3>
+        <p class="text-sm text-slate-600">Royal Canin · perro</p>
+        <p class="text-rose-700 font-semibold">$40.09</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$40.09">1.5kg (x6) — $40.09</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-hypoallergenic-feline-gato" data-name="Hypoallergenic Feline" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Hypoallergenic Feline" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Hypoallergenic Feline</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$62.41</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2.5kg (x4)" data-price="$62.41">2.5kg (x4) — $62.41</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-diabetic-so-index-feline-gato" data-name="Diabetic So Index Feline" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Diabetic So Index Feline" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Diabetic So Index Feline</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$14.20–$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$14.20">400gr (x12) — $14.20</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$44.55">1.5kg (x6) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-satiety-weight-management-feline-gato" data-name="Satiety Weight Management Feline" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Satiety Weight Management Feline" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Satiety Weight Management Feline</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$14.20–$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$14.20">400gr (x12) — $14.20</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$44.55">1.5kg (x6) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-gastrointestinal-kitten-gato" data-name="Gastrointestinal Kitten" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Gastrointestinal Kitten" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Gastrointestinal Kitten</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$17.30–$65.13</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$17.30">400gr (x12) — $17.30</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$65.13">2kg (x6) — $65.13</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-gastrointestinal-fibre-response-gato" data-name="Gastrointestinal Fibre Response" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Gastrointestinal Fibre Response" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Gastrointestinal Fibre Response</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$17.30–$65.13</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$17.30">400gr (x12) — $17.30</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$65.13">2kg (x6) — $65.13</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-gastrointestinal-so-index-feline-gato" data-name="Gastrointestinal So Index Feline" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Gastrointestinal So Index Feline" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Gastrointestinal So Index Feline</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$14.20–$53.48</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$14.20">400gr (x12) — $14.20</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$53.48">2kg (x6) — $53.48</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-hepatic-so-index-feline-gato" data-name="Hepatic So Index Feline" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Hepatic So Index Feline" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Hepatic So Index Feline</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$53.48</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$53.48">2kg (x6) — $53.48</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-early-renal-feline-gato" data-name="Early Renal Feline" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Early Renal Feline" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Early Renal Feline</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$17.30–$53.48</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$17.30">400gr (x12) — $17.30</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$53.48">1.5kg (x6) — $53.48</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-renal-feline-gato" data-name="Renal Feline" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Renal Feline" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Renal Feline</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$53.48</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$53.48">2kg (x6) — $53.48</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-urinary-feline-so-gato" data-name="Urinary Feline So" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Urinary Feline So" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Urinary Feline So</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$44.55–$142.77</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$44.55">1.5kg (x6) — $44.55</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="7kg" data-price="$142.77">7kg — $142.77</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-urinary-s-o-moderate-calorie-gato" data-name="Urinary S/O Moderate Calorie" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Urinary S/O Moderate Calorie" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Urinary S/O Moderate Calorie</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$44.55</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="1.5kg (x6)" data-price="$44.55">1.5kg (x6) — $44.55</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-calm-feline-gato" data-name="Calm Feline" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Calm Feline" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Calm Feline</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$60.78–$78.17</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="2kg (x6)" data-price="$60.78">2kg (x6) — $60.78</button><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="4kg (x6)" data-price="$78.17">4kg (x6) — $78.17</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-recovery-feline-canine-gato" data-name="Recovery Feline/Canine" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Recovery Feline/Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Recovery Feline/Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$8.84</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="195gr (x12)" data-price="$8.84">195gr (x12) — $8.84</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-renal-feline-with-tuna-x-12-gato" data-name="Renal Feline With Tuna . X 12" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Renal Feline With Tuna . X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Renal Feline With Tuna . X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$52.50</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="85gr" data-price="$52.50">85gr — $52.50</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-veterinary-diet-feline-urinary-so-feline-x-12-gato" data-name="Veterinary Diet Feline Urinary So Feline X 12" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Veterinary Diet Feline Urinary So Feline X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Veterinary Diet Feline Urinary So Feline X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$52.50</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="100gr" data-price="$52.50">100gr — $52.50</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-gastrointestinal-feline-x-12-gato" data-name="Gastrointestinal Feline X 12" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Gastrointestinal Feline X 12" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Gastrointestinal Feline X 12</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$52.50</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="100gr" data-price="$52.50">100gr — $52.50</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-renal-canine-gato" data-name="Renal Canine" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Renal Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Renal Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$9.73</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="410gr (x12)" data-price="$9.73">410gr (x12) — $9.73</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-urinary-canine-gato" data-name="Urinary Canine" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Urinary Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Urinary Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$9.73</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="410gr (x12)" data-price="$9.73">410gr (x12) — $9.73</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-gastrointestinal-canine-gato" data-name="Gastrointestinal Canine" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Gastrointestinal Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Gastrointestinal Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$9.73</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$9.73">400gr (x12) — $9.73</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-hepatic-canine-gato" data-name="Hepatic Canine" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Hepatic Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Hepatic Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$9.73</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="420gr (x12)" data-price="$9.73">420gr (x12) — $9.73</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
+             data-id="royal-hypoallergenic-canine-gato" data-name="Hypoallergenic Canine" data-brand="Royal Canin" data-animal="gato">
+      <img src="nan" alt="Hypoallergenic Canine" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">Hypoallergenic Canine</h3>
+        <p class="text-sm text-slate-600">Royal Canin · gato</p>
+        <p class="text-rose-700 font-semibold">$9.73</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="400gr (x12)" data-price="$9.73">400gr (x12) — $9.73</button></div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>
+    
+    </div>
+  </main>
+
+  <footer id="contacto" class="container mx-auto px-4 py-10 text-sm border-t">
+    <div class="grid sm:grid-cols-3 gap-6">
+      <div><h3 class="font-semibold mb-3">Amicotti</h3><p>Salud y bienestar para tus mascotas. Quito — Ecuador.</p></div>
+      <div><h3 class="font-semibold mb-3">Contacto</h3>
+        <p>WhatsApp: <a id="waFooter" class="text-rose-600" target="_blank" rel="noopener"></a></p>
+        <p>Email: <a class="text-rose-600" href="mailto:amicotti.uio@gmail.com">amicotti.uio@gmail.com</a></p>
+      </div>
+      <div><h3 class="font-semibold mb-3">Redes</h3><p><a class="text-rose-600" href="#" target="_blank" rel="noopener">Instagram</a> · <a class="text-rose-600" href="#" target="_blank" rel="noopener">Facebook</a></p></div>
+    </div>
+    <p class="text-xs text-slate-500 mt-6">© 2025 Amicotti.</p>
+  </footer>
+<script>
+(() => {
+  console.log('[Amicotti] local images script running');
+
+  const PLACEHOLDER =
+    "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%' height='100%' fill='%23f5f5f5'/><text x='50%' y='50%' font-size='24' font-family='Arial, sans-serif' fill='%23999' text-anchor='middle' dominant-baseline='middle'>Imagen referencial</text></svg>";
+
+  // Extensiones que vamos a probar en orden
+  const EXT = ['webp','jpg','jpeg','png'];
+
+  document.querySelectorAll('article.card[data-id]').forEach(card => {
+    const id  = (card.dataset.id || '').trim();     // p.ej. royal-babydog-milk-perro
+    const img = card.querySelector('img');
+    if (!img || !id) return;
+
+    const current = (img.getAttribute('src') || '').trim().toLowerCase();
+    if (current && current !== 'nan' && current !== '#') return;
+
+    // Probamos assets/<id>.<ext> hasta que una cargue
+    let i = 0;
+    const tryNext = () => {
+      if (i >= EXT.length) { img.src = PLACEHOLDER; return; }
+      img.onerror = () => { i++; tryNext(); };
+      img.src = `assets/${id}.${EXT[i]}`;
+    };
+    tryNext();
+
+    img.loading  = 'lazy';
+    img.decoding = 'async';
+   
+  });
+})();
+</script>
+ <script>
+(() => {
+  const PHONE = (typeof WA_PHONE !== 'undefined' && WA_PHONE) || '593995315716';
+
+  const waMsg = ({brand, name, size, price}) => 
+`Hola Amicotti 👋
+Quiero comprar:
+• ${brand||''} ${name||''} ${size||''}
+Precio: ${price||''}
+
+Sector: [Quito/Valles]
+Dirección:
+Nombre y teléfono:
+Pago: [Transferencia/Efectivo]
+Observaciones:`;
+
+  const buildUrl = data => 'https://wa.me/' + PHONE + '?text=' + encodeURIComponent(waMsg(data));
+
+  const toLink = (el, url) => {
+    if (!el) return null;
+    if (el.tagName === 'A') {
+      el.href = url; el.target = '_blank'; el.rel = 'noopener';
+      return el;
+    }
+    // si es <button> o cualquier otro, lo reemplazamos por <a>
+    const a = document.createElement('a');
+    a.innerHTML = el.innerHTML;
+    a.className = el.className || 'buy-btn';
+    a.href = url; a.target = '_blank'; a.rel = 'noopener';
+    el.replaceWith(a);
+    return a;
+  };
+
+  document.querySelectorAll('article.card[data-id]').forEach(card => {
+    const brand = card.dataset.brand || '';
+    const name  = card.dataset.name  || card.querySelector('h3, .title, .name')?.textContent?.trim() || '';
+
+    // variantes posibles
+    const variants = Array.from(card.querySelectorAll('.variant, [data-size], [data-price], .variants button, .variants a'));
+
+    const getSelected = () =>
+      variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
+
+    const current = () => {
+      const v = getSelected();
+      const size  = v?.dataset.size  || v?.textContent?.trim() || '';
+      const price = v?.dataset.price || card.querySelector('.p-price, [data-price-display]')?.textContent?.trim() || '';
+      return { brand, name, size, price };
+    };
+
+    // candidatos a “Comprar”: <a> o <button> cuyo texto contenga "comprar"
+    const buyCandidates = Array.from(card.querySelectorAll('a,button'))
+      .filter(b => /comprar/i.test(b.textContent || ''));
+
+    if (buyCandidates.length === 0) return; // no hay botón en esta card
+
+    // conectar todos los botones de compra de la tarjeta
+    const links = buyCandidates.map(b => toLink(b, buildUrl(current())));
+
+    // actualizar link cuando cambie la variante
+    const update = () => {
+      const url = buildUrl(current());
+      links.forEach(a => { a.href = url; });
+    };
+
+    variants.forEach(v => {
+      v.addEventListener('click', () => {
+        variants.forEach(x => { x.classList.remove('active'); x.removeAttribute('aria-pressed'); });
+        v.classList.add('active'); v.setAttribute('aria-pressed', 'true');
+        update();
+      });
+    });
+
+    update(); // inicial
+  });
+})();
+</script>
+<script>
+(() => {
+  console.log('[Amicotti] Buscador listo');
+
+  const $q      = document.getElementById('catalog-search');
+  const $clear  = document.getElementById('catalog-search-clear');
+  const $count  = document.getElementById('catalog-search-count');
+  const cards   = [...document.querySelectorAll('article.card[data-id]')];
+
+  // Normaliza: minúsculas + sin acentos + colapsa espacios
+  const norm = s => (s || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // Indexa cada tarjeta una sola vez
+  cards.forEach(card => {
+    if (card.dataset.index) return;
+    const parts = [
+      card.dataset.id,
+      card.dataset.name,
+      card.dataset.brand,
+      card.dataset.animal,
+      card.querySelector('h3')?.textContent || '',
+      // tamaños / precios visibles
+      [...card.querySelectorAll('.variant,[data-size][data-price]')]
+        .map(v => `${v.dataset.size || ''} ${v.dataset.price || ''} ${v.textContent || ''}`)
+        .join(' ')
+    ];
+    card.dataset.index = norm(parts.join(' '));
+  });
+
+  const updateURL = (q) => {
+    const url = q ? `${location.pathname}?q=${encodeURIComponent(q)}` : location.pathname;
+    history.replaceState(null, '', url);
+  };
+
+  const apply = (query) => {
+    const term = norm(query);
+    let visible = 0;
+
+    cards.forEach(card => {
+      const hit = !term || card.dataset.index.includes(term);
+      card.style.display = hit ? '' : 'none';
+      if (hit) visible++;
+    });
+
+    $count.textContent = `${visible} producto${visible === 1 ? '' : 's'}`;
+    updateURL(query);
+
+    // Mensaje "sin resultados"
+    document.getElementById('emptyMsg')?.remove();
+    if (!visible) {
+      const m = document.createElement('p');
+      m.id = 'emptyMsg';
+      m.className = 'container mx-auto px-4 py-10 text-slate-500';
+      m.textContent = 'No encontramos resultados. Prueba con otra palabra (ej. “kitten”, “8kg”, “mousse”).';
+      // colócalo después del buscador
+      const searchSection = document.querySelector('#catalog-search')?.closest('section');
+      (searchSection?.parentNode || document.body).appendChild(m);
+    }
+  };
+
+  // Debounce sencillo para tecleo
+  let t;
+  const deb = fn => (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), 150); };
+
+  // Lee ?q= de la URL (para compartir búsquedas)
+  const params = new URLSearchParams(location.search);
+  if (params.has('q')) $q.value = decodeURIComponent(params.get('q'));
+
+  // Eventos
+  $q.addEventListener('input', deb(e => apply(e.target.value)));
+  $clear.addEventListener('click', () => { $q.value = ''; apply(''); $q.focus(); });
+
+  // Primera aplicación
+  apply($q.value);
+})();
+</script>
+<!-- ===================== CARRITO AMICOTTI (bloque único) ===================== -->
+ <!-- Carga de datos Purina -->
+<script src="./assets/data/products-purina.js"></script>
+
+<style>
+  /* Botón flotante carrito */
+  #cartFab{
+    position:fixed; right:1rem; bottom:1rem; z-index:50;
+    display:inline-flex; align-items:center; gap:.5rem;
+    background:#f43f5e; color:#fff; border-radius:9999px;
+    box-shadow:0 10px 20px rgba(244,63,94,.25);
+    padding:.6rem .9rem; cursor:pointer; user-select:none;
+  }
+  #cartFab .badge{
+    background:#fff; color:#f43f5e; min-width:1.5rem; text-align:center;
+    border-radius:9999px; font-weight:700; padding:.1rem .4rem;
+  }
+
+  /* Panel/modal */
+  #cartModal{ position:fixed; inset:0; background:rgba(15,23,42,.55); display:none; z-index:60 }
+  #cartPanel{
+    position:absolute; right:0; top:0; height:100%; width:min(92vw,420px);
+    background:#fff; box-shadow:-10px 0 30px rgba(0,0,0,.2); display:flex; flex-direction:column;
+  }
+  .cart-header,.cart-footer{ padding:1rem; border-bottom:1px solid #e5e7eb }
+  .cart-footer{ border-top:1px solid #e5e7eb; margin-top:auto }
+  .cart-items{ overflow:auto; padding:1rem; display:flex; flex-direction:column; gap:.75rem }
+  .cart-item{
+    display:grid; grid-template-columns:1fr auto; gap:.25rem;
+    padding:.6rem .75rem; border:1px solid #e5e7eb; border-radius:.75rem; background:#fff;
+  }
+  .cart-item small{ color:#6b7280 }
+  .qty{ display:inline-flex; align-items:center; gap:.25rem; margin-left:.5rem }
+  .qty button{ width:1.6rem; height:1.6rem; border-radius:.4rem; border:1px solid #e5e7eb; background:#f8fafc }
+
+  /* Botones */
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:.35rem;
+        border-radius:.75rem; padding:.6rem .9rem; font-weight:600; border:1px solid transparent }
+  .btn-primary{ background:#f43f5e; color:#fff }
+  .btn-outline{ background:#fff; color:#f43f5e; border-color:#fecdd3 }
+  .btn-muted{ background:#f8fafc; color:#0f172a; border-color:#e5e7eb }
+</style>
+
+<!-- FAB del carrito -->
+<div id="cartFab" aria-label="Abrir carrito">
+  🛒 <span id="cartBadge" class="badge">0</span>
+</div>
+
+<!-- Modal del carrito -->
+<div id="cartModal" aria-hidden="true">
+  <aside id="cartPanel">
+    <div class="cart-header" style="display:flex;justify-content:space-between;align-items:center">
+      <strong>Tu carrito</strong>
+      <button id="cartClose" class="btn btn-muted">Cerrar</button>
+    </div>
+
+    <div id="cartItems" class="cart-items"></div>
+
+    <div class="cart-footer" style="display:grid; gap:.5rem">
+      <div style="display:flex;justify-content:space-between;font-weight:700">
+        <span>Total</span><span id="cartTotal">$0.00</span>
+      </div>
+      <div style="display:flex; gap:.5rem; flex-wrap:wrap">
+        <button id="cartClear" class="btn btn-muted" title="Vaciar carrito">Vaciar</button>
+        <button id="cartCheckout" class="btn btn-primary" title="Enviar por WhatsApp">Finalizar por WhatsApp</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+(() => {
+  // ========= Config =========
+  const KEY   = 'amicotti_cart';
+  const PHONE = (typeof WA_PHONE !== 'undefined' && WA_PHONE) ? String(WA_PHONE) : '593995315716';
+
+  // ========= Utils =========
+  const $ = (s) => document.querySelector(s);
+  const parseMoney = (s) => Number(String(s||'').replace(/[^0-9.,-]/g,'').replace(',', '.')) || 0;
+  const money = (n) => '$' + (Math.round((+n||0) * 100) / 100).toFixed(2);
+
+  // ========= Estado / API global =========
+  const AMICART = (window.AMICART = window.AMICART || {});
+  AMICART.get = () => { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; } };
+  AMICART.set = (cart) => { localStorage.setItem(KEY, JSON.stringify(cart)); AMICART.refresh(); };
+  AMICART.add = (item) => {
+    const cart = AMICART.get();
+    const found = cart.find(i => i.key === item.key);
+    if (found) found.qty += (item.qty || 1);
+    else cart.push({ ...item, qty: item.qty || 1 });
+    AMICART.set(cart);
+  };
+
+  // ========= UI refs =========
+  const fab      = $('#cartFab');
+  const badge    = $('#cartBadge');
+  const modal    = $('#cartModal');
+  const closeBtn = $('#cartClose');
+  const itemsBox = $('#cartItems');
+  const totalEl  = $('#cartTotal');
+  const clearBtn = $('#cartClear');
+  const checkout = $('#cartCheckout');
+
+  // ========= Render / abrir-cerrar =========
+  AMICART.refresh = () => {
+    const cart = AMICART.get();
+    // contador
+    badge.textContent = cart.reduce((s,i)=> s + (i.qty || 0), 0);
+
+    // listado + total
+    if (!itemsBox || !totalEl) return;
+    itemsBox.innerHTML = '';
+    let total = 0;
+
+    if (!cart.length) {
+      itemsBox.innerHTML = '<p class="text-slate-500">Tu carrito está vacío.</p>';
+      totalEl.textContent = '$0.00';
+      return;
+    }
+
+    cart.forEach((it, idx) => {
+      const line = (it.qty || 1) * parseMoney(it.price);
+      total += line;
+
+      const row = document.createElement('div');
+      row.className = 'cart-item';
+      row.innerHTML = `
+        <div>
+          <div><strong>${it.brand || ''} ${it.name || ''}</strong></div>
+          <small>${it.size || ''} · ${it.price || ''}</small>
+        </div>
+        <div style="text-align:right">
+          <div>${money(line)}</div>
+          <div class="qty">
+            <button class="down" aria-label="Quitar">−</button>
+            <span>${it.qty || 1}</span>
+            <button class="up" aria-label="Sumar">+</button>
+            <button class="del" aria-label="Eliminar" title="Eliminar" style="margin-left:.4rem">🗑️</button>
+          </div>
+        </div>
+      `;
+      row.querySelector('.down').onclick = () => { const c = AMICART.get(); c[idx].qty = Math.max(1, (c[idx].qty||1) - 1); AMICART.set(c); };
+      row.querySelector('.up').onclick   = () => { const c = AMICART.get(); c[idx].qty = (c[idx].qty||1) + 1; AMICART.set(c); };
+      row.querySelector('.del').onclick  = () => { const c = AMICART.get(); c.splice(idx, 1); AMICART.set(c); };
+
+      itemsBox.appendChild(row);
+    });
+
+    totalEl.textContent = money(total);
+  };
+
+  AMICART.open  = () => { modal.style.display = 'block'; };
+  AMICART.close = () => { modal.style.display = 'none'; };
+
+  // Eventos base
+  fab.onclick = AMICART.open;
+  closeBtn.onclick = AMICART.close;
+  modal.addEventListener('click', e => { if (e.target === modal) AMICART.close(); });
+  clearBtn.onclick = () => AMICART.set([]);
+  checkout.onclick = () => {
+    const cart = AMICART.get();
+    if (!cart.length) { AMICART.open(); return; }
+    const lines = cart.map(i => `• ${i.brand||''} ${i.name||''} ${i.size||''} x${i.qty||1} (${i.price||''})`).join('\n');
+    const total = money(cart.reduce((s,i)=> s + parseMoney(i.price) * (i.qty||1), 0));
+    const msg = `Hola Amicotti 👋
+Quiero confirmar mi pedido:
+
+${lines}
+
+Total: ${total}
+
+Sector: [Quito/Valles]
+Dirección:
+Nombre y teléfono:
+Pago: [Transferencia/Efectivo]
+Observaciones:`;
+    window.open('https://wa.me/' + PHONE + '?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+  };
+
+  // Refrescar al cargar y cuando cambie localStorage (otra pestaña)
+  AMICART.refresh();
+  window.addEventListener('storage', e => { if (e.key === KEY) AMICART.refresh(); });
+
+  // ========= Vincular tarjetas (inyecta "Agregar" si falta) =========
+  const bound = new WeakSet();
+
+  function bindCard(card){
+    if (!card || bound.has(card)) return;
+    bound.add(card);
+
+    // Crea botón "Agregar" si no existe
+    let add = card.querySelector('.add-to-cart');
+    if (!add){
+      const buy = card.querySelector('.buy, .buy-btn, a[href*="wa.me"], button.buy');
+      add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'add-to-cart btn btn-outline';
+      add.textContent = 'Agregar';
+      if (buy && buy.parentElement) buy.parentElement.insertBefore(add, buy);
+      else (card.querySelector('.actions') || card).appendChild(add);
+    }
+
+    add.addEventListener('click', () => {
+      // Detectar variante seleccionada (o primera)
+      const variants = Array.from(card.querySelectorAll('.variant,[data-size][data-price]'));
+      const sel = variants.find(v => v.getAttribute('aria-pressed') === 'true' || v.classList.contains('active')) || variants[0];
+
+      // Construir item del carrito
+      const item = {
+        id:    card.dataset.id    || '',
+        brand: card.dataset.brand || '',
+        name:  card.dataset.name  || (card.querySelector('h3, .title, .name')?.textContent || '').trim(),
+        size:  sel?.dataset?.size || (sel?.textContent || '').trim(),
+        price: sel?.dataset?.price || (card.querySelector('.p-price,[data-price-display]')?.textContent || '').trim()
+      };
+      item.key = item.id + '|' + (item.size || '');
+
+      // Guardar y refrescar UI
+      AMICART.add(item);
+
+      // Feedback visual
+      const prev = add.textContent;
+      add.disabled = true;
+      add.textContent = 'Agregado ✓';
+      add.classList.remove('btn-outline'); add.classList.add('btn-primary');
+      setTimeout(() => {
+        add.disabled = false;
+        add.textContent = prev;
+        add.classList.add('btn-outline'); add.classList.remove('btn-primary');
+      }, 900);
+    });
+  }
+
+  // Enlazado inicial + observar nuevas cards
+  document.querySelectorAll('article.card[data-id]').forEach(bindCard);
+  const mo = new MutationObserver(muts => {
+    muts.forEach(m => m.addedNodes.forEach(n => {
+      if (n.nodeType !== 1) return;
+      if (n.matches?.('article.card[data-id]')) bindCard(n);
+      n.querySelectorAll?.('article.card[data-id]').forEach(bindCard);
+    }));
+  });
+  mo.observe(document.body, { childList:true, subtree:true });
+})();
+</script>
+<!-- ===================== /CARRITO AMICOTTI ===================== -->
+
+
+
+
+</body>
+ <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
+</html>
