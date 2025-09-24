@@ -73,21 +73,9 @@
   </section>
 
   <main class="container mx-auto px-4 pb-16">
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      
-    <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
-             data-id="royal-puppy-pro-tech-perro" data-name="Puppy Pro Tech" data-brand="Royal Canin" data-animal="perro">
-      <img src="nan" alt="Puppy Pro Tech" class="rounded-xl w-full h-56 object-cover bg-slate-100">
-      <div class="mt-4 space-y-1">
-        <h3 class="font-semibold">Puppy Pro Tech</h3>
-        <p class="text-sm text-slate-600">Royal Canin · perro</p>
-        <p class="text-rose-700 font-semibold">$62.41</p>
-        <div class="flex flex-wrap gap-2 mt-1" role="list"><button class="variant px-2 py-1 rounded-lg border text-xs" data-size="300gr" data-price="$62.41">300gr — $62.41</button></div>
-        <div class="flex gap-2 mt-2">
-          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
-        </div>
-      </div>
-    </article>
+    
+    <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+  
     
 
     <article class="card group bg-white border rounded-2xl p-4 shadow-soft" 
@@ -2018,10 +2006,51 @@ Observaciones:`;
   apply($q.value);
 })();
 </script>
-<!-- ===================== CARRITO AMICOTTI (bloque único) ===================== -->
+
  <!-- Carga de datos Purina -->
 <script src="./assets/data/products-purina.js"></script>
+<script>
+/* Render básico de tarjetas desde PRODUCTS (Purina) */
+(function(){
+  const grid = document.getElementById('grid');
+  if(!grid || !window.PRODUCTS){ return; }
+  grid.innerHTML = '';
 
+  const money = n => `$${(Math.round(Number(n||0)*100)/100).toFixed(2)}`;
+
+  for(const p of PRODUCTS){
+    const min = p.variants?.length ? Math.min(...p.variants.map(v=>Number(v.price)||0)) : 0;
+    const variantsHTML = (p.variants||[]).map(v => `
+      <button class="btn-outline" data-size="${v.label}" data-price="${money(v.price)}">
+        ${v.label} — ${money(v.price)}
+      </button>`).join('');
+
+    const art = document.createElement('article');
+    art.className = 'card group bg-white border rounded-2xl p-4 shadow-soft';
+    art.setAttribute('data-id', (p.id||`${p.brand}-${p.name}`).toLowerCase().replace(/[^a-z0-9]+/g,'-'));
+    art.setAttribute('data-name', p.name||'');
+    art.setAttribute('data-brand', p.brand||'');
+    art.setAttribute('data-animal', p.species||'');
+
+    art.innerHTML = `
+      <img src="${p.image||''}" alt="${p.name||''}" class="rounded-xl w-full h-56 object-contain bg-slate-100">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">${p.name||''}</h3>
+        <p class="text-sm text-slate-600">${(p.brand||'')} · ${p.species||''}</p>
+        <p class="text-rose-700 font-semibold">${min?money(min):''}</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list">${variantsHTML}</div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    `;
+    grid.appendChild(art);
+  }
+})();
+</script>
+ 
+ 
+<!-- ===================== CARRITO AMICOTTI (bloque único) ===================== -->
 <style>
   /* Botón flotante carrito */
   #cartFab{
