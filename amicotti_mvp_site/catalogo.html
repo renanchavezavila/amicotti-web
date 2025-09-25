@@ -1,4 +1,321 @@
-<!DOCTYPE html>
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Amicotti — Purina</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="assets/logo.png" />
+  <style>
+    .container{max-width:1200px}
+    .shadow-soft{box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    .variant.active{background:#fee2e2;border-color:#ef4444}
+    /* Catálogo: imagen grande sin recortes */
+    article.card img{width:100%;height:260px;object-fit:contain;background:#f8fafc;border-radius:.75rem}
+    @media (min-width:1024px){article.card img{height:300px}}
+  </style>
+</head>
+<body class="bg-white text-slate-800">
+  <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
+
+  <!-- Top bar -->
+  <div class="bg-slate-900 text-slate-100 text-xs">
+    <div class="container mx-auto px-4 py-2 flex items-center justify-between gap-4">
+      <span>Entrega en Quito y valles</span>
+      <span>Pagos: <strong>transferencia bancaria</strong></span>
+      <a id="waTop" class="text-rose-300 hover:text-rose-200 underline" target="_blank" rel="noopener">Atención WhatsApp</a>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="border-b">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <img src="assets/logo.png" alt="Amicotti" class="h-10 w-auto" onerror="this.style.display='none'">
+        <span class="font-semibold text-xl tracking-tight">Amicotti</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a class="hover:text-rose-700" href="catalogo.html">Royal Canin</a>
+        <a class="text-rose-700 font-semibold" href="purina.html">Purina</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Título -->
+  <section class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold">Purina</h1>
+    <p class="text-slate-600 mt-1">Cat Chow, Dog Chow, Excellent, Pro Plan, Felix, Fancy Feast y PPVD. Compra por WhatsApp.</p>
+  </section>
+
+  <!-- BUSCADOR -->
+  <section class="container mx-auto px-4 pt-2 pb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+      <label for="catalog-search" class="sr-only">Buscar en catálogo</label>
+      <input id="catalog-search" type="search" placeholder="Buscar: cat chow, 1.5kg, perro, urinary..."
+             class="w-full sm:max-w-lg rounded-xl border px-4 py-3 outline-none focus:ring-2 focus:ring-rose-500" autocomplete="off"/>
+      <button id="catalog-search-clear" class="px-4 py-3 rounded-xl border bg-slate-50 hover:bg-slate-100">Limpiar</button>
+      <span id="catalog-search-count" class="text-sm text-slate-500 sm:ml-auto"></span>
+    </div>
+  </section>
+
+  <!-- GRID -->
+  <main class="container mx-auto px-4 pb-16">
+    <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    <p id="emptyMsg" class="hidden text-slate-500 py-10">No encontramos resultados. Prueba con otra palabra.</p>
+  </main>
+
+  <!-- Footer -->
+  <footer id="contacto" class="container mx-auto px-4 py-10 text-sm border-t">
+    <div class="grid sm:grid-cols-3 gap-6">
+      <div><h3 class="font-semibold mb-3">Amicotti</h3><p>Salud y bienestar para tus mascotas. Quito — Ecuador.</p></div>
+      <div><h3 class="font-semibold mb-3">Contacto</h3>
+        <p>WhatsApp: <a id="waFooter" class="text-rose-600" target="_blank" rel="noopener"></a></p>
+        <p>Email: <a class="text-rose-600" href="mailto:amicotti.uio@gmail.com">amicotti.uio@gmail.com</a></p>
+      </div>
+      <div><h3 class="font-semibold mb-3">Redes</h3><p><a class="text-rose-600" href="#" target="_blank" rel="noopener">Instagram</a> · <a class="text-rose-600" href="#" target="_blank" rel="noopener">Facebook</a></p></div>
+    </div>
+    <p class="text-xs text-slate-500 mt-6">© 2025 Amicotti.</p>
+  </footer>
+
+  <!-- =================== LOGICA PURINA (CSV) =================== -->
+  <script>
+  const CSV_URL = "./data/purina.csv"; // coloca tu purina.csv aquí
+  const PLACEHOLDER =
+    "data:image/svg+xml;utf8," +
+    encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'>
+      <rect width='100%' height='100%' fill='#f5f5f5'/>
+      <text x='50%' y='50%' font-size='24' font-family='Arial, sans-serif' fill='#999' text-anchor='middle' dominant-baseline='middle'>Imagen referencial</text>
+    </svg>`);
+
+  const CAT_LABEL = {dry:'Seco',wet:'Húmedo',treats:'Snacks',veterinary:'Veterinaria'};
+  const SPECIES   = {cat:'gato', dog:'perro'};
+
+  const waLink = 'https://wa.me/' + (window.WA_PHONE || '593995315716');
+  document.getElementById('waTop').href = waLink;
+  document.getElementById('waFooter').href = waLink;
+  document.getElementById('waFooter').textContent = '+' + (window.WA_PHONE || '593995315716');
+
+  const parseCSV = (txt) => txt.trim().split(/\r?\n/).map((row,i)=>{
+    if(!row) return null;
+    if(i===0){ return null; } // header
+    const cols = row.split(','); // nuestro CSV no usa comillas
+    if(cols.length < 7) return null;
+    const [id,brand,name,species,category,variants,image_url] = cols.map(s=>s.trim());
+    return { id, brand, name, species, category, variants, image_url };
+  }).filter(Boolean);
+
+  const chip = (t) => `<span class="px-2 py-0.5 rounded-full border text-xs">${t}</span>`;
+
+  function card(p){
+    const variants = (p.variants||'').split('|').filter(Boolean);
+    const varBtns = variants.map((v,i)=>
+      `<button class="variant px-2 py-1 rounded-lg border text-xs ${i===0?'active':''}" data-size="${v}" ${i===0?'aria-pressed="true"':''}>${v}</button>`
+    ).join('');
+    const msg = encodeURIComponent(`Hola Amicotti 👋
+Quiero comprar:
+• ${p.brand} ${p.name}
+Presentación: ${variants[0]||'consultar'}
+
+Sector: [Quito/Valles]
+Dirección:
+Nombre y teléfono:
+Pago: [Transferencia/Efectivo]
+Observaciones:`);
+    const buyUrl = waLink + '?text=' + msg;
+
+    return `
+    <article class="card group bg-white border rounded-2xl p-4 shadow-soft"
+             data-id="${p.id}" data-name="${p.name}" data-brand="${p.brand}" data-animal="${SPECIES[p.species]||p.species}">
+      <img src="${p.image_url||PLACEHOLDER}" alt="${p.name}" class="rounded-xl w-full h-56 object-cover bg-slate-100"
+           onerror="this.onerror=null;this.src='${PLACEHOLDER}'">
+      <div class="mt-4 space-y-1">
+        <h3 class="font-semibold">${p.name}</h3>
+        <p class="text-sm text-slate-600">${p.brand} · ${SPECIES[p.species]||p.species}</p>
+        <div class="flex flex-wrap gap-2 mt-1" role="list">${varBtns}</div>
+        <div class="flex items-center gap-2 mt-2 text-xs text-slate-600">
+          ${chip(CAT_LABEL[p.category]||p.category)}
+        </div>
+        <div class="flex gap-2 mt-2">
+          <button class="buy px-4 py-2 rounded-xl bg-rose-600 text-white">Comprar</button>
+        </div>
+      </div>
+    </article>`;
+  }
+
+  let DATA = [];
+  const grid = document.getElementById('grid');
+  const countEl = document.getElementById('catalog-search-count');
+  const emptyEl = document.getElementById('emptyMsg');
+
+  function render(list){
+    grid.innerHTML = list.map(card).join('');
+    // actualizar contador
+    countEl.textContent = `${list.length} producto${list.length===1?'':'s'}`;
+    emptyEl.classList.toggle('hidden', list.length !== 0);
+  }
+
+  fetch(CSV_URL)
+    .then(r => r.ok ? r.text() : Promise.reject('No se pudo cargar purina.csv'))
+    .then(txt => { DATA = parseCSV(txt); render(DATA); })
+    .catch(err => { grid.innerHTML = `<p class="text-red-600">${err}</p>`; });
+
+  // Buscador
+  const $q = document.getElementById('catalog-search');
+  const $clear = document.getElementById('catalog-search-clear');
+
+  const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+
+  function apply(q){
+    const term = norm(q);
+    const out = !term ? DATA : DATA.filter(p =>
+      norm([p.id,p.brand,p.name,p.species,p.category,p.variants].join(' ')).includes(term)
+    );
+    render(out);
+  }
+  let t; const deb = fn => (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),150); };
+  $q.addEventListener('input', deb(e=>apply(e.target.value)));
+  $clear.addEventListener('click', ()=>{ $q.value=''; apply(''); $q.focus(); });
+  </script>
+
+  <!-- ============ Imagen local fallback si el CSV trae "nan" o "#" ============ -->
+  <script>
+  (() => {
+    const EXT = ['webp','jpg','jpeg','png'];
+    document.addEventListener('error', e => {
+      const img = e.target;
+      if (!(img instanceof HTMLImageElement)) return;
+      const card = img.closest('article.card[data-id]');
+      const id = card?.dataset.id;
+      if(!id) return;
+      let i=0;
+      const tryNext = () => {
+        if (i>=EXT.length){ img.src = `${PLACEHOLDER}`; return; }
+        img.onerror = () => { i++; tryNext(); };
+        img.src = `assets/${id}.${EXT[i]}`;
+      };
+      const current = (img.getAttribute('src')||'').trim().toLowerCase();
+      if (current==='nan' || current==='#' || current==='') tryNext();
+    }, true);
+  })();
+  </script>
+
+  <!-- ===================== CARRITO AMICOTTI (igual que catálogo) ===================== -->
+  <style>
+    #cartFab{position:fixed;right:1rem;bottom:1rem;z-index:50;display:inline-flex;align-items:center;gap:.5rem;background:#f43f5e;color:#fff;border-radius:9999px;box-shadow:0 10px 20px rgba(244,63,94,.25);padding:.6rem .9rem;cursor:pointer;user-select:none}
+    #cartFab .badge{background:#fff;color:#f43f5e;min-width:1.5rem;text-align:center;border-radius:9999px;font-weight:700;padding:.1rem .4rem}
+    #cartModal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;z-index:60}
+    #cartPanel{position:absolute;right:0;top:0;height:100%;width:min(92vw,420px);background:#fff;box-shadow:-10px 0 30px rgba(0,0,0,.2);display:flex;flex-direction:column}
+    .cart-header,.cart-footer{padding:1rem;border-bottom:1px solid #e5e7eb}
+    .cart-footer{border-top:1px solid #e5e7eb;margin-top:auto}
+    .cart-items{overflow:auto;padding:1rem;display:flex;flex-direction:column;gap:.75rem}
+    .cart-item{display:grid;grid-template-columns:1fr auto;gap:.25rem;padding:.6rem .75rem;border:1px solid #e5e7eb;border-radius:.75rem;background:#fff}
+    .cart-item small{color:#6b7280}
+    .qty{display:inline-flex;align-items:center;gap:.25rem;margin-left:.5rem}
+    .qty button{width:1.6rem;height:1.6rem;border-radius:.4rem;border:1px solid #e5e7eb;background:#f8fafc}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:.35rem;border-radius:.75rem;padding:.6rem .9rem;font-weight:600;border:1px solid transparent}
+    .btn-primary{background:#f43f5e;color:#fff}
+    .btn-outline{background:#fff;color:#f43f5e;border-color:#fecdd3}
+    .btn-muted{background:#f8fafc;color:#0f172a;border-color:#e5e7eb}
+  </style>
+
+  <div id="cartFab" aria-label="Abrir carrito">🛒 <span id="cartBadge" class="badge">0</span></div>
+  <div id="cartModal" aria-hidden="true">
+    <aside id="cartPanel">
+      <div class="cart-header" style="display:flex;justify-content:space-between;align-items:center">
+        <strong>Tu carrito</strong><button id="cartClose" class="btn btn-muted">Cerrar</button>
+      </div>
+      <div id="cartItems" class="cart-items"></div>
+      <div class="cart-footer" style="display:grid;gap:.5rem">
+        <div style="display:flex;justify-content:space-between;font-weight:700"><span>Total</span><span id="cartTotal">$0.00</span></div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <button id="cartClear" class="btn btn-muted">Vaciar</button>
+          <button id="cartCheckout" class="btn btn-primary">Finalizar por WhatsApp</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+  (() => {
+    const KEY='amicotti_cart'; const PHONE=String(window.WA_PHONE||'593995315716');
+    const $=s=>document.querySelector(s); const money=n=>'$'+(Math.round((+n||0)*100)/100).toFixed(2);
+    const parseMoney=s=>Number(String(s||'').replace(/[^0-9.,-]/g,'').replace(',', '.'))||0;
+
+    const AMICART=(window.AMICART=window.AMICART||{});
+    AMICART.get=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return[]}};
+    AMICART.set=c=>{localStorage.setItem(KEY,JSON.stringify(c));AMICART.refresh()};
+    AMICART.add=item=>{const c=AMICART.get();const f=c.find(i=>i.key===item.key);if(f)f.qty+=(item.qty||1);else c.push({...item,qty:item.qty||1});AMICART.set(c)};
+
+    const fab=$('#cartFab'),badge=$('#cartBadge'),modal=$('#cartModal'),closeBtn=$('#cartClose'),
+          itemsBox=$('#cartItems'),totalEl=$('#cartTotal'),clearBtn=$('#cartClear'),checkout=$('#cartCheckout');
+
+    AMICART.refresh=()=>{
+      const cart=AMICART.get(); badge.textContent=cart.reduce((s,i)=>s+(i.qty||0),0);
+      if(!itemsBox||!totalEl)return; itemsBox.innerHTML=''; let total=0;
+      if(!cart.length){itemsBox.innerHTML='<p class="text-slate-500">Tu carrito está vacío.</p>'; totalEl.textContent='$0.00'; return;}
+      cart.forEach((it,idx)=>{const line=(it.qty||1)*parseMoney(it.price); total+=line;
+        const row=document.createElement('div'); row.className='cart-item';
+        row.innerHTML=`<div><div><strong>${it.brand||''} ${it.name||''}</strong></div><small>${it.size||''} · ${it.price||''}</small></div>
+        <div style="text-align:right"><div>${money(line)}</div><div class="qty">
+          <button class="down">−</button><span>${it.qty||1}</span><button class="up">+</button>
+          <button class="del" style="margin-left:.4rem">🗑️</button></div></div>`;
+        row.querySelector('.down').onclick=()=>{const c=AMICART.get(); c[idx].qty=Math.max(1,(c[idx].qty||1)-1); AMICART.set(c)};
+        row.querySelector('.up').onclick=()=>{const c=AMICART.get(); c[idx].qty=(c[idx].qty||1)+1; AMICART.set(c)};
+        row.querySelector('.del').onclick=()=>{const c=AMICART.get(); c.splice(idx,1); AMICART.set(c)};
+        itemsBox.appendChild(row);
+      });
+      totalEl.textContent=money(total);
+    };
+
+    AMICART.open=()=>{modal.style.display='block'}; AMICART.close=()=>{modal.style.display='none'};
+    fab.onclick=AMICART.open; closeBtn.onclick=AMICART.close; modal.addEventListener('click',e=>{if(e.target===modal)AMICART.close()});
+    clearBtn.onclick=()=>AMICART.set([]);
+    checkout.onclick=()=>{const cart=AMICART.get(); if(!cart.length){AMICART.open();return}
+      const lines=cart.map(i=>`• ${i.brand||''} ${i.name||''} ${i.size||''} x${i.qty||1} (${i.price||''})`).join('\n');
+      const total=money(cart.reduce((s,i)=>s+parseMoney(i.price)*(i.qty||1),0));
+      const msg=`Hola Amicotti 👋\nQuiero confirmar mi pedido:\n\n${lines}\n\nTotal: ${total}\n\nSector: [Quito/Valles]\nDirección:\nNombre y teléfono:\nPago: [Transferencia/Efectivo]\nObservaciones:`;
+      window.open('https://wa.me/'+PHONE+'?text='+encodeURIComponent(msg),'_blank','noopener');
+    };
+
+    AMICART.refresh();
+    window.addEventListener('storage', e=>{if(e.key===KEY)AMICART.refresh()});
+
+    // Inyectar botón "Agregar" y conectar "Comprar"
+    const bound=new WeakSet();
+    function toLink(el,url){if(!el)return null; if(el.tagName==='A'){el.href=url;el.target='_blank';el.rel='noopener';return el}
+      const a=document.createElement('a'); a.innerHTML=el.innerHTML; a.className=el.className||'buy-btn';
+      a.href=url; a.target='_blank'; a.rel='noopener'; el.replaceWith(a); return a; }
+
+    function bindCard(card){
+      if(!card||bound.has(card))return; bound.add(card);
+      const brand=card.dataset.brand||''; const name=card.dataset.name||card.querySelector('h3')?.textContent?.trim()||'';
+      const variants=[...card.querySelectorAll('.variant,[data-size][data-price]')];
+      const getSel=()=>variants.find(v=>v.getAttribute('aria-pressed')==='true'||v.classList.contains('active'))||variants[0];
+      const current=()=>({brand,name,size:getSel()?.dataset.size||(getSel()?.textContent||''),price:getSel()?.dataset.price||''});
+      const waMsg=d=>`Hola Amicotti 👋\nQuiero comprar:\n• ${d.brand||''} ${d.name||''} ${d.size||''}\nPrecio: ${d.price||''}\n\nSector: [Quito/Valles]\nDirección:\nNombre y teléfono:\nPago: [Transferencia/Efectivo]\nObservaciones:`;
+      const buildUrl=d=>'https://wa.me/'+(window.WA_PHONE||'593995315716')+'?text='+encodeURIComponent(waMsg(d));
+      const buys=[...card.querySelectorAll('a,button')].filter(b=>/comprar/i.test(b.textContent||'')); if(!buys.length)return;
+      const links=buys.map(b=>toLink(b,buildUrl(current())));
+      const update=()=>{const u=buildUrl(current()); links.forEach(a=>a.href=u)};
+      variants.forEach(v=>v.addEventListener('click',()=>{variants.forEach(x=>{x.classList.remove('active');x.removeAttribute('aria-pressed')}); v.classList.add('active'); v.setAttribute('aria-pressed','true'); update()}));
+      // botón Agregar
+      let add=card.querySelector('.add-to-cart'); if(!add){add=document.createElement('button'); add.type='button'; add.className='add-to-cart btn btn-outline'; add.textContent='Agregar';
+        const buy=links[0]; (buy?.parentElement||card).insertBefore(add,buy||null);}
+      add.addEventListener('click',()=>{const d=current(); const item={id:card.dataset.id||'',brand,name,size:d.size,price:d.price}; item.key=item.id+'|'+(item.size||''); AMICART.add(item);
+        const prev=add.textContent; add.disabled=true; add.textContent='Agregado ✓'; add.classList.remove('btn-outline'); add.classList.add('btn-primary');
+        setTimeout(()=>{add.disabled=false; add.textContent=prev; add.classList.add('btn-outline'); add.classList.remove('btn-primary')},900)});
+      update();
+    }
+
+    const mo=new MutationObserver(m=>m.forEach(x=>x.addedNodes.forEach(n=>{if(n.nodeType!==1)return; if(n.matches?.('article.card[data-id]'))bindCard(n); n.querySelectorAll?.('article.card[data-id]').forEach(bindCard)})));
+    mo.observe(document.body,{childList:true,subtree:true});
+    document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('article.card[data-id]').forEach(bindCard));
+  })();
+  </script>
+  <!-- ===================== /CARRITO ===================== -->
+
+</body>
+</html><!DOCTYPE html>
 <html lang="es"> 
  <style>
   /* Catálogo: imagen más grande y sin recortes */
