@@ -585,6 +585,57 @@ Observaciones:`;
   <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
 </body>
 </html>
+<script>
+const CSV_URL = "/data/purina.csv";
+const $ = s => document.querySelector(s);
+const grid = $("#grid"), q = $("#catalog-search"), count = $("#catalog-search-count");
+const PLACEHOLDER = "data:image/svg+xml;utf8,"+encodeURIComponent(
+  "<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%' height='100%' fill='%23f5f5f5'/><text x='50%' y='50%' font-size='24' font-family='Arial' fill='%23999' text-anchor='middle' dominant-baseline='middle'>Imagen referencial</text></svg>"
+);
+
+// CSV: id,brand,name,species,category,variants,image_url (sin comillas)
+const parse = t => t.trim().split(/\r?\n/).slice(1).map(r=>{
+  const cols = r.split(','); if (cols.length < 7) return null;
+  const [id,brand,name,species,category,variants,image_url] = cols.map(s=>s.trim());
+  return {id,brand,name,species,category,variants,image_url};
+}).filter(Boolean);
+
+const card = p => `
+<article class="card group bg-white border rounded-2xl p-4 shadow-soft" data-id="${p.id}">
+  <img src="${p.image_url||''}" onerror="this.src='${PLACEHOLDER}'" alt="${p.name}" class="rounded-xl w-full h-56 object-cover bg-slate-100">
+  <div class="mt-4 space-y-1">
+    <h3 class="font-semibold">${p.name}</h3>
+    <p class="text-sm text-slate-600">${p.brand} · ${p.species==='cat'?'gato':'perro'}</p>
+    <div class="flex flex-wrap gap-2 mt-1">
+      ${(p.variants||'').split('|').filter(Boolean).map((v,i)=>`<button class="variant px-2 py-1 rounded-lg border text-xs ${i? '' : 'active'}" data-size="${v}" ${i? '' : 'aria-pressed="true"'}>${v}</button>`).join('')}
+    </div>
+    <div class="flex gap-2 mt-2">
+      <a class="buy px-4 py-2 rounded-xl bg-rose-600 text-white" target="_blank" rel="noopener"
+         href="https://wa.me/${window.WA_PHONE||'593995315716'}?text=${encodeURIComponent('Hola Amicotti 👋 Quiero comprar: '+(p.brand||'')+' '+(p.name||''))}">
+        Comprar
+      </a>
+    </div>
+  </div>
+</article>`;
+
+let DATA = [];
+function render(list){
+  grid.innerHTML = list.map(card).join('');
+  if (count) count.textContent = `${list.length} producto${list.length===1?'':'s'}`;
+}
+const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+function apply(txt){
+  const t = norm(txt);
+  render(!t ? DATA : DATA.filter(p => norm([p.id,p.brand,p.name,p.species,p.category,p.variants].join(' ')).includes(t)));
+}
+
+fetch(CSV_URL)
+  .then(r => r.ok ? r.text() : Promise.reject("No se pudo cargar purina.csv"))
+  .then(txt => { DATA = parse(txt); render(DATA); })
+  .catch(err => { grid.innerHTML = `<p class="text-red-600">${err}</p>`; });
+
+q && q.addEventListener('input', e => apply(e.target.value));
+</script>
  
 </body>
  <script>window.WA_PHONE = window.WA_PHONE || '593995315716';</script>
