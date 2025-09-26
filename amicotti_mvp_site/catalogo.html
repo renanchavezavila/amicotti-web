@@ -208,23 +208,61 @@ const CSV_URLS = ["data/purina.csv", "data/royal.csv"];
     }));
     const arrays = await Promise.all(loads);
     const merged = arrays.flat();
-    // Normalización
-    PRODUCTS = merged.map((r,idx)=>({
+    // Normalización: acepta esquema "master" o "purina/royal"
+PRODUCTS = arrays.flat().map((r, idx) => {
+  const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
+  if (hasBrandSchema) {
+    // --- CSV estilo Purina/Royal: id,brand,name,species,category,variants,image_url
+    const specie = (r.species || '').trim().toLowerCase();
+    const categoriaRaw = (r.category || '').trim().toLowerCase();
+    const especie = specie === 'cat' ? 'Gato' : specie === 'dog' ? 'Perro' : '';
+    const categoria = categoriaRaw === 'dry' ? 'Seco'
+                     : categoriaRaw === 'wet' ? 'Húmedo'
+                     : categoriaRaw === 'veterinary' ? 'Veterinario'
+                     : categoriaRaw === 'treats' ? 'Snack'
+                     : '';
+    // tomar la PRIMERA variante solo para mostrar "Presentación"
+    let peso_g = null;
+    if (r.variants) {
+      const v = String(r.variants).split('|')[0].trim(); // ej "500g" | "1.5kg" | "unidad"
+      if (/unidad/i.test(v)) { peso_g = null; }
+      else if (/kg/i.test(v)) { const n = parseFloat(v); if (!isNaN(n)) peso_g = Math.round(n * 1000); }
+      else if (/g/i.test(v))  { const n = parseFloat(v); if (!isNaN(n)) peso_g = Math.round(n); }
+    }
+    return {
+      id: r.id || ('row'+idx),
+      marca: (r.brand || '').toString().trim(),
+      linea: '',
+      especie,
+      categoria,
+      nombre: (r.name || '').toString().trim(),
+      peso_g,
+      sku: '',                 // opcional por ahora
+      precio: null,            // mostramos "Consultar"
+      imagen_url: (r.image_url || '').toString().trim(),
+      descripcion: '',
+      disponible: true
+    };
+  } else {
+    // --- CSV estilo "master": ya viene con las columnas esperadas
+    return {
       id: r.id || ('row'+idx),
       marca: (r.marca||'').trim(),
       linea: (r.linea||'').trim(),
       especie: (r.especie||'').trim(),
       categoria: (r.categoria||'').trim(),
       nombre: (r.nombre||'').trim(),
-      peso_g: r.peso_g? Number(r.peso_g): null,
+      peso_g: r.peso_g ? Number(r.peso_g) : null,
       sku: (r.sku||'').trim(),
       precio: r.precio!=='' && r.precio!=null ? Number(r.precio) : null,
       imagen_url: (r.imagen_url||'').trim(),
       descripcion: (r.descripcion||'').trim(),
       disponible: String(r.disponible||'1')==='1'
-    })).filter(p=>p.disponible);
+    };
   }
+}).filter(p => p.disponible);
 
+   
   // ================== FILTROS ==================
   function fillSelect(sel, values){ sel.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
   function fillFilters(){
