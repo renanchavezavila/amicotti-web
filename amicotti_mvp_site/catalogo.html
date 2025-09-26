@@ -326,7 +326,8 @@ const altList = candidates.slice(1).join("|");
     const badgeVet = (p.categoria.toLowerCase()==='veterinario') ? `<span class='px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 rounded'>Veterinario</span>` : '';
     return `<article class='border rounded-lg overflow-hidden bg-white'>
       <div class='img-box w-full bg-gray-50 grid place-items-center'>
-        <img src='${img}' alt='${p.nombre}' loading='lazy'/>
+     <img src='${img}' data-alt='${altList}' alt='${p.nombre}' loading='lazy'
+     onerror="onImgError(this)"/>
       </div>
       <div class='p-3 space-y-1'>
         <h3 class='font-medium leading-tight'>${p.nombre}</h3>
