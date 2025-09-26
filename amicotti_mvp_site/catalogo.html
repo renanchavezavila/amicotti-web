@@ -320,7 +320,9 @@ function onImgError(el){
   function cardHTML(p){
     const peso = weight(p.peso_g);
     const precio = p.precio!=null? money(p.precio) : 'Consultar';
-    const img = p.imagen_url || 'assets/placeholder.png';
+    const candidates = buildImgCandidates(p);
+const img = candidates[0];
+const altList = candidates.slice(1).join("|");
     const badgeVet = (p.categoria.toLowerCase()==='veterinario') ? `<span class='px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 rounded'>Veterinario</span>` : '';
     return `<article class='border rounded-lg overflow-hidden bg-white'>
       <div class='img-box w-full bg-gray-50 grid place-items-center'>
