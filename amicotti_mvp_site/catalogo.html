@@ -299,6 +299,23 @@ const IMG_EXTS = [".jpg", ".png", ".webp"];
     }
     return out;
   }
+function buildImgCandidates(p){
+  // Si viene ruta en CSV, úsala primero
+  if (p.imagen_url && p.imagen_url.trim()) return [p.imagen_url.trim()];
+  // Si no, intenta por id con varias extensiones
+  return IMG_EXTS.map(ext => `${IMG_BASE}${p.id}${ext}`);
+}
+
+function onImgError(el){
+  const rest = (el.dataset.alt || "").split("|").filter(Boolean);
+  if (rest.length){
+    el.src = rest.shift();            // prueba siguiente candidato
+    el.dataset.alt = rest.join("|");
+  }else{
+    el.onerror = null;
+    el.src = "assets/logo.png";       // placeholder existente
+  }
+}
 
   function cardHTML(p){
     const peso = weight(p.peso_g);
