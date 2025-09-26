@@ -11,13 +11,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- PapaParse para CSV robusto -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
   <style>
     /* Evita saltos feos en imágenes */
-    .img-box{height:12rem}
-    .img-box img{max-height:11rem;object-fit:contain}
-    /* Drawer */
-    .drawer{transform:translateX(100%);transition:transform .25s ease}
-    .drawer.open{transform:translateX(0)}
+    .img-box { height: 12rem }
+    .img-box img { max-height: 11rem; object-fit: contain }
+
+    /* Drawer (carrito) */
+    .drawer { transform: translateX(100%); transition: transform .25s ease }
+    .drawer.open { transform: translateX(0) }
   </style>
 </head>
 <body class="bg-white text-gray-900">
@@ -105,12 +107,10 @@
 
   <script>
   // ================== CONFIG ==================
-  const WA_PHONE = "593995315716"; // ← Reemplazar si hay número definitivo único
-  // Opción A: Catálogo unificado
-  // Usar múltiples CSV (Purina + Royal)
-const CSV_URLS = ["/data/purina.csv", "/data/royal.csv"];
-  // Opción B: Catálogo por marca (descomenta y comenta la línea de arriba)
-  // const CSV_URLS = ["data/purina.csv", "data/royal.csv"]; 
+  const WA_PHONE = "593995315716"; // ← Reemplaza si hay número definitivo
+
+  // Catálogo unificado: Purina + Royal (rutas absolutas en producción)
+  const CSV_URLS = ["/data/purina.csv", "/data/royal.csv"];
 
   // ================== ESTADO ==================
   let PRODUCTS = [];        // productos disponibles (desde CSV)
@@ -191,7 +191,7 @@ const CSV_URLS = ["/data/purina.csv", "/data/royal.csv"];
     let lines = [];
     lines.push('🛍️ *Pedido Amicotti*');
     CART.forEach(it=>{
-      const price = it.precio!=null?` — ${money(it.precio)} c/u`:'';
+      const price = it.precio!=null?` — ${money(it.precio)} c/u`:''; 
       lines.push(`• ${it.nombre}${it.peso_g?(' — '+weight(it.peso_g)):''} — Cant: ${it.qty}${price}`);
     });
     const total = CART.reduce((a,i)=> a + (i.precio!=null? i.precio*i.qty:0), 0);
@@ -204,65 +204,74 @@ const CSV_URLS = ["/data/purina.csv", "/data/royal.csv"];
   // ================== CSV / PRODUCTOS ==================
   async function loadCSVs(){
     const loads = CSV_URLS.map(url => new Promise((resolve,reject)=>{
-      Papa.parse(url,{download:true,header:true,skipEmptyLines:true,complete:r=>resolve(r.data),error:reject});
+      Papa.parse(url, {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: r => resolve(r.data),
+        error: reject
+      });
     }));
     const arrays = await Promise.all(loads);
-    const merged = arrays.flat();
-    // Normalización: acepta esquema "master" o "purina/royal"
-PRODUCTS = arrays.flat().map((r, idx) => {
-  const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
-  if (hasBrandSchema) {
-    // --- CSV estilo Purina/Royal: id,brand,name,species,category,variants,image_url
-    const specie = (r.species || '').trim().toLowerCase();
-    const categoriaRaw = (r.category || '').trim().toLowerCase();
-    const especie = specie === 'cat' ? 'Gato' : specie === 'dog' ? 'Perro' : '';
-    const categoria = categoriaRaw === 'dry' ? 'Seco'
-                     : categoriaRaw === 'wet' ? 'Húmedo'
-                     : categoriaRaw === 'veterinary' ? 'Veterinario'
-                     : categoriaRaw === 'treats' ? 'Snack'
-                     : '';
-    // tomar la PRIMERA variante solo para mostrar "Presentación"
-    let peso_g = null;
-    if (r.variants) {
-      const v = String(r.variants).split('|')[0].trim(); // ej "500g" | "1.5kg" | "unidad"
-      if (/unidad/i.test(v)) { peso_g = null; }
-      else if (/kg/i.test(v)) { const n = parseFloat(v); if (!isNaN(n)) peso_g = Math.round(n * 1000); }
-      else if (/g/i.test(v))  { const n = parseFloat(v); if (!isNaN(n)) peso_g = Math.round(n); }
-    }
-    return {
-      id: r.id || ('row'+idx),
-      marca: (r.brand || '').toString().trim(),
-      linea: '',
-      especie,
-      categoria,
-      nombre: (r.name || '').toString().trim(),
-      peso_g,
-      sku: '',                 // opcional por ahora
-      precio: null,            // mostramos "Consultar"
-      imagen_url: (r.image_url || '').toString().trim(),
-      descripcion: '',
-      disponible: true
-    };
-  } else {
-    // --- CSV estilo "master": ya viene con las columnas esperadas
-    return {
-      id: r.id || ('row'+idx),
-      marca: (r.marca||'').trim(),
-      linea: (r.linea||'').trim(),
-      especie: (r.especie||'').trim(),
-      categoria: (r.categoria||'').trim(),
-      nombre: (r.nombre||'').trim(),
-      peso_g: r.peso_g ? Number(r.peso_g) : null,
-      sku: (r.sku||'').trim(),
-      precio: r.precio!=='' && r.precio!=null ? Number(r.precio) : null,
-      imagen_url: (r.imagen_url||'').trim(),
-      descripcion: (r.descripcion||'').trim(),
-      disponible: String(r.disponible||'1')==='1'
-    };
-  }
-}).filter(p => p.disponible);
 
-   
+    // Normalización: acepta esquema "master" o "purina/royal"
+    PRODUCTS = arrays.flat().map((r, idx) => {
+      const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
+      if (hasBrandSchema) {
+        // --- CSV estilo Purina/Royal: id,brand,name,species,category,variants,image_url
+        const specie = (r.species || '').trim().toLowerCase();
+        const categoriaRaw = (r.category || '').trim().toLowerCase();
+        const especie = specie === 'cat' ? 'Gato' : specie === 'dog' ? 'Perro' : '';
+        const categoria = categoriaRaw === 'dry' ? 'Seco'
+                         : categoriaRaw === 'wet' ? 'Húmedo'
+                         : categoriaRaw === 'veterinary' ? 'Veterinario'
+                         : categoriaRaw === 'treats' ? 'Snack'
+                         : '';
+
+        // Tomar la PRIMERA variante solo para mostrar "Presentación"
+        let peso_g = null;
+        if (r.variants) {
+          const v = String(r.variants).split('|')[0].trim(); // ej "500g" | "1.5kg" | "unidad"
+          if (/unidad/i.test(v)) { peso_g = null; }
+          else if (/kg/i.test(v)) { const n = parseFloat(v); if (!isNaN(n)) peso_g = Math.round(n * 1000); }
+          else if (/g/i.test(v))  { const n = parseFloat(v); if (!isNaN(n)) peso_g = Math.round(n); }
+        }
+
+        return {
+          id: r.id || ('row'+idx),
+          marca: (r.brand || '').toString().trim(),
+          linea: '',
+          especie,
+          categoria,
+          nombre: (r.name || '').toString().trim(),
+          peso_g,
+          sku: '',                 // opcional por ahora
+          precio: null,            // mostramos "Consultar"
+          imagen_url: (r.image_url || '').toString().trim(),
+          descripcion: '',
+          disponible: true
+        };
+      } else {
+        // --- CSV estilo "master": ya viene con las columnas esperadas
+        return {
+          id: r.id || ('row'+idx),
+          marca: (r.marca||'').trim(),
+          linea: (r.linea||'').trim(),
+          especie: (r.especie||'').trim(),
+          categoria: (r.categoria||'').trim(),
+          nombre: (r.nombre||'').trim(),
+          peso_g: r.peso_g ? Number(r.peso_g) : null,
+          sku: (r.sku||'').trim(),
+          precio: r.precio!=='' && r.precio!=null ? Number(r.precio) : null,
+          imagen_url: (r.imagen_url||'').trim(),
+          descripcion: (r.descripcion||'').trim(),
+          disponible: String(r.disponible||'1')==='1'
+        };
+      }
+    }).filter(p => p.disponible);
+    return PRODUCTS;
+  } // <<< CIERRE que faltaba
+
   // ================== FILTROS ==================
   function fillSelect(sel, values){ sel.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
   function fillFilters(){
@@ -278,7 +287,7 @@ PRODUCTS = arrays.flat().map((r, idx) => {
       (!m || p.marca===m) &&
       (!e || p.especie===e) &&
       (!c || p.categoria===c) &&
-      (!q || p.nombre.toLowerCase().includes(q) || p.linea.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q))
+      (!q || p.nombre.toLowerCase().includes(q) || p.linea.toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q))
     );
     switch(fSort.value){
       case 'precio-asc': out.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9)); break;
@@ -304,7 +313,7 @@ PRODUCTS = arrays.flat().map((r, idx) => {
         <p class='text-xs text-gray-500'>Presentación: ${peso || '—'}</p>
         <div class='flex items-center justify-between pt-2'>
           <strong>${precio}</strong>
-          <button class='px-2 py-1 border rounded text-sm' onclick='addToCart(${JSON.stringify({id:""}).replace("{}","" )})'>Agregar</button>
+          <button class='px-2 py-1 border rounded text-sm' onclick='addToCart(${JSON.stringify({id:""}).replace("{}", "")})'>Agregar</button>
         </div>
       </div>
     </article>`
@@ -352,5 +361,6 @@ PRODUCTS = arrays.flat().map((r, idx) => {
   </script>
 </body>
 </html>
+
 
 
