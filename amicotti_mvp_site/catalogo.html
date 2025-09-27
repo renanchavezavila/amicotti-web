@@ -6,28 +6,21 @@
   <title>Amicotti — Catálogo</title>
   <meta name="description" content="Catálogo de alimentos para mascotas. Entrega en Quito y Valles. Compra por WhatsApp." />
   <link rel="icon" href="assets/logo.png" />
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PapaParse para CSV robusto -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
-
   <style>
-    /* Evita saltos feos en imágenes */
-    .img-box { height: 12rem }
-    .img-box img { max-height: 11rem; object-fit: contain }
-
-    /* Drawer (carrito) */
-    .drawer { transform: translateX(100%); transition: transform .25s ease }
-    .drawer.open { transform: translateX(0) }
+    .img-box{height:12rem}
+    .img-box img{max-height:11rem;object-fit:contain}
+    .drawer{transform:translateX(100%);transition:transform .25s ease}
+    .drawer.open{transform:translateX(0)}
   </style>
 </head>
 <body class="bg-white text-gray-900">
   <!-- HEADER -->
   <header class="p-4 border-b bg-white/70 backdrop-blur sticky top-0 z-30">
     <div class="max-w-6xl mx-auto flex items-center justify-between gap-3">
-      <a href="index.html" class="flex items-center gap-2">
-        <img src="assets/logo.png" class="w-9 h-9" alt="Amicotti"/>
+      <a href="/index.html" class="flex items-center gap-2">
+        <img src="/assets/logo.png" class="w-9 h-9" alt="Amicotti"/>
         <span class="font-semibold">Amicotti</span>
       </a>
       <div class="flex items-center gap-2">
@@ -69,17 +62,13 @@
         </select>
       </div>
       <button id="clearFilters" class="w-full border p-2 rounded">Limpiar filtros</button>
-
-      <!-- INFO -->
       <div class="text-xs text-gray-500 pt-2">
-        <p>Tip: puedes escribir “urinary”, “persian”, “kitten”, etc. en el buscador.</p>
+        <p>Tip: escribe “urinary”, “persian”, “kitten”, etc.</p>
       </div>
     </aside>
 
     <main class="md:col-span-4">
-      <!-- Mensajes -->
       <div id="alertBox" class="hidden mb-3 p-3 rounded bg-yellow-50 border text-sm text-yellow-900"></div>
-      <!-- Grilla -->
       <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </main>
   </section>
@@ -100,289 +89,314 @@
     </div>
   </div>
 
-  <!-- BOTÓN WA FLOTANTE (móvil) -->
+  <!-- BOTÓN WA FLOTANTE -->
   <a id="waFloat" target="_blank" class="fixed bottom-4 right-4 md:hidden w-12 h-12 rounded-full bg-green-600 text-white grid place-items-center shadow-lg">WA</a>
 
   <footer class="border-t text-center text-xs text-gray-500 p-6">© Amicotti — Quito & Valles</footer>
 
   <script>
-  // ================== CONFIG ==================
-  const WA_PHONE = "593995315716"; // ← Reemplaza si hay número definitivo
-const IMG_BASE = "/assets/royal/";
-const IMG_EXTS = [".jpg", ".png", ".webp"];
+/* ============== CONFIG ============== */
+const WA_PHONE = "593995315716";
+const CSV_URLS = ["/data/purina.csv","/data/royal.csv"];
+const IMG_EXTS = [".webp",".jpg",".png"];
 
-  // Catálogo unificado: Purina + Royal (rutas absolutas en producción)
-  const CSV_URLS = ["/data/purina.csv", "/data/royal.csv"];
+/* ============== ESTADO ============== */
+let PRODUCTS = [];
+let CART = loadCart();
+const SELECTED = Object.create(null); // id -> índice variante
 
-  // ================== ESTADO ==================
-  let PRODUCTS = [];        // productos disponibles (desde CSV)
-  let CART = loadCart();    // carrito desde localStorage
-
-  // ================== SELECTORES ==================
-  const grid = document.getElementById('grid');
-  const fMarca = document.getElementById('fMarca');
-  const fEspecie = document.getElementById('fEspecie');
-  const fCategoria = document.getElementById('fCategoria');
-  const fSearch = document.getElementById('fSearch');
-  const fSort = document.getElementById('fSort');
-  const alertBox = document.getElementById('alertBox');
-  const cartBtn = document.getElementById('cartBtn');
-  const cartDrawer = document.getElementById('cartDrawer');
-  const cartList = document.getElementById('cartList');
-  const cartTotal = document.getElementById('cartTotal');
-  const cartCount = document.getElementById('cartCount');
-
-  // ================== UTILIDADES ==================
-  function money(n){ const x=Number(n); return Number.isFinite(x)?('$'+x.toFixed(2)):'—'; }
-  function weight(g){ if(!g) return '' ; g=Number(g); return g>=1000? (g/1000)+" kg" : g+" g"; }
-  function unique(arr,key){ return [...new Set(arr.map(o => (o[key]||'').trim()).filter(Boolean))].sort(); }
-
-  // ================== WHATSAPP LINKS ==================
-  function setWALinks(){
-    const url = `https://wa.me/${WA_PHONE}`;
-    const top = document.getElementById('waTop');
-    const flo = document.getElementById('waFloat');
-    if(top) { top.href = url; top.textContent = `WhatsApp ${WA_PHONE}`; }
-    if(flo) { flo.href = url; }
-  }
-
-  // ================== CARRITO ==================
-  function loadCart(){ try{ return JSON.parse(localStorage.getItem('amicart'))||[] }catch{ return [] } }
-  function saveCart(){ localStorage.setItem('amicart', JSON.stringify(CART)); updateCartBadge(); }
-  function updateCartBadge(){ const c=CART.reduce((a,i)=>a+i.qty,0); cartCount.textContent=c; }
-  function openCart(){ cartDrawer.classList.add('open'); }
-  function closeCart(){ cartDrawer.classList.remove('open'); }
-
-  function addToCart(p){
-    const key = p.sku || p.id;
-    const i = CART.findIndex(x=>x.key===key);
-    if(i>=0) CART[i].qty += 1; else CART.push({key, sku:p.sku, nombre:p.nombre, peso_g:p.peso_g, precio:p.precio, qty:1});
-    saveCart(); drawCart(); openCart();
-  }
-  function chgQty(key,d){
-    const i = CART.findIndex(x=>x.key===key); if(i<0) return;
-    CART[i].qty += d; if(CART[i].qty<=0) CART.splice(i,1);
-    saveCart(); drawCart();
-  }
-  function removeFromCart(key){ CART = CART.filter(x=>x.key!==key); saveCart(); drawCart(); }
-  function drawCart(){
-    if(!CART.length){ cartList.innerHTML = `<p class='text-sm text-gray-500'>Tu carrito está vacío.</p>`; cartTotal.textContent='$0.00'; return; }
-    cartList.innerHTML = CART.map(it=>{
-      const subtotal = it.precio!=null ? it.precio*it.qty : null;
-      return `<div class='flex items-start justify-between gap-2'>
-        <div class='text-sm'>
-          <div class='font-medium'>${it.nombre}</div>
-          <div class='text-gray-500'>${it.sku||''} ${it.peso_g?('• '+weight(it.peso_g)):''}</div>
-          <div>${it.precio!=null? money(it.precio):'Consultar'}</div>
-          <div class='flex items-center gap-2 mt-1'>
-            <button class='border px-2 rounded' onclick="chgQty('${it.key}',-1)">−</button>
-            <span>${it.qty}</span>
-            <button class='border px-2 rounded' onclick="chgQty('${it.key}',1)">+</button>
-          </div>
-        </div>
-        <div class='text-right'>
-          ${subtotal!=null?`<div class='font-semibold'>${money(subtotal)}</div>`:''}
-          <button class='text-red-500 text-sm mt-2' onclick="removeFromCart('${it.key}')">Eliminar</button>
-        </div>
-      </div>`
-    }).join('');
-    const total = CART.reduce((a,i)=> a + (i.precio!=null? i.precio*i.qty:0), 0);
-    cartTotal.textContent = money(total);
-  }
-  function buildWAMessage(){
-    let lines = [];
-    lines.push('🛍️ *Pedido Amicotti*');
-    CART.forEach(it=>{
-      const price = it.precio!=null?` — ${money(it.precio)} c/u`:''; 
-      lines.push(`• ${it.nombre}${it.peso_g?(' — '+weight(it.peso_g)):''} — Cant: ${it.qty}${price}`);
-    });
-    const total = CART.reduce((a,i)=> a + (i.precio!=null? i.precio*i.qty:0), 0);
-    if(total>0) lines.push(`\nTotal estimado: *${money(total)}*`);
-    lines.push('\nNombre y sector para la entrega:');
-    return lines.join('\n');
-  }
-  function sendWA(){ if(!CART.length) return alert('Tu carrito está vacío.'); window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(buildWAMessage())}`,'_blank'); }
-
-  // ================== CSV / PRODUCTOS ==================
-  async function loadCSVs(){
-    const loads = CSV_URLS.map(url => new Promise((resolve,reject)=>{
-      Papa.parse(url, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: r => resolve(r.data),
-        error: reject
-      });
-    }));
-    const arrays = await Promise.all(loads);
-
-    // Normalización: acepta esquema "master" o "purina/royal"
-    PRODUCTS = arrays.flat().map((r, idx) => {
-      const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
-      if (hasBrandSchema) {
-        // --- CSV estilo Purina/Royal: id,brand,name,species,category,variants,image_url
-        const specie = (r.species || '').trim().toLowerCase();
-        const categoriaRaw = (r.category || '').trim().toLowerCase();
-        const especie = specie === 'cat' ? 'Gato' : specie === 'dog' ? 'Perro' : '';
-        const categoria = categoriaRaw === 'dry' ? 'Seco'
-                         : categoriaRaw === 'wet' ? 'Húmedo'
-                         : categoriaRaw === 'veterinary' ? 'Veterinario'
-                         : categoriaRaw === 'treats' ? 'Snack'
-                         : '';
-
-        // Tomar la PRIMERA variante solo para mostrar "Presentación"
-        let peso_g = null;
-        if (r.variants) {
-          const v = String(r.variants).split('|')[0].trim(); // ej "500g" | "1.5kg" | "unidad"
-          if (/unidad/i.test(v)) { peso_g = null; }
-          else if (/kg/i.test(v)) { const n = parseFloat(v); if (!isNaN(n)) peso_g = Math.round(n * 1000); }
-          else if (/g/i.test(v))  { const n = parseFloat(v); if (!isNaN(n)) peso_g = Math.round(n); }
-        }
-
-        return {
-          id: r.id || ('row'+idx),
-          marca: (r.brand || '').toString().trim(),
-          linea: '',
-          especie,
-          categoria,
-          nombre: (r.name || '').toString().trim(),
-          peso_g,
-          sku: '',                 // opcional por ahora
-          precio: null,            // mostramos "Consultar"
-          imagen_url: (r.image_url || '').toString().trim(),
-          descripcion: '',
-          disponible: true
-        };
-      } else {
-        // --- CSV estilo "master": ya viene con las columnas esperadas
-        return {
-          id: r.id || ('row'+idx),
-          marca: (r.marca||'').trim(),
-          linea: (r.linea||'').trim(),
-          especie: (r.especie||'').trim(),
-          categoria: (r.categoria||'').trim(),
-          nombre: (r.nombre||'').trim(),
-          peso_g: r.peso_g ? Number(r.peso_g) : null,
-          sku: (r.sku||'').trim(),
-          precio: r.precio!=='' && r.precio!=null ? Number(r.precio) : null,
-          imagen_url: (r.imagen_url||'').trim(),
-          descripcion: (r.descripcion||'').trim(),
-          disponible: String(r.disponible||'1')==='1'
-        };
-      }
-    }).filter(p => p.disponible);
-    return PRODUCTS;
-  } // <<< CIERRE que faltaba
-
-  // ================== FILTROS ==================
-  function fillSelect(sel, values){ sel.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
-  function fillFilters(){
-    fillSelect(fMarca, ['Marca…', ...unique(PRODUCTS,'marca')]);
-    fillSelect(fEspecie, ['Especie…', 'Gato', 'Perro']);
-    fillSelect(fCategoria, ['Categoría…', ...unique(PRODUCTS,'categoria')]);
-  }
-
-  // ================== RENDER ==================
-  function getFiltered(){
-    const m=fMarca.value, e=fEspecie.value, c=fCategoria.value, q=(fSearch.value||'').trim().toLowerCase();
-    let out = PRODUCTS.filter(p=>
-      (!m || p.marca===m) &&
-      (!e || p.especie===e) &&
-      (!c || p.categoria===c) &&
-      (!q || p.nombre.toLowerCase().includes(q) || p.linea.toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q))
-    );
-    switch(fSort.value){
-      case 'precio-asc': out.sort((a,b)=>(a.precio??1e9)-(b.precio??1e9)); break;
-      case 'precio-desc': out.sort((a,b)=>(b.precio??-1)-(a.precio??-1)); break;
-      case 'nombre-asc': out.sort((a,b)=>a.nombre.localeCompare(b.nombre)); break;
-      case 'nombre-desc': out.sort((a,b)=>b.nombre.localeCompare(a.nombre)); break;
+/* ============== HELPERS ============== */
+function money(n){ const x=Number(n); return (Number.isFinite(x) && x>=0) ? ('$'+x.toFixed(2)) : 'Consultar'; }
+function gramsFromLabel(lbl){
+  if(!lbl) return null;
+  if(/unidad/i.test(lbl)) return null;
+  let m = lbl.match(/([\d.,]+)\s*kg/i); if(m){ const v=parseFloat(m[1].replace(',','.')); return isNaN(v)?null:Math.round(v*1000); }
+  m = lbl.match(/([\d.,]+)\s*g/i); if(m){ const v=parseFloat(m[1].replace(',','.')); return isNaN(v)?null:Math.round(v); }
+  return null;
+}
+function parseVariants(str){
+  if(!str) return [];
+  return String(str).split('|').map(s=>{
+    s = s.trim();
+    const parts = s.split(':'); // "label:$price"
+    const label = (parts[0]||'').trim();
+    const grams = gramsFromLabel(label);
+    let price = null;
+    if(parts[1] && parts[1].trim().startsWith('$')){
+      const num = parseFloat(parts[1].replace('$','').trim());
+      if(!isNaN(num)) price = num;
     }
-    return out;
-  }
-function buildImgCandidates(p){
-  // Si viene ruta en CSV, úsala primero
-  if (p.imagen_url && p.imagen_url.trim()) return [p.imagen_url.trim()];
-  // Si no, intenta por id con varias extensiones
-  return IMG_EXTS.map(ext => `${IMG_BASE}${p.id}${ext}`);
+    return label ? { label, grams, price } : null;
+  }).filter(Boolean);
+}
+function unique(arr,key){ return [...new Set(arr.map(o => (o[key]||'').trim()).filter(Boolean))].sort(); }
+
+/* ============== WHATSAPP LINKS ============== */
+function setWALinks(){
+  const url = `https://wa.me/${WA_PHONE}`;
+  const top = document.getElementById('waTop');
+  const flo = document.getElementById('waFloat');
+  if(top){ top.href=url; top.textContent=`WhatsApp ${WA_PHONE}`; }
+  if(flo){ flo.href=url; }
 }
 
+/* ============== CARRITO ============== */
+function loadCart(){ try{ return JSON.parse(localStorage.getItem('amicart'))||[] }catch{ return [] } }
+function saveCart(){ localStorage.setItem('amicart', JSON.stringify(CART)); updateCartBadge(); }
+function updateCartBadge(){ const c=CART.reduce((a,i)=>a+i.qty,0); document.getElementById('cartCount').textContent=c; }
+function openCart(){ document.getElementById('cartDrawer').classList.add('open'); }
+function closeCart(){ document.getElementById('cartDrawer').classList.remove('open'); }
+
+function addToCartById(pid){
+  const p = PRODUCTS.find(x=>x.id===pid); if(!p) return;
+  const idx = Number.isInteger(SELECTED[pid]) ? SELECTED[pid] : 0;
+  const v = (p.variants && p.variants[idx]) || null;
+  const key = pid + '::' + (v?v.label:'');
+  const item = {
+    key, sku: pid,
+    nombre: p.nombre,
+    presentacion: v ? v.label : '',
+    peso_g: v ? v.grams : (p.peso_g || null),
+    precio: v ? v.price : (p.precio ?? null),
+  };
+  const i = CART.findIndex(x=>x.key===key);
+  if(i>=0) CART[i].qty += 1; else CART.push({...item, qty:1});
+  saveCart(); drawCart(); openCart();
+}
+function chgQty(key,d){
+  const i=CART.findIndex(x=>x.key===key); if(i<0) return;
+  CART[i].qty += d; if(CART[i].qty<=0) CART.splice(i,1);
+  saveCart(); drawCart();
+}
+function removeFromCart(key){ CART = CART.filter(x=>x.key!==key); saveCart(); drawCart(); }
+function drawCart(){
+  const cartList = document.getElementById('cartList');
+  const cartTotal = document.getElementById('cartTotal');
+  if(!CART.length){ cartList.innerHTML = `<p class='text-sm text-gray-500'>Tu carrito está vacío.</p>`; cartTotal.textContent='$0.00'; return; }
+  cartList.innerHTML = CART.map(it=>{
+    const subtotal = it.precio!=null ? it.precio*it.qty : null;
+    return `<div class='flex items-start justify-between gap-2'>
+      <div class='text-sm'>
+        <div class='font-medium'>${it.nombre}</div>
+        <div class='text-gray-500'>
+          ${it.sku||''} ${it.presentacion?('• '+it.presentacion):''}
+        </div>
+        <div>${money(it.precio)}</div>
+        <div class='flex items-center gap-2 mt-1'>
+          <button class='border px-2 rounded' onclick="chgQty('${it.key}',-1)">−</button>
+          <span>${it.qty}</span>
+          <button class='border px-2 rounded' onclick="chgQty('${it.key}',1)">+</button>
+        </div>
+      </div>
+      <div class='text-right'>
+        ${subtotal!=null?`<div class='font-semibold'>${money(subtotal)}</div>`:''}
+        <button class='text-red-500 text-sm mt-2' onclick="removeFromCart('${it.key}')">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+  const total = CART.reduce((a,i)=> a + (i.precio!=null? i.precio*i.qty:0), 0);
+  cartTotal.textContent = money(total);
+}
+function buildWAMessage(){
+  let lines = ['🛍️ *Pedido Amicotti*'];
+  CART.forEach(it=>{
+    const pres = it.presentacion ? ` — ${it.presentacion}` : '';
+    const price = it.precio!=null?` — ${money(it.precio)} c/u`:'';
+    lines.push(`• ${it.nombre}${pres} — Cant: ${it.qty}${price}`);
+  });
+  const total = CART.reduce((a,i)=> a + (i.precio!=null? i.precio*i.qty:0), 0);
+  if(total>0) lines.push(`\nTotal estimado: *${money(total)}*`);
+  lines.push('\nNombre y sector para la entrega:');
+  return lines.join('\n');
+}
+function sendWA(){ if(!CART.length) return alert('Tu carrito está vacío.'); window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(buildWAMessage())}`,'_blank'); }
+
+/* ============== IMÁGENES (fallback) ============== */
+function swapExt(url, ext){
+  const i = url.lastIndexOf('.');
+  if(i<0) return url + ext;
+  return url.slice(0,i) + ext;
+}
+function buildImgCandidates(p){
+  const brand = (p.marca||'').toLowerCase();
+  // Si trae image_url, probamos esa y alternativas cambiando extensión
+  if(p.imagen_url && p.imagen_url.trim()){
+    const first = p.imagen_url.trim();
+    const alts = IMG_EXTS.map(e => swapExt(first, e));
+    const uniq = [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
+    return uniq;
+  }
+  // Si no trae image_url, armamos por marca + id con múltiples extensiones
+  const base = brand.includes('royal') ? '/assets/royal/' :
+               brand.includes('purina') ? '/assets/purina/' : '/assets/catalog/';
+  return IMG_EXTS.map(ext => `${base}${p.id}${ext}`);
+}
 function onImgError(el){
   const rest = (el.dataset.alt || "").split("|").filter(Boolean);
-  if (rest.length){
-    el.src = rest.shift();            // prueba siguiente candidato
+  if(rest.length){
+    el.src = rest.shift();
     el.dataset.alt = rest.join("|");
   }else{
     el.onerror = null;
-    el.src = "assets/logo.png";       // placeholder existente
+    el.src = "/assets/logo.png";
   }
 }
 
-  function cardHTML(p){
-    const peso = weight(p.peso_g);
-    const precio = p.precio!=null? money(p.precio) : 'Consultar';
-    const candidates = buildImgCandidates(p);
-const img = candidates[0];
-const altList = candidates.slice(1).join("|");
-    const badgeVet = (p.categoria.toLowerCase()==='veterinario') ? `<span class='px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 rounded'>Veterinario</span>` : '';
-    return `<article class='border rounded-lg overflow-hidden bg-white'>
-      <div class='img-box w-full bg-gray-50 grid place-items-center'>
-     <img src='${img}' data-alt='${altList}' alt='${p.nombre}' loading='lazy'
-     onerror="onImgError(this)"/>
-      </div>
-      <div class='p-3 space-y-1'>
-        <h3 class='font-medium leading-tight'>${p.nombre}</h3>
-        <p class='text-xs text-gray-500'>${p.marca} • ${p.linea || '—'} • ${p.especie} ${badgeVet}</p>
-        <p class='text-xs text-gray-500'>Presentación: ${peso || '—'}</p>
-        <div class='flex items-center justify-between pt-2'>
-          <strong>${precio}</strong>
-          <button class='px-2 py-1 border rounded text-sm' onclick='addToCart(${JSON.stringify({id:""}).replace("{}", "")})'>Agregar</button>
-        </div>
-      </div>
-    </article>`
-    .replace("{\"id\":\"\"}", JSON.stringify(p).replace(/'/g,"&apos;"));
-  }
+/* ============== CSV / PRODUCTOS ============== */
+async function loadCSVs(){
+  const loads = CSV_URLS.map(url => new Promise((resolve,reject)=>{
+    Papa.parse(url,{download:true,header:true,skipEmptyLines:true,complete:r=>resolve(r.data),error:reject});
+  }));
+  const arrays = await Promise.all(loads);
 
-  function render(){
-    const items = getFiltered();
-    if(!items.length){
-      grid.innerHTML = `<div class='col-span-full p-6 text-center text-sm text-gray-500 border rounded'>No hay productos con esos filtros.</div>`;
-      return;
+  PRODUCTS = arrays.flat().map((r, idx)=>{
+    const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
+    if(hasBrandSchema){
+      const specie = (r.species||'').trim().toLowerCase();
+      const categoriaRaw = (r.category||'').trim().toLowerCase();
+      const especie = specie==='cat' ? 'Gato' : specie==='dog' ? 'Perro' : '';
+      const categoria = categoriaRaw==='dry' ? 'Seco'
+                      : categoriaRaw==='wet' ? 'Húmedo'
+                      : categoriaRaw==='veterinary' ? 'Veterinario'
+                      : categoriaRaw==='treats' ? 'Snack' : '';
+      const variants = parseVariants(r.variants||'');
+      const first = variants[0] || null;
+      return {
+        id: r.id || ('row'+idx),
+        marca: (r.brand||'').toString().trim(),
+        linea: '',
+        especie,
+        categoria,
+        nombre: (r.name||'').toString().trim(),
+        peso_g: first ? first.grams : null,
+        sku: '',
+        precio: first ? first.price : null,
+        imagen_url: (r.image_url||'').toString().trim(),
+        descripcion: '',
+        disponible: true,
+        variants
+      };
+    }else{
+      const variants = parseVariants(r.variants||'');
+      const first = variants[0] || null;
+      return {
+        id: r.id || ('row'+idx),
+        marca: (r.marca||'').trim(),
+        linea: (r.linea||'').trim(),
+        especie: (r.especie||'').trim(),
+        categoria: (r.categoria||'').trim(),
+        nombre: (r.nombre||'').trim(),
+        peso_g: r.peso_g ? Number(r.peso_g) : (first?first.grams:null),
+        sku: (r.sku||'').trim(),
+        precio: (r.precio!=='' && r.precio!=null) ? Number(r.precio) : (first?first.price:null),
+        imagen_url: (r.imagen_url||'').trim(),
+        descripcion: (r.descripcion||'').trim(),
+        disponible: String(r.disponible||'1')==='1',
+        variants
+      };
     }
-    grid.innerHTML = items.map(cardHTML).join('');
+  }).filter(p=>p.disponible);
+}
+
+/* ============== FILTROS + RENDER ============== */
+const grid = document.getElementById('grid');
+const fMarca = document.getElementById('fMarca');
+const fEspecie = document.getElementById('fEspecie');
+const fCategoria = document.getElementById('fCategoria');
+const fSearch = document.getElementById('fSearch');
+const fSort = document.getElementById('fSort');
+const alertBox = document.getElementById('alertBox');
+
+function fillSelect(sel, values){ sel.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
+function fillFilters(){
+  fillSelect(fMarca, ['Marca…', ...unique(PRODUCTS,'marca')]);
+  fillSelect(fEspecie, ['Especie…', 'Gato', 'Perro']);
+  fillSelect(fCategoria, ['Categoría…', ...unique(PRODUCTS,'categoria')]);
+}
+function getFiltered(){
+  const m=fMarca.value, e=fEspecie.value, c=fCategoria.value, q=(fSearch.value||'').trim().toLowerCase();
+  let out = PRODUCTS.filter(p=>
+    (!m || p.marca===m) &&
+    (!e || p.especie===e) &&
+    (!c || p.categoria===c) &&
+    (!q || p.nombre.toLowerCase().includes(q) || p.linea.toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q))
+  );
+  switch(fSort.value){
+    case 'precio-asc': out.sort((a,b)=>((a.variants?.[0]?.price ?? a.precio ?? 1e9) - (b.variants?.[0]?.price ?? b.precio ?? 1e9))); break;
+    case 'precio-desc': out.sort((a,b)=>((b.variants?.[0]?.price ?? b.precio ?? -1) - (a.variants?.[0]?.price ?? a.precio ?? -1))); break;
+    case 'nombre-asc': out.sort((a,b)=>a.nombre.localeCompare(b.nombre)); break;
+    case 'nombre-desc': out.sort((a,b)=>b.nombre.localeCompare(a.nombre)); break;
   }
+  return out;
+}
+function onChangeVariant(pid, idx){
+  SELECTED[pid] = Number(idx)||0;
+  const p = PRODUCTS.find(x=>x.id===pid); if(!p) return;
+  const v = p.variants[SELECTED[pid]] || null;
+  const priceEl = document.getElementById('price-'+pid);
+  if(priceEl) priceEl.textContent = v ? money(v.price) : money(p.precio);
+}
+function cardHTML(p){
+  const candidates = buildImgCandidates(p);
+  const img = candidates[0];
+  const altList = candidates.slice(1).join("|");
+  const badgeVet = (p.categoria.toLowerCase()==='veterinario') ? `<span class='px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 rounded'>Veterinario</span>` : '';
+  const variantsSel = (p.variants && p.variants.length) ? `
+    <label class="block text-xs text-gray-500 mt-2">Presentación</label>
+    <select class="w-full border p-2 rounded text-sm" onchange="onChangeVariant('${p.id}', this.value)">
+      ${p.variants.map((v,i)=>`<option value="${i}">${v.label}${v.price!=null?(' — '+money(v.price)):''}</option>`).join('')}
+    </select>
+  ` : `<p class='text-xs text-gray-500 mt-1'>Presentación: ${p.peso_g? (p.peso_g>=1000? (p.peso_g/1000)+' kg' : p.peso_g+' g') : '—'}</p>`;
+  const initialPrice = (p.variants && p.variants.length) ? money(p.variants[0].price) : money(p.precio);
+  return `<article class='border rounded-lg overflow-hidden bg-white'>
+    <div class='img-box w-full bg-gray-50 grid place-items-center'>
+      <img src='${img}' data-alt='${altList}' alt='${p.nombre}' loading='lazy' onerror="onImgError(this)"/>
+    </div>
+    <div class='p-3 space-y-1'>
+      <h3 class='font-medium leading-tight'>${p.nombre}</h3>
+      <p class='text-xs text-gray-500'>${p.marca} • ${p.linea || '—'} • ${p.especie} ${badgeVet}</p>
+      ${variantsSel}
+      <div class='flex items-center justify-between pt-2'>
+        <strong id="price-${p.id}">${initialPrice}</strong>
+        <button class='px-2 py-1 border rounded text-sm' onclick="addToCartById('${p.id}')">Agregar</button>
+      </div>
+    </div>
+  </article>`;
+}
+function render(){
+  const items = getFiltered();
+  if(!items.length){
+    grid.innerHTML = `<div class='col-span-full p-6 text-center text-sm text-gray-500 border rounded'>No hay productos con esos filtros.</div>`;
+    return;
+  }
+  items.forEach(p=>{ if(!(p.id in SELECTED)) SELECTED[p.id]=0; });
+  grid.innerHTML = items.map(cardHTML).join('');
+}
 
-  // ================== EVENTOS ==================
-  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.addEventListener('input', render));
-  document.getElementById('clearFilters').addEventListener('click',()=>{
-    [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); render();
-  });
-  document.getElementById('sendWA').addEventListener('click', sendWA);
-  document.getElementById('clearCart').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); }});
-  cartBtn.addEventListener('click', openCart);
-  document.getElementById('closeCart').addEventListener('click', closeCart);
+/* ============== EVENTOS ============== */
+[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.addEventListener('input', render));
+document.getElementById('clearFilters').addEventListener('click',()=>{ [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); render(); });
+document.getElementById('sendWA').addEventListener('click', sendWA);
+document.getElementById('clearCart').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); }});
+document.getElementById('cartBtn').addEventListener('click', openCart);
+document.getElementById('closeCart').addEventListener('click', closeCart);
 
-  // ================== INIT ==================
-  (async function init(){
-    setWALinks();
-    updateCartBadge();
-    try{
-      await loadCSVs();
-      if(!PRODUCTS.length){
-        alertBox.classList.remove('hidden');
-        alertBox.textContent = 'No se cargaron productos. Revisa las rutas CSV en /data y que el sitio no esté en una subcarpeta con rutas absolutas.';
-      }
-      fillFilters();
-      render();
-      drawCart();
-    }catch(e){
-      console.error(e);
+/* ============== INIT ============== */
+(async function init(){
+  setWALinks(); updateCartBadge();
+  try{
+    await loadCSVs();
+    if(!PRODUCTS.length){
       alertBox.classList.remove('hidden');
-      alertBox.textContent = 'Error cargando el catálogo. Verifica rutas y formato del CSV.';
+      alertBox.textContent = 'No se cargaron productos. Revisa las rutas CSV.';
     }
-  })();
+    fillFilters(); render(); drawCart();
+  }catch(e){
+    console.error(e);
+    alertBox.classList.remove('hidden');
+    alertBox.textContent = 'Error cargando el catálogo. Verifica rutas y formato del CSV.';
+  }
+})();
   </script>
 </body>
 </html>
-
-
-
