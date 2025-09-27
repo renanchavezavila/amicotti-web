@@ -1,6 +1,6 @@
 id,brand,name,species,category,variants,image_url
 cat-chow-adulto-carne,purina,Cat Chow Adulto Carne,cat,dry,500g:$5.13|1.5kg:$12.19|8kg:$52.77,/assets/purina/cat-chow-adulto-carne.webp
-cat-chow-adulto-pescado,purina,Cat Chow Adulto Pescado,cat,dry,500g:$5.13|1.5kg:$12.19|8kg:$52.77,/assets/purina/cat-chow-adulto-pescado.jpg
+cat-chow-adulto-pescado,purina,Cat Chow Adulto Pescado,cat,dry,500g:$5.13|1.5kg:$12.19|8kg:$52.77,/assets/purina/cat-chow-adulto-pescado.webp
 cat-chow-adulto-esterilizado,purina,Cat Chow Adulto Esterilizado,cat,dry,500g:$5.13|1.5kg:$13.25|8kg:$59.10,/assets/purina/cat-chow-adulto-esterilizado.webp
 cat-chow-gatitos-prebioticos,purina,Cat Chow Gatitos Prebióticos,cat,dry,500g:$4.77|1.5kg:$13.43,/assets/purina/cat-chow-gatitos-prebioticos.webp
 fancy-feast-pollo-85g,purina,Fancy Feast Pollo 85g,cat,wet,85g:$2.21,/assets/purina/fancy-feast-pollo-85g.jpg
@@ -35,5 +35,6 @@ ppvd-gato-gastrointestinal,purina,Pro Plan Veterinary Diets Gato Gastrointestina
 ppvd-gato-renal,purina,Pro Plan Veterinary Diets Gato Renal,cat,veterinary,1.5kg:$30.00|7.5kg:$120.00,/assets/purina/ppvd-gato-renal.jpg
 ppvd-gato-urinario,purina,Pro Plan Veterinary Diets Gato Urinario,cat,veterinary,1.5kg:$30.00|7.5kg:$120.00,/assets/purina/ppvd-gato-urinario.webp
 doguitos-tira-asado,purina,Doguitos Tira Asado,dog,treats,65g:$2.88|120g:$5.50,/assets/purina/doguitos-tira-asado.png
+
 
 
