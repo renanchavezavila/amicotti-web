@@ -390,67 +390,21 @@ function onChangeVariant(pid, idx){
   const priceEl = document.getElementById('price-'+pid);
   if(priceEl) priceEl.textContent = v ? money(v.price) : money(p.precio);
 }
- // ===== Helpers de imagen =====
-
-// Crea una lista de candidatos a imagen: original + alternativas por extensión + fallback al logo
-function buildImgCandidates(p){
-  const res = [];
-  const base = (p.imagen_url || '').trim();
-  if (base) res.push(base);
-
-  // Si es ruta local, probamos con otras extensiones por si el archivo subido es .jpg/.webp/.png
-  if (base && /^\/assets\//.test(base)) {
-    if (/\.webp$/i.test(base)) { res.push(base.replace(/\.webp$/i, '.jpg'), base.replace(/\.webp$/i, '.png')); }
-    if (/\.jpe?g$/i.test(base)) { res.push(base.replace(/\.jpe?g$/i, '.webp'), base.replace(/\.jpe?g$/i, '.png')); }
-    if (/\.png$/i.test(base))   { res.push(base.replace(/\.png$/i, '.webp'),  base.replace(/\.png$/i, '.jpg')); }
-  }
-
-  // Fallback final
-  res.push('/assets/logo.png');
-
-  // Sin duplicados y sin vacíos
-  return [...new Set(res.filter(Boolean))];
-}
-
-// Avanza al siguiente candidato cuando falla la carga
-function onImgError(img){
-  const list = (img.getAttribute('data-alt') || '').split('|').filter(Boolean);
-  const current = img.getAttribute('src') || '';
-
-  // Si ya estamos en el logo o no quedan opciones, fija logo y elimina el onerror
-  if (current === '/assets/logo.png' || list.length === 0) {
-    img.onerror = null;
-    img.src = '/assets/logo.png';
-    return;
-  }
-
-  const next = list.shift();
-  img.setAttribute('data-alt', list.join('|'));
-  img.src = next;
-}
-   
 function cardHTML(p){
   const candidates = buildImgCandidates(p);
-  const img = candidates[0];                    // <- usa el 1er candidato
-  const altList = candidates.slice(1).join('|'); // <- resto para data-alt
-
-  const badgeVet = (p.categoria.toLowerCase()==='veterinario')
-    ? `<span class='px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 rounded'>Veterinario</span>`
-    : '';
-
-  const variantsSel = (p.variants && p.variants.length)
-    ? `<label class="block text-xs text-gray-500 mt-2">Presentación</label>
-       <select class="w-full border p-2 rounded text-sm" onchange="onChangeVariant('${p.id}', this.value)">
-         ${p.variants.map((v,i)=>`<option value="${i}">${v.label}${v.price!=null?(' — '+money(v.price)) : ''}</option>`).join('')}
-       </select>`
-    : '';
-
+  const img = candidates[0];
+  const altList = candidates.slice(1).join("|");
+  const badgeVet = (p.categoria.toLowerCase()==='veterinario') ? `<span class='px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 rounded'>Veterinario</span>` : '';
+  const variantsSel = (p.variants && p.variants.length) ? `
+    <label class="block text-xs text-gray-500 mt-2">Presentación</label>
+    <select class="w-full border p-2 rounded text-sm" onchange="onChangeVariant('${p.id}', this.value)">
+      ${p.variants.map((v,i)=>`<option value="${i}">${v.label}${v.price!=null?(' — '+money(v.price)):''}</option>`).join('')}
+    </select>
+  ` : `<p class='text-xs text-gray-500 mt-1'>Presentación: ${p.peso_g? (p.peso_g>=1000? (p.peso_g/1000)+' kg' : p.peso_g+' g') : '—'}</p>`;
   const initialPrice = (p.variants && p.variants.length) ? money(p.variants[0].price) : money(p.precio);
-
   return `<article class='border rounded-lg overflow-hidden bg-white'>
-    <div class="img-box w-full bg-gray-50 grid place-items-center">
-      <img src="${img}" data-alt="${altList}" alt="${p.nombre}"
-           loading="lazy" decoding="async" onerror="onImgError(this)" />
+    <div class='img-box w-full bg-gray-50 grid place-items-center'>
+      <img src='${img}' data-alt='${altList}' alt='${p.nombre}' loading='lazy' onerror="onImgError(this)"/>
     </div>
     <div class='p-3 space-y-1'>
       <h3 class='font-medium leading-tight'>${p.nombre}</h3>
@@ -463,7 +417,6 @@ function cardHTML(p){
     </div>
   </article>`;
 }
-
 function render(){
   const items = getFiltered();
   if(!items.length){
@@ -475,14 +428,8 @@ function render(){
 }
 
 /* ============== EVENTOS ============== */
-[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> 
-  el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); })
-);
-document.getElementById('clearFilters').addEventListener('click',()=>{
-  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); 
-  render(); 
-  updateURLFromFilters();
-});
+[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.addEventListener('input', render));
+document.getElementById('clearFilters').addEventListener('click',()=>{ [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); render(); });
 document.getElementById('sendWA').addEventListener('click', sendWA);
 document.getElementById('clearCart').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); }});
 document.getElementById('cartBtn').addEventListener('click', openCart);
@@ -497,7 +444,7 @@ document.getElementById('closeCart').addEventListener('click', closeCart);
       alertBox.classList.remove('hidden');
       alertBox.textContent = 'No se cargaron productos. Revisa las rutas CSV.';
     }
-    fillFilters(); applyInitialFiltersFromURL(); render(); drawCart();
+    fillFilters(); render(); drawCart();
   }catch(e){
     console.error(e);
     alertBox.classList.remove('hidden');
