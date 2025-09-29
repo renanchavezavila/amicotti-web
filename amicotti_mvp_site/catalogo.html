@@ -6,8 +6,12 @@
   <title>Amicotti — Catálogo</title>
   <meta name="description" content="Catálogo de alimentos para mascotas. Entrega en Quito y Valles. Compra por WhatsApp." />
   <link rel="icon" href="assets/logo.png" />
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PapaParse -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
   <style>
     .img-box{height:12rem}
     .img-box img{max-height:11rem;object-fit:contain}
@@ -32,7 +36,7 @@
     </div>
   </header>
 
-  <!-- CONTROLES / FILTROS -->
+  <!-- CONTROLES -->
   <section class="max-w-6xl mx-auto p-4 grid md:grid-cols-5 gap-4">
     <aside class="md:col-span-1 space-y-3">
       <div>
@@ -95,17 +99,17 @@
   <footer class="border-t text-center text-xs text-gray-500 p-6">© Amicotti — Quito & Valles</footer>
 
   <script>
-/* ============== CONFIG ============== */
+/* ================= CONFIG ================= */
 const WA_PHONE = "593995315716";
 const CSV_URLS = ["/data/purina.csv","/data/royal.csv"];
 const IMG_EXTS = [".webp", ".jpg", ".jpeg", ".png", ".avif"];
 
-/* ============== ESTADO ============== */
+/* ================= ESTADO ================= */
 let PRODUCTS = [];
 let CART = loadCart();
-const SELECTED = Object.create(null); // id -> índice variante
+const SELECTED = Object.create(null); // id -> índice de variante
 
-/* ============== HELPERS ============== */
+/* ================= HELPERS ================= */
 function money(n){ const x=Number(n); return (Number.isFinite(x) && x>=0) ? ('$'+x.toFixed(2)) : 'Consultar'; }
 function gramsFromLabel(lbl){
   if(!lbl) return null;
@@ -116,13 +120,14 @@ function gramsFromLabel(lbl){
 }
 function parseVariants(str){
   if(!str) return [];
+  // Acepta "2kg — $44.55", "2kg - $44.55" o "2kg:$44.55"
   return String(str).split('|').map(s=>{
-    s = s.trim();
-    const parts = s.split(':'); // "label:$price"
+    const raw = s.trim();
+    const parts = raw.split(/[:\-—]+/); // separadores flexibles
     const label = (parts[0]||'').trim();
     const grams = gramsFromLabel(label);
     let price = null;
-    if(parts[1] && parts[1].trim().startsWith('$')){
+    if(parts[1]){
       const num = parseFloat(parts[1].replace('$','').trim());
       if(!isNaN(num)) price = num;
     }
@@ -131,7 +136,7 @@ function parseVariants(str){
 }
 function unique(arr,key){ return [...new Set(arr.map(o => (o[key]||'').trim()).filter(Boolean))].sort(); }
 
-/* ============== WHATSAPP LINKS ============== */
+/* ================= WHATSAPP ================= */
 function setWALinks(){
   const url = `https://wa.me/${WA_PHONE}`;
   const top = document.getElementById('waTop');
@@ -140,7 +145,7 @@ function setWALinks(){
   if(flo){ flo.href=url; }
 }
 
-/* ============== CARRITO ============== */
+/* ================= CARRITO ================= */
 function loadCart(){ try{ return JSON.parse(localStorage.getItem('amicart'))||[] }catch{ return [] } }
 function saveCart(){ localStorage.setItem('amicart', JSON.stringify(CART)); updateCartBadge(); }
 function updateCartBadge(){ const c=CART.reduce((a,i)=>a+i.qty,0); document.getElementById('cartCount').textContent=c; }
@@ -211,7 +216,7 @@ function buildWAMessage(){
 }
 function sendWA(){ if(!CART.length) return alert('Tu carrito está vacío.'); window.open(`https://wa.me/${WA_PHONE}?text=${encodeURIComponent(buildWAMessage())}`,'_blank'); }
 
-/* ============== IMÁGENES (fallback) ============== */
+/* ================= IMÁGENES (fallback robusto) ================= */
 function swapExt(url, ext){
   const i = url.lastIndexOf('.');
   if(i<0) return url + ext;
@@ -219,14 +224,12 @@ function swapExt(url, ext){
 }
 function buildImgCandidates(p){
   const brand = (p.marca||'').toLowerCase();
-  // Si trae image_url, probamos esa y alternativas cambiando extensión
   if(p.imagen_url && p.imagen_url.trim()){
     const first = p.imagen_url.trim();
     const alts = IMG_EXTS.map(e => swapExt(first, e));
     const uniq = [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
     return uniq;
   }
-  // Si no trae image_url, armamos por marca + id con múltiples extensiones
   const base = brand.includes('royal') ? '/assets/royal/' :
                brand.includes('purina') ? '/assets/purina/' : '/assets/catalog/';
   return IMG_EXTS.map(ext => `${base}${p.id}${ext}`);
@@ -242,7 +245,7 @@ function onImgError(el){
   }
 }
 
-/* ============== CSV / PRODUCTOS ============== */
+/* ================= CSV / PRODUCTOS ================= */
 async function loadCSVs(){
   const loads = CSV_URLS.map(url => new Promise((resolve,reject)=>{
     Papa.parse(url,{download:true,header:true,skipEmptyLines:true,complete:r=>resolve(r.data),error:reject});
@@ -298,7 +301,7 @@ async function loadCSVs(){
   }).filter(p=>p.disponible);
 }
 
-/* ============== FILTROS + RENDER ============== */
+/* ================= FILTROS + RENDER ================= */
 const grid = document.getElementById('grid');
 const fMarca = document.getElementById('fMarca');
 const fEspecie = document.getElementById('fEspecie');
@@ -306,10 +309,10 @@ const fCategoria = document.getElementById('fCategoria');
 const fSearch = document.getElementById('fSearch');
 const fSort = document.getElementById('fSort');
 const alertBox = document.getElementById('alertBox');
-/* ============== FILTRO POR URL (linkeable) ============== */
+
+/* ---- filtros linkeables por URL ---- */
 const urlParams = new URLSearchParams(location.search);
 const norm = v => (v||'').toString().trim().toLowerCase();
-
 function mapEspecie(v){
   v = norm(v);
   if(v==='cat' || v==='gato') return 'Gato';
@@ -324,31 +327,23 @@ function mapCategoria(v){
   if(v==='snack' || v==='treats') return 'Snack';
   return '';
 }
-
 function applyInitialFiltersFromURL(){
-  // Marca: acepta mayúsc/minúsc y espacios
   const marcaParam = urlParams.get('marca');
   if(marcaParam){
-    // intenta match exacto; si no, intenta por normalizado
     const opts = unique(PRODUCTS,'marca');
     const exact = opts.find(m => m === marcaParam);
     const byNorm = opts.find(m => norm(m) === norm(marcaParam));
     fMarca.value = exact || byNorm || '';
   }
-
   const espParam = urlParams.get('especie');
   if(espParam){ fEspecie.value = mapEspecie(espParam); }
-
   const catParam = urlParams.get('categoria');
   if(catParam){ fCategoria.value = mapCategoria(catParam); }
-
   const qParam = urlParams.get('q');
   if(qParam){ fSearch.value = qParam; }
-
   const sortParam = urlParams.get('orden');
   if(sortParam){ fSort.value = sortParam; }
 }
-
 function updateURLFromFilters(){
   const params = new URLSearchParams();
   if(fMarca.value) params.set('marca', fMarca.value);
@@ -360,66 +355,15 @@ function updateURLFromFilters(){
   history.replaceState(null, '', window.location.pathname + (qs?('?'+qs):''));
 }
 
-/* ============== FILTRO POR URL (linkeable) ============== */
-const urlParams = new URLSearchParams(location.search);
-const norm = v => (v||'').toString().trim().toLowerCase();
-
-function mapEspecie(v){
-  v = norm(v);
-  if(v==='cat' || v==='gato') return 'Gato';
-  if(v==='dog' || v==='perro') return 'Perro';
-  return '';
-}
-function mapCategoria(v){
-  v = norm(v);
-  if(v==='dry' || v==='seco') return 'Seco';
-  if(v==='wet' || v==='húmedo' || v==='humedo') return 'Húmedo';
-  if(v==='veterinary' || v==='veterinario' || v==='vet') return 'Veterinario';
-  if(v==='snack' || v==='treats') return 'Snack';
-  return '';
-}
-
-function applyInitialFiltersFromURL(){
-  // Marca: acepta mayúsc/minúsc y espacios
-  const marcaParam = urlParams.get('marca');
-  if(marcaParam){
-    // intenta match exacto; si no, intenta por normalizado
-    const opts = unique(PRODUCTS,'marca');
-    const exact = opts.find(m => m === marcaParam);
-    const byNorm = opts.find(m => norm(m) === norm(marcaParam));
-    fMarca.value = exact || byNorm || '';
-  }
-
-  const espParam = urlParams.get('especie');
-  if(espParam){ fEspecie.value = mapEspecie(espParam); }
-
-  const catParam = urlParams.get('categoria');
-  if(catParam){ fCategoria.value = mapCategoria(catParam); }
-
-  const qParam = urlParams.get('q');
-  if(qParam){ fSearch.value = qParam; }
-
-  const sortParam = urlParams.get('orden');
-  if(sortParam){ fSort.value = sortParam; }
-}
-
-function updateURLFromFilters(){
-  const params = new URLSearchParams();
-  if(fMarca.value) params.set('marca', fMarca.value);
-  if(fEspecie.value) params.set('especie', fEspecie.value);
-  if(fCategoria.value) params.set('categoria', fCategoria.value);
-  if(fSearch.value.trim()) params.set('q', fSearch.value.trim());
-  if(fSort.value) params.set('orden', fSort.value);
-  const qs = params.toString();
-  history.replaceState(null, '', window.location.pathname + (qs?('?'+qs):''));
-}
-    
+/* ---- construcción de selects ---- */
 function fillSelect(sel, values){ sel.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
 function fillFilters(){
   fillSelect(fMarca, ['Marca…', ...unique(PRODUCTS,'marca')]);
   fillSelect(fEspecie, ['Especie…', 'Gato', 'Perro']);
   fillSelect(fCategoria, ['Categoría…', ...unique(PRODUCTS,'categoria')]);
 }
+
+/* ---- listado y tarjetas ---- */
 function getFiltered(){
   const m=fMarca.value, e=fEspecie.value, c=fCategoria.value, q=(fSearch.value||'').trim().toLowerCase();
   let out = PRODUCTS.filter(p=>
@@ -480,13 +424,13 @@ function render(){
   grid.innerHTML = items.map(cardHTML).join('');
 }
 
-/* ============== EVENTOS ============== */
-[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> 
+/* ================= EVENTOS ================= */
+[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el =>
   el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); })
 );
 document.getElementById('clearFilters').addEventListener('click',()=>{
-  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); 
-  render(); 
+  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value='');
+  render();
   updateURLFromFilters();
 });
 document.getElementById('sendWA').addEventListener('click', sendWA);
@@ -494,7 +438,7 @@ document.getElementById('clearCart').addEventListener('click', ()=>{ if(confirm(
 document.getElementById('cartBtn').addEventListener('click', openCart);
 document.getElementById('closeCart').addEventListener('click', closeCart);
 
-/* ============== INIT ============== */
+/* ================= INIT ================= */
 (async function init(){
   setWALinks(); updateCartBadge();
   try{
@@ -503,7 +447,10 @@ document.getElementById('closeCart').addEventListener('click', closeCart);
       alertBox.classList.remove('hidden');
       alertBox.textContent = 'No se cargaron productos. Revisa las rutas CSV.';
     }
-    fillFilters(); applyInitialFiltersFromURL(); render(); drawCart();
+    fillFilters();
+    applyInitialFiltersFromURL();
+    render();
+    drawCart();
   }catch(e){
     console.error(e);
     alertBox.classList.remove('hidden');
