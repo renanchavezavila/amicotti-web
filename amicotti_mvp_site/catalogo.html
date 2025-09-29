@@ -307,6 +307,60 @@ const fSearch = document.getElementById('fSearch');
 const fSort = document.getElementById('fSort');
 const alertBox = document.getElementById('alertBox');
 
+/* ============== FILTRO POR URL (linkeable) ============== */
+const urlParams = new URLSearchParams(location.search);
+const norm = v => (v||'').toString().trim().toLowerCase();
+
+function mapEspecie(v){
+  v = norm(v);
+  if(v==='cat' || v==='gato') return 'Gato';
+  if(v==='dog' || v==='perro') return 'Perro';
+  return '';
+}
+function mapCategoria(v){
+  v = norm(v);
+  if(v==='dry' || v==='seco') return 'Seco';
+  if(v==='wet' || v==='húmedo' || v==='humedo') return 'Húmedo';
+  if(v==='veterinary' || v==='veterinario' || v==='vet') return 'Veterinario';
+  if(v==='snack' || v==='treats') return 'Snack';
+  return '';
+}
+
+function applyInitialFiltersFromURL(){
+  // Marca: acepta mayúsc/minúsc y espacios
+  const marcaParam = urlParams.get('marca');
+  if(marcaParam){
+    // intenta match exacto; si no, intenta por normalizado
+    const opts = unique(PRODUCTS,'marca');
+    const exact = opts.find(m => m === marcaParam);
+    const byNorm = opts.find(m => norm(m) === norm(marcaParam));
+    fMarca.value = exact || byNorm || '';
+  }
+
+  const espParam = urlParams.get('especie');
+  if(espParam){ fEspecie.value = mapEspecie(espParam); }
+
+  const catParam = urlParams.get('categoria');
+  if(catParam){ fCategoria.value = mapCategoria(catParam); }
+
+  const qParam = urlParams.get('q');
+  if(qParam){ fSearch.value = qParam; }
+
+  const sortParam = urlParams.get('orden');
+  if(sortParam){ fSort.value = sortParam; }
+}
+
+function updateURLFromFilters(){
+  const params = new URLSearchParams();
+  if(fMarca.value) params.set('marca', fMarca.value);
+  if(fEspecie.value) params.set('especie', fEspecie.value);
+  if(fCategoria.value) params.set('categoria', fCategoria.value);
+  if(fSearch.value.trim()) params.set('q', fSearch.value.trim());
+  if(fSort.value) params.set('orden', fSort.value);
+  const qs = params.toString();
+  history.replaceState(null, '', window.location.pathname + (qs?('?'+qs):''));
+}
+    
 function fillSelect(sel, values){ sel.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
 function fillFilters(){
   fillSelect(fMarca, ['Marca…', ...unique(PRODUCTS,'marca')]);
