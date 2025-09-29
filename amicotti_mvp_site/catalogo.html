@@ -390,6 +390,45 @@ function onChangeVariant(pid, idx){
   const priceEl = document.getElementById('price-'+pid);
   if(priceEl) priceEl.textContent = v ? money(v.price) : money(p.precio);
 }
+ // ===== Helpers de imagen =====
+
+// Crea una lista de candidatos a imagen: original + alternativas por extensión + fallback al logo
+function buildImgCandidates(p){
+  const res = [];
+  const base = (p.imagen_url || '').trim();
+  if (base) res.push(base);
+
+  // Si es ruta local, probamos con otras extensiones por si el archivo subido es .jpg/.webp/.png
+  if (base && /^\/assets\//.test(base)) {
+    if (/\.webp$/i.test(base)) { res.push(base.replace(/\.webp$/i, '.jpg'), base.replace(/\.webp$/i, '.png')); }
+    if (/\.jpe?g$/i.test(base)) { res.push(base.replace(/\.jpe?g$/i, '.webp'), base.replace(/\.jpe?g$/i, '.png')); }
+    if (/\.png$/i.test(base))   { res.push(base.replace(/\.png$/i, '.webp'),  base.replace(/\.png$/i, '.jpg')); }
+  }
+
+  // Fallback final
+  res.push('/assets/logo.png');
+
+  // Sin duplicados y sin vacíos
+  return [...new Set(res.filter(Boolean))];
+}
+
+// Avanza al siguiente candidato cuando falla la carga
+function onImgError(img){
+  const list = (img.getAttribute('data-alt') || '').split('|').filter(Boolean);
+  const current = img.getAttribute('src') || '';
+
+  // Si ya estamos en el logo o no quedan opciones, fija logo y elimina el onerror
+  if (current === '/assets/logo.png' || list.length === 0) {
+    img.onerror = null;
+    img.src = '/assets/logo.png';
+    return;
+  }
+
+  const next = list.shift();
+  img.setAttribute('data-alt', list.join('|'));
+  img.src = next;
+}
+   
 function cardHTML(p){
   const candidates = buildImgCandidates(p);
   const img = (p.imagen_url && p.imagen_url.trim()) || '/assets/logo.png';
