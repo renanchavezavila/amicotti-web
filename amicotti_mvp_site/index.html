@@ -7,10 +7,12 @@
   <meta name="description" content="Entrega rápida en Quito y Valles. Compra por WhatsApp. Productos oficiales Royal Canin y Purina." />
   <link rel="icon" href="assets/logo.png" />
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PapaParse para leer CSV -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
-    .slide {opacity:0; transform:scale(1.02); transition:opacity .6s ease, transform .6s ease}
-    .slide.active {opacity:1; transform:scale(1)}
-    .tag {font-size:.65rem}
+    .slide{opacity:0;transform:scale(1.02);transition:opacity .6s ease,transform .6s ease}
+    .slide.active{opacity:1;transform:scale(1)}
+    .tag{font-size:.65rem}
   </style>
 </head>
 <body class="bg-white text-gray-900">
@@ -58,16 +60,14 @@
         </div>
       </div>
 
-      <!-- Carrusel simple -->
+      <!-- Carrusel simple (muestra algunos productos Purina/Royal) -->
       <div class="relative aspect-[4/3] rounded-2xl border bg-slate-50 overflow-hidden">
-        <!-- slides -->
         <img class="slide absolute inset-0 w-full h-full object-contain p-6" src="assets/purina/cat-chow-adulto-carne.webp" alt="Cat Chow Adulto Carne">
         <img class="slide absolute inset-0 w-full h-full object-contain p-6" src="assets/purina/dog-chow-adulto-cordero.webp" alt="Dog Chow Adulto Cordero">
         <img class="slide absolute inset-0 w-full h-full object-contain p-6" src="assets/purina/pro-plan-gato-urinary.webp" alt="Pro Plan Gato Urinary">
-        <img class="slide absolute inset-0 w-full h-full object-contain p-6" src="assets/purina/fancy-feast-salmon-85g.webp" alt="Fancy Feast Salmón 85g">
-        <img class="slide absolute inset-0 w-full h-full object-contain p-6" src="assets/purina/doguitos-tira-asado.png" alt="Doguitos">
+        <img class="slide absolute inset-0 w-full h-full object-contain p-6" src="assets/royal/royal-caln-feline-gato.png" alt="Royal Canin (ejemplo)">
+        <img class="slide absolute inset-0 w-full h-full object-contain p-6" src="assets/royal/royal-bulldog-adult-perro.webp" alt="Royal Canin Bulldog Adulto">
 
-        <!-- Bullets -->
         <div class="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
           <span class="h-1.5 w-6 rounded-full bg-slate-300" data-dot="0"></span>
           <span class="h-1.5 w-6 rounded-full bg-slate-300" data-dot="1"></span>
@@ -78,86 +78,16 @@
       </div>
     </section>
 
-    <!-- PROMOS -->
+    <!-- PROMOS DINÁMICAS -->
     <section class="container mx-auto px-4 pb-6">
       <div class="flex items-end justify-between mb-4">
         <h2 class="text-xl font-semibold">Promos de la semana</h2>
         <a class="text-rose-600 hover:text-rose-700 text-sm" href="catalogo.html">Ver todo →</a>
       </div>
-
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Card -->
-        <article class="border rounded-xl overflow-hidden group bg-white">
-          <div class="p-4 grid place-items-center bg-slate-50">
-            <img src="assets/purina/cat-chow-adulto-carne.webp" alt="" class="h-36 object-contain">
-          </div>
-          <div class="p-4">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="tag px-2 py-0.5 bg-rose-100 text-rose-700 rounded">-10%</span>
-              <span class="tag px-2 py-0.5 bg-slate-100 text-slate-700 rounded">Gato • Seco</span>
-            </div>
-            <h3 class="font-medium leading-snug">Cat Chow Adulto Carne</h3>
-            <div class="mt-1 text-sm">
-              <span class="line-through text-slate-400 mr-2">$5.70</span>
-              <strong>$5.13</strong> <span class="text-slate-500">/ 500g</span>
-            </div>
-            <a href="catalogo.html" class="mt-3 inline-block text-sm px-3 py-2 border rounded-lg hover:bg-slate-50">Comprar</a>
-          </div>
-        </article>
-
-        <article class="border rounded-xl overflow-hidden group bg-white">
-          <div class="p-4 grid place-items-center bg-slate-50">
-            <img src="assets/purina/fancy-feast-salmon-85g.webp" alt="" class="h-36 object-contain">
-          </div>
-          <div class="p-4">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="tag px-2 py-0.5 bg-rose-100 text-rose-700 rounded">2x</span>
-              <span class="tag px-2 py-0.5 bg-slate-100 text-slate-700 rounded">Gato • Húmedo</span>
-            </div>
-            <h3 class="font-medium leading-snug">Fancy Feast Salmón 85g</h3>
-            <div class="mt-1 text-sm">
-              <span class="line-through text-slate-400 mr-2">$2.40</span>
-              <strong>$2.21</strong> <span class="text-slate-500">/ unidad</span>
-            </div>
-            <a href="catalogo.html" class="mt-3 inline-block text-sm px-3 py-2 border rounded-lg hover:bg-slate-50">Comprar</a>
-          </div>
-        </article>
-
-        <article class="border rounded-xl overflow-hidden group bg-white">
-          <div class="p-4 grid place-items-center bg-slate-50">
-            <img src="assets/purina/dog-chow-adulto-cordero.webp" alt="" class="h-36 object-contain">
-          </div>
-          <div class="p-4">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="tag px-2 py-0.5 bg-rose-100 text-rose-700 rounded">-12%</span>
-              <span class="tag px-2 py-0.5 bg-slate-100 text-slate-700 rounded">Perro • Seco</span>
-            </div>
-            <h3 class="font-medium leading-snug">Dog Chow Adulto Cordero</h3>
-            <div class="mt-1 text-sm">
-              <span class="line-through text-slate-400 mr-2">$14.80</span>
-              <strong>$13.00</strong> <span class="text-slate-500">/ 1.5kg</span>
-            </div>
-            <a href="catalogo.html" class="mt-3 inline-block text-sm px-3 py-2 border rounded-lg hover:bg-slate-50">Comprar</a>
-          </div>
-        </article>
-
-        <article class="border rounded-xl overflow-hidden group bg-white">
-          <div class="p-4 grid place-items-center bg-slate-50">
-            <img src="assets/purina/pro-plan-gato-urinary.webp" alt="" class="h-36 object-contain">
-          </div>
-          <div class="p-4">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="tag px-2 py-0.5 bg-rose-100 text-rose-700 rounded">Nuevo</span>
-              <span class="tag px-2 py-0.5 bg-slate-100 text-slate-700 rounded">Gato • Seco</span>
-            </div>
-            <h3 class="font-medium leading-snug">Pro Plan Gato Urinary</h3>
-            <div class="mt-1 text-sm">
-              <strong>$15.00</strong> <span class="text-slate-500">/ 1.5kg</span>
-            </div>
-            <a href="catalogo.html" class="mt-3 inline-block text-sm px-3 py-2 border rounded-lg hover:bg-slate-50">Comprar</a>
-          </div>
-        </article>
+      <div id="promosGrid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- JS insertará las cards aquí -->
       </div>
+      <div id="promosMsg" class="hidden mt-3 text-sm text-slate-500">No hay promos marcadas. Mostramos destacados.</div>
     </section>
 
     <!-- Accesos por especie -->
@@ -171,7 +101,7 @@
           </div>
         </a>
         <a href="catalogo.html" class="group rounded-2xl border overflow-hidden bg-gradient-to-br from-amber-50 to-white p-6 flex items-center gap-5 hover:shadow-sm">
-          <img src="assets/purina/dog-chow-cachorro.webp" class="w-24 h-24 object-contain" alt="Perros">
+          <img src="assets/royal/royal-bulldog-puppy-perro.jpg" class="w-24 h-24 object-contain" alt="Perros">
           <div>
             <h3 class="text-lg font-semibold">Para perros</h3>
             <p class="text-sm text-slate-600">Puppy, adulto y snacks.</p>
@@ -184,8 +114,7 @@
     <section class="container mx-auto px-4 py-6">
       <h2 class="text-xs font-semibold text-slate-500 mb-3">Marcas que trabajamos</h2>
       <div class="flex flex-wrap items-center gap-6">
-        <img src="assets/logo.png" alt="Amicotti" class="h-10 opacity-80">
-        <span class="text-sm text-slate-500">Royal Canin • Purina</span>
+        <span class="text-sm text-slate-600">Royal Canin • Purina</span>
       </div>
     </section>
 
@@ -208,12 +137,6 @@
           <p class="text-sm text-slate-600">Entrega en Quito y Valles. Pago por transferencia.</p>
         </div>
       </div>
-    </section>
-
-    <!-- FAQ (tu bloque actual puede quedarse aquí) -->
-    <section class="container mx-auto px-4 py-8" id="faq">
-      <h2 class="sr-only">Preguntas frecuentes</h2>
-      <!-- Puedes reutilizar tu acordeón actual -->
     </section>
   </main>
 
@@ -241,7 +164,7 @@
   <a id="waFloat" class="fixed bottom-4 right-4 w-14 h-14 rounded-full bg-rose-600 text-white grid place-items-center shadow-lg hover:bg-rose-700" target="_blank" aria-label="WhatsApp">WA</a>
 
   <script>
-    // ===== Config WhatsApp
+    // ================== Config WhatsApp
     const WA_PHONE = "593995315716";
     const waUrl = (msg = "") => `https://wa.me/${WA_PHONE}${msg ? `?text=${encodeURIComponent(msg)}` : ""}`;
     document.getElementById('waTop').href   = waUrl();
@@ -249,7 +172,7 @@
     document.getElementById('waFoot').href  = waUrl();
     document.getElementById('waFloat').href = waUrl('Hola 👋');
 
-    // ===== Hero simple slider
+    // ================== Carrusel
     const slides = Array.from(document.querySelectorAll('.slide'));
     const dots   = Array.from(document.querySelectorAll('[data-dot]'));
     let idx = 0;
@@ -260,6 +183,109 @@
     setActive(0);
     setInterval(()=> { idx = (idx+1) % slides.length; setActive(idx); }, 3500);
     dots.forEach(d => d.addEventListener('click', ()=>{ idx = +d.dataset.dot; setActive(idx); }));
+
+    // ================== Promos desde CSV (Purina + Royal)
+    const CSV_URLS = ["/data/purina.csv", "/data/royal.csv"];
+    const promosGrid = document.getElementById('promosGrid');
+    const promosMsg  = document.getElementById('promosMsg');
+
+    const t = (s='') => (s||'').toString().trim();
+    const money = (n) => (typeof n === 'number' && !Number.isNaN(n)) ? `$${n.toFixed(2)}` : null;
+
+    function parseVariants(variants){
+      // soporta "500g - $5.13|1.5kg - $12.19" o "500g|1.5kg"
+      if(!variants) return [];
+      return variants.split('|').map(raw=>{
+        const p = raw.split('-').map(x=>x.trim());
+        let size = p[0] || '';
+        let price = null;
+        if(p[1]){
+          const m = p[1].match(/[\d\.]+/);
+          if(m) price = Number(m[0]);
+        } else {
+          // si no hay precio explícito
+          price = null;
+        }
+        return {size, price};
+      }).filter(x=>x.size);
+    }
+
+    function normalizeRow(r){
+      const brand = t(r.brand).toLowerCase();
+      const speciesRaw = t(r.species).toLowerCase();
+      const species = /cat|gato/.test(speciesRaw) ? 'Gato' : /dog|perro/.test(speciesRaw) ? 'Perro' : '';
+      const categoryRaw = t(r.category).toLowerCase();
+      const catMap = {dry:'Seco', wet:'Húmedo', veterinary:'Veterinario', treats:'Snack'};
+      const category = catMap[categoryRaw] || (categoryRaw ? categoryRaw[0].toUpperCase()+categoryRaw.slice(1) : '');
+      const variants = parseVariants(t(r.variants));
+      const minPrice = variants.map(v=>v.price).filter(v=>v!=null).sort((a,b)=>a-b)[0] ?? null;
+      const image = t(r.image_url) || 'assets/placeholder.png';
+      const promo = /^(yes|si|true|1)$/i.test(t(r.promo));
+      const promoBadge = t(r.promo_badge) || (promo ? 'Promo' : '');
+      return {
+        id:t(r.id), brand:brand==='royal'?'Royal Canin':(brand[0]?.toUpperCase()+brand.slice(1)),
+        name:t(r.name), species, category, variants, minPrice, image, promo, promoBadge
+      };
+    }
+
+    function cardHTML(p){
+      const badge = p.promoBadge || (p.category ? p.category : '');
+      const mini  = p.minPrice!=null ? `${money(p.minPrice)} <span class="text-slate-500">/ desde</span>` : 'Consultar';
+      const catTag = p.species && p.category ? `${p.species} • ${p.category}` : (p.species||p.category||'');
+      return `
+        <article class="border rounded-xl overflow-hidden bg-white">
+          <div class="p-4 grid place-items-center bg-slate-50">
+            <img src="${p.image}" alt="${p.name}" class="h-36 object-contain" onerror="this.src='assets/placeholder.png'">
+          </div>
+          <div class="p-4">
+            <div class="flex items-center gap-2 mb-1">
+              ${p.promo ? `<span class="tag px-2 py-0.5 bg-rose-100 text-rose-700 rounded">${badge}</span>`:''}
+              ${catTag?`<span class="tag px-2 py-0.5 bg-slate-100 text-slate-700 rounded">${catTag}</span>`:''}
+            </div>
+            <h3 class="font-medium leading-snug">${p.name}</h3>
+            <div class="mt-1 text-sm"><strong>${mini}</strong></div>
+            <div class="mt-2 text-xs text-slate-500">${p.brand||''}</div>
+            <a href="catalogo.html" class="mt-3 inline-block text-sm px-3 py-2 border rounded-lg hover:bg-slate-50">Comprar</a>
+          </div>
+        </article>
+      `;
+    }
+
+    async function loadCSV(url){
+      return new Promise((resolve,reject)=>{
+        Papa.parse(url,{
+          download:true, header:true, skipEmptyLines:true,
+          complete: res => resolve(res.data), error: reject
+        });
+      });
+    }
+
+    async function renderPromos(){
+      try{
+        const arrays = await Promise.all(CSV_URLS.map(loadCSV));
+        const rows = arrays.flat().map(normalizeRow).filter(r=>r.id && r.name);
+        let promos = rows.filter(r=>r.promo);
+
+        if(promos.length===0){
+          promosMsg.classList.remove('hidden'); // sin promos -> destacados
+          // sample 8 al azar mezclando marcas
+          rows.sort(()=>Math.random()-0.5);
+          promos = rows.slice(0,8);
+        }else{
+          promosMsg.classList.add('hidden');
+        }
+
+        // limitar a 8
+        promos = promos.slice(0,8);
+
+        promosGrid.innerHTML = promos.map(cardHTML).join('');
+      }catch(e){
+        console.error(e);
+        promosGrid.innerHTML = `<div class="col-span-full p-6 text-center text-sm text-slate-500 border rounded">No pudimos cargar las promos.</div>`;
+      }
+    }
+
+    renderPromos();
 
     // Año footer
     document.getElementById('y').textContent = new Date().getFullYear();
