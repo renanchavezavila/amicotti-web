@@ -503,7 +503,7 @@ document.getElementById('closeCart').addEventListener('click', closeCart);
       alertBox.classList.remove('hidden');
       alertBox.textContent = 'No se cargaron productos. Revisa las rutas CSV.';
     }
-    fillFilters(); render(); drawCart();
+    fillFilters(); applyInitialFiltersFromURL(); render(); drawCart();
   }catch(e){
     console.error(e);
     alertBox.classList.remove('hidden');
