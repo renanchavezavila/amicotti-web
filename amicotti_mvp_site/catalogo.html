@@ -481,8 +481,14 @@ function render(){
 }
 
 /* ============== EVENTOS ============== */
-[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.addEventListener('input', render));
-document.getElementById('clearFilters').addEventListener('click',()=>{ [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); render(); });
+[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> 
+  el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); })
+);
+document.getElementById('clearFilters').addEventListener('click',()=>{
+  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); 
+  render(); 
+  updateURLFromFilters();
+});
 document.getElementById('sendWA').addEventListener('click', sendWA);
 document.getElementById('clearCart').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); }});
 document.getElementById('cartBtn').addEventListener('click', openCart);
