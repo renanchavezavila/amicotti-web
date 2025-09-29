@@ -428,8 +428,14 @@ function render(){
 }
 
 /* ============== EVENTOS ============== */
-[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.addEventListener('input', render));
-document.getElementById('clearFilters').addEventListener('click',()=>{ [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); render(); });
+[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> 
+  el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); })
+);
+document.getElementById('clearFilters').addEventListener('click',()=>{
+  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); 
+  render(); 
+  updateURLFromFilters();
+});
 document.getElementById('sendWA').addEventListener('click', sendWA);
 document.getElementById('clearCart').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); }});
 document.getElementById('cartBtn').addEventListener('click', openCart);
@@ -444,7 +450,7 @@ document.getElementById('closeCart').addEventListener('click', closeCart);
       alertBox.classList.remove('hidden');
       alertBox.textContent = 'No se cargaron productos. Revisa las rutas CSV.';
     }
-    fillFilters(); render(); drawCart();
+    fillFilters(); applyInitialFiltersFromURL(); render(); drawCart();
   }catch(e){
     console.error(e);
     alertBox.classList.remove('hidden');
