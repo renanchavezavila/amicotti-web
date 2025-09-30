@@ -491,7 +491,7 @@ function buildWAMessage(buyer){
 }
 function sendToGoogleForms(buyer){
   if(!FORM_ID) return Promise.resolve();
-  const endpoint = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
+  const endpoint = `?https://docs.google.com/forms/d/e/1FAIpQLSfsSxhFoBs9Xkv5MmYjTwr98zTSR6IefJ-vm2p9FSUOMSs69g/viewform?usp=preview`;
   const payload = new URLSearchParams();
   const sub = cartSubtotal().toFixed(2);
   if(ENTRY_NAME)    payload.append(ENTRY_NAME, buyer.name);
