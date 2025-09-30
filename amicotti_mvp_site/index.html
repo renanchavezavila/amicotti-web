@@ -15,6 +15,11 @@
     .carousel-track{ display:flex; will-change: transform; }
     .carousel-slide{ min-width:100%; }
     .dot{ width:8px; height:8px; border-radius:9999px; }
+    /* Contenedor de imagen de promo: centra y evita recortes */
+    .promo-img-wrap{ display:grid; place-items:center; padding:1rem; background:#fff; }
+    .promo-img{ width:auto; height:auto; max-height:520px; object-fit:contain; }
+    @media (max-width:1024px){ .promo-img{ max-height:420px; } }
+    @media (max-width:640px){ .promo-img{ max-height:320px; } }
   </style>
 </head>
 <body class="bg-white text-gray-900 selection:bg-rose-100 selection:text-rose-700">
@@ -54,7 +59,6 @@
       Entrega rápida en Quito y Valles. Compra por WhatsApp. Productos oficiales Royal Canin y Purina.
     </p>
     <div class="mt-6 flex items-center gap-3">
-      <!-- Unificados también aquí para coherencia -->
       <a href="#promos" class="px-4 py-2 rounded-xl bg-rose-600 text-white hover:bg-rose-700">Promos</a>
       <a href="catalogo.html" class="px-4 py-2 rounded-xl bg-rose-600 text-white hover:bg-rose-700">Ver catálogo</a>
     </div>
@@ -209,17 +213,16 @@
   const AUTOPLAY_MS = 3500;
 
   function buildSlide(p){
-    // sources
     let pictureHTML = '';
     if(p.image.webp) pictureHTML += `<source srcset="${p.image.webp}" type="image/webp">`;
     const fallbackSrc = p.image.jpg || p.image.png || p.image.webp || "assets/logo.png";
-    pictureHTML += `<img src="${fallbackSrc}" alt="${p.name}" class="w-full h-full object-contain" onerror="safeImg(this)">`;
+    pictureHTML += `<img src="${fallbackSrc}" alt="${p.name}" class="promo-img" onerror="safeImg(this)">`;
 
     return `
       <div class="carousel-slide">
         <div class="grid md:grid-cols-2 items-center">
-          <div class="bg-white h-[18rem] sm:h-[22rem] md:h-[26rem] grid place-items-center p-4">
-            <picture class="w-full h-full">${pictureHTML}</picture>
+          <div class="promo-img-wrap">
+            <picture>${pictureHTML}</picture>
           </div>
           <div class="p-6 md:p-10">
             <span class="chip px-2 py-1 rounded bg-slate-100 text-slate-600">${p.species}</span>
