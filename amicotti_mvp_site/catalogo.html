@@ -158,6 +158,31 @@ let CART = loadCart();
 const SELECTED = Object.create(null); // id -> índice de variante
 
 /* ================= HELPERS ================= */
+/* ====== Teléfono Ecuador: formato y validación ====== */
+function normalizeEcPhone(raw){
+  const digits = String(raw||'').replace(/\D+/g,'');
+  if(digits.startsWith('593')) return '593' + digits.slice(3,12);
+  if(digits.startsWith('09'))  return '0'   + digits.slice(1,10);
+  if(digits.startsWith('9'))   return '0'   + digits.slice(0,9);
+  return digits.slice(0,10);
+}
+function isValidEcPhone(raw){
+  const n = normalizeEcPhone(raw);
+  return /^0?9\d{8}$/.test(n) || /^5939\d{8}$/.test(n);
+}
+function prettyEcPhone(raw){
+  const n = normalizeEcPhone(raw);
+  if(/^0?9\d{8}$/.test(n)){
+    const ten = n.startsWith('0') ? n : '0'+n;
+    return `${ten.slice(0,3)} ${ten.slice(3,6)} ${ten.slice(6,10)}`;
+  }
+  if(/^5939\d{8}$/.test(n)){
+    const ten = '0'+n.slice(3);
+    return `${ten.slice(0,3)} ${ten.slice(3,6)} ${ten.slice(6,10)}`;
+  }
+  return raw;
+}
+    
 function money(n){ const x=Number(n); return (Number.isFinite(x) && x>=0) ? ('$'+x.toFixed(2)) : 'Consultar'; }
 function gramsFromLabel(lbl){
   if(!lbl) return null;
