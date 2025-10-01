@@ -549,76 +549,82 @@
     }catch(e){}
   }
 
-  /* ======== CHECKOUT (pantalla nueva) ======== */
-  <script>
-  function goToCheckout(){
-    if(!CART.length){
-      alert('Tu carrito está vacío.');
-      return;
-    }
-    // Marcamos de dónde vienes (por si luego quieres usarlo en checkout)
-    localStorage.setItem('amicotti_checkout_source', 'catalog');
-    // Usa ruta relativa para que funcione en subcarpetas
-    location.href = 'checkout.html';
+<!-- === CHECKOUT + EVENTOS + INIT (PARCHE LIMPIO) === -->
+<script>
+// === CHECKOUT (llevar a página nueva; no valida el form oculto) ===
+function goToCheckout(){
+  if(!CART.length){
+    alert('Tu carrito está vacío.');
+    return;
   }
-</script>
+  localStorage.setItem('amicotti_checkout_source', 'catalog'); // opcional
+  location.href = 'checkout.html'; // ruta RELATIVA (funciona en subcarpetas)
+}
 
-    // Guardamos un "snapshot" para la página de checkout
-    localStorage.setItem('amicotti_checkout_source', 'catalog');
-    location.href = '/checkout.html';
+/* ============== EVENTOS ============== */
+// header (desktop)
+[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el =>
+  el.addEventListener('input', ()=>{
+    render();
+    updateURLFromFilters();
+    mirrorMobileFromDesktop();
+  })
+);
+document.getElementById('clearFilters').addEventListener('click',()=>{
+  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value='');
+  render(); updateURLFromFilters(); mirrorMobileFromDesktop();
+});
+
+// móvil
+const panel = document.getElementById('filtersPanel');
+document.getElementById('openFilters').addEventListener('click', ()=> panel.classList.toggle('hidden'));
+[m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el =>
+  el.addEventListener('input', ()=>{
+    mirrorDesktopFromMobile();
+    render();
+    updateURLFromFilters();
+  })
+);
+document.getElementById('m_clearFilters').addEventListener('click',()=>{
+  [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el=> el.value='');
+  mirrorDesktopFromMobile(); render(); updateURLFromFilters();
+});
+
+// drawer / carrito
+document.getElementById('cartBtn').addEventListener('click', openCart);
+document.getElementById('closeCart').addEventListener('click', closeCart);
+document.getElementById('btnEmpty').addEventListener('click', ()=>{
+  if(confirm('¿Vaciar carrito?')){
+    CART=[]; saveCart(); drawCart();
   }
+});
+document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
 
-  /* ============== EVENTOS ============== */
-  // header desktop
-  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el => el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); mirrorMobileFromDesktop(); }));
-  document.getElementById('clearFilters').addEventListener('click',()=>{ [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); render(); updateURLFromFilters(); mirrorMobileFromDesktop(); });
+// Evita submit del formulario oculto (si existe)
+document.getElementById('buyerForm')?.addEventListener('submit', e => e.preventDefault());
 
-  // móvil
-  const panel = document.getElementById('filtersPanel');
-  document.getElementById('openFilters').addEventListener('click', ()=> panel.classList.toggle('hidden'));
-  ;[m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el => el.addEventListener('input', ()=>{ mirrorDesktopFromMobile(); render(); updateURLFromFilters(); }));
-  document.getElementById('m_clearFilters').addEventListener('click',()=>{ [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el=> el.value=''); mirrorDesktopFromMobile(); render(); updateURLFromFilters(); });
-
-  // carrito
-  document.getElementById('cartBtn').addEventListener('click', openCart);
-  document.getElementById('closeCart').addEventListener('click', closeCart);
-  document.getElementById('btnEmpty').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); } });
-  document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
-
-  // formato teléfono live
-  const bfPhoneInput = document.getElementById('bf_phone');
-  const bfPhoneHelp = document.getElementById('bf_phone_help');
-  if(bfPhoneInput){
-    bfPhoneInput.addEventListener('input', () => {
-      const pos = bfPhoneInput.selectionStart;
-      const pretty = prettyEcPhone(bfPhoneInput.value);
-      bfPhoneInput.value = pretty;
-      if(isValidEcPhone(bfPhoneInput.value)){
-        bfPhoneInput.classList.remove('border-rose-400'); bfPhoneHelp?.classList.add('hidden');
-      }else{
-        bfPhoneInput.classList.add('border-rose-400'); bfPhoneHelp?.classList.remove('hidden');
-      }
-      try{ bfPhoneInput.setSelectionRange(pos,pos); }catch(e){}
-    });
-  }
-
-  /* ============== INIT ============== */
-  async function init(){
-    setWALinks(); updateCartBadge(); drawCart();
-    try{
-      await loadCSVs();
-      if(!PRODUCTS.length){
-        alertBox.classList.remove('hidden');
-        alertBox.textContent = 'No se cargaron productos. Revisa las rutas CSV.';
-      }
-      fillFilters(); applyInitialFiltersFromURL(); render(); prefillBuyer();
-    }catch(e){
-      console.error(e);
+/* ============== INIT ============== */
+(async function init(){
+  setWALinks();
+  updateCartBadge();
+  drawCart();
+  try{
+    await loadCSVs();
+    if(!PRODUCTS.length){
       alertBox.classList.remove('hidden');
-      alertBox.textContent = 'Error cargando el catálogo. Verifica rutas y formato del CSV.';
+      alertBox.textContent = 'No se cargaron productos. Revisa las rutas CSV.';
     }
+    fillFilters();
+    applyInitialFiltersFromURL();
+    render();
+    prefillBuyer(); // no molesta aunque el bloque esté oculto
+  }catch(e){
+    console.error(e);
+    alertBox.classList.remove('hidden');
+    alertBox.textContent = 'Error cargando el catálogo. Verifica rutas y formato del CSV.';
   }
-  init();
-  </script>
+})();
+</script>
+  
 </body>
 </html>
