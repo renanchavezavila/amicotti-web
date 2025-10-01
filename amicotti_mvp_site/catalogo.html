@@ -135,37 +135,14 @@ const WA_PHONE = "593995315716";
 const CSV_URLS = ["/data/purina.csv","/data/royal.csv"];
 const IMG_EXTS = [".webp", ".jpg", ".jpeg", ".png", ".avif"];
 
-/* Google Forms (IDs reales de tu form) */
+/* Google Forms (tus IDs reales) */
 const FORM_ID       = "1FAIpQLSfsSxhFoBs9Xkv5MmYjTwr9BzTSR6IefJ-vm2p9SFUOMSs69g";
-// OJO: revisa que estos coincidan con tu Payload (Network → formResponse → Form Data)
-const ENTRY_NAME    = "entry.1205890323";   // Nombre Completo
-const ENTRY_ADDRESS = "entry.1074248946";  // Dirección exacta
-const ENTRY_PHONE   = "entry.646283436";   // Teléfono (WhatsApp)
-const ENTRY_CART    = "entry.1875788310";   // Carrito (JSON)
-const ENTRY_TOTAL   = "entry.624785838";    // Total estimado
-const ENTRY_SOURCE  = "entry.1894560572";   // Fuente (ej. "site-amicotti")
-
-/* ==== Envío a Google Forms ==== */
-function cartSubtotal(){
-  return CART.reduce((a,i)=> a + (i.precio!=null ? i.precio*i.qty : 0), 0);
-}
-function sendToGoogleForms(buyer){
-  if(!FORM_ID) return Promise.resolve();
-  const endpoint = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`; // correcto para /d/e/
-
-  const payload = new URLSearchParams();
-  const sub = cartSubtotal().toFixed(2);
-
-  if(ENTRY_NAME)    payload.append(ENTRY_NAME, buyer.name);
-  if(ENTRY_ADDRESS) payload.append(ENTRY_ADDRESS, buyer.address);
-  if(ENTRY_PHONE)   payload.append(ENTRY_PHONE, buyer.phone);
-  if(ENTRY_TOTAL)   payload.append(ENTRY_TOTAL, sub);
-  if(ENTRY_CART)    payload.append(ENTRY_CART, JSON.stringify(CART));
-  if(ENTRY_SOURCE)  payload.append(ENTRY_SOURCE, 'site-amicotti');
-
-  // No bloquea el flujo si falla
-  return fetch(endpoint, { method:'POST', mode:'no-cors', body: payload }).catch(()=>{});
-}
+const ENTRY_NAME    = "entry.1205890323"; // Nombre
+const ENTRY_ADDRESS = "entry.1074248946"; // Dirección
+const ENTRY_PHONE   = "entry.646283436";  // Teléfono
+const ENTRY_CART    = "entry.1875788310"; // JSON carrito
+const ENTRY_TOTAL   = "entry.614785838";  // Total $
+const ENTRY_SOURCE  = "entry.1894560572"; // (opcional) "site-amicotti"
 
 /* ================= ESTADO ================= */
 let PRODUCTS = [];
@@ -236,6 +213,10 @@ function chgQty(key,d){
   saveCart(); drawCart();
 }
 function removeFromCart(key){ CART = CART.filter(x=>x.key!==key); saveCart(); drawCart(); }
+
+function cartSubtotal(){ 
+  return CART.reduce((a,i)=> a + (i.precio!=null ? i.precio*i.qty : 0), 0); 
+}
 
 function drawCart(){
   const list = document.getElementById('cartItems');
@@ -511,6 +492,21 @@ function buildWAMessage(buyer){
   lines.push('Por favor comparte tu ubicación (pin) en este chat para entregar más rápido. ¡Gracias! 🐾');
   return lines.join('\n');
 }
+function sendToGoogleForms(buyer){
+  if(!FORM_ID) return Promise.resolve();
+  // Endpoint correcto: /d/e/${FORM_ID}/formResponse
+  const endpoint = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
+  const payload = new URLSearchParams();
+  const sub = cartSubtotal().toFixed(2);
+  if(ENTRY_NAME)    payload.append(ENTRY_NAME, buyer.name);
+  if(ENTRY_ADDRESS) payload.append(ENTRY_ADDRESS, buyer.address);
+  if(ENTRY_PHONE)   payload.append(ENTRY_PHONE, buyer.phone);
+  if(ENTRY_TOTAL)   payload.append(ENTRY_TOTAL, sub);
+  if(ENTRY_CART)    payload.append(ENTRY_CART, JSON.stringify(CART));
+  if(ENTRY_SOURCE)  payload.append(ENTRY_SOURCE, 'site-amicotti');
+  // No bloquea el flujo si falla
+  return fetch(endpoint, { method:'POST', mode:'no-cors', body: payload }).catch(()=>{});
+}
 async function finalizarPedido(){
   if(!CART.length){ alert('Tu carrito está vacío.'); return; }
   const buyer = getBuyer();
@@ -519,7 +515,6 @@ async function finalizarPedido(){
   }
   persistBuyer(buyer);
   sendToGoogleForms(buyer); // no bloquea
-
   const text = buildWAMessage(buyer);
   const url  = `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(text)}`;
   window.open(url, '_blank', 'noopener');
