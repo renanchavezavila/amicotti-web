@@ -531,6 +531,7 @@ function buildWAMessage(buyer){
   lines.push(`Nombre: ${buyer.name}`);
   lines.push(`Dirección: ${buyer.address}`);
   lines.push(`Teléfono: ${buyer.phone}`);
+  lines.push(`Forma de pago: ${buyer.pay || '—'}`);
   lines.push('');
   lines.push('Items:');
   CART.forEach(it=>{
