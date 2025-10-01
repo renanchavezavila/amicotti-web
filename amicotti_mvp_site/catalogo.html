@@ -107,6 +107,21 @@
     <p id="bf_phone_help" class="mt-1 text-[11px] text-rose-600 hidden">Ingresa un número válido de Ecuador.</p>
   </div>
 
+<div>
+  <label class="block text-xs text-gray-600 mb-2">Forma de pago *</label>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+    <label class="flex items-center gap-2 border rounded px-3 py-2 cursor-pointer">
+      <input type="radio" name="bf_pay" value="Transferencia bancaria" checked>
+      <span class="text-sm">Transferencia bancaria</span>
+    </label>
+    <label class="flex items-center gap-2 border rounded px-3 py-2 cursor-pointer">
+      <input type="radio" name="bf_pay" value="Contraentrega (efectivo)">
+      <span class="text-sm">Contraentrega (efectivo)</span>
+    </label>
+  </div>
+</div>
+
+      
   <label class="flex items-start gap-2 text-sm select-none">
     <input id="bf_consent" type="checkbox" required class="mt-1">
     <span>Acepto que Amicotti use mis datos para coordinar la entrega y enviar novedades. <a href="#" class="underline">Privacidad</a>.</span>
