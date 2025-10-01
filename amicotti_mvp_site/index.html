@@ -9,9 +9,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .chip{font-size:.7rem}
-    /* Imagenes neutras reutilizables */
-    .img-box{height:12rem}
-    .img-box img{max-height:11rem;object-fit:contain}
   </style>
 </head>
 <body class="bg-white text-gray-900 selection:bg-rose-100 selection:text-rose-700">
@@ -32,7 +29,7 @@
       <img src="assets/logo.png" class="w-9 h-9" alt="Amicotti"/>
       <span class="font-semibold tracking-tight">Amicotti</span>
     </a>
-    <nav class="flex items-center gap-2">
+    <nav class="flex flex-wrap items-center gap-2">
       <a href="#marcas" class="px-4 py-2 rounded-xl hover:bg-rose-50">Marcas</a>
       <a href="#promos" class="px-4 py-2 rounded-xl bg-rose-600 text-white hover:bg-rose-700">Promos</a>
       <a href="catalogo.html" class="px-4 py-2 rounded-xl border border-rose-600 text-rose-600 hover:bg-rose-50">Catálogo</a>
@@ -42,7 +39,7 @@
   </div>
 </header>
 
-<!-- Hero (mejorado) -->
+<!-- Hero -->
 <section class="bg-gradient-to-r from-rose-50 to-rose-100 py-12 md:py-16">
   <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-8 items-center">
     <div class="space-y-6">
@@ -50,7 +47,8 @@
         Salud y bienestar <span class="text-rose-600">para tus mascotas</span>
       </h1>
       <p class="text-slate-700 text-lg">
-        Entrega rápida en Quito y Valles. Productos oficiales <strong>Royal Canin</strong> y <strong>Purina</strong>. Compra segura y asesoría por WhatsApp.
+        Entrega rápida en Quito y Valles. Productos oficiales <strong>Royal Canin</strong> y <strong>Purina</strong>.
+        Compra segura y asesoría por WhatsApp.
       </p>
       <div class="flex flex-wrap gap-3">
         <a href="catalogo.html" class="px-6 py-3 rounded-lg bg-rose-600 text-white font-semibold shadow hover:bg-rose-700">Ver catálogo</a>
@@ -63,8 +61,8 @@
       </ul>
     </div>
     <div class="hidden md:block">
-      <!-- Reemplaza por tu imagen -->
-      <img src="assets/hero-pet.png" alt="Mascotas felices con Amicotti" class="rounded-2xl shadow-xl"/>
+      <!-- Coloca aquí tu imagen real -->
+      <img src="assets/hero-pet.png" alt="Mascotas felices con Amicotti" class="rounded-2xl shadow-xl" onerror="this.src='assets/logo.png'"/>
     </div>
   </div>
 </section>
@@ -78,76 +76,39 @@
   </div>
 </section>
 
-<!-- Marcas (tarjetas) -->
+<!-- Marcas -->
 <section id="marcas" class="py-12 bg-white">
   <div class="max-w-7xl mx-auto px-4">
     <h2 class="text-2xl font-bold mb-6 text-slate-800">Marcas que confían en nosotros</h2>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
       <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-        <img src="assets/royal.png" alt="Royal Canin" class="h-12"/>
+        <img src="assets/royal.png" alt="Royal Canin" class="h-12" onerror="this.src='assets/logo.png'"/>
       </div>
       <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-        <img src="assets/purina.png" alt="Purina" class="h-12"/>
+        <img src="assets/purina.png" alt="Purina" class="h-12" onerror="this.src='assets/logo.png'"/>
       </div>
       <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-        <img src="assets/dogchow.png" alt="Dog Chow" class="h-12"/>
+        <img src="assets/dogchow.png" alt="Dog Chow" class="h-12" onerror="this.src='assets/logo.png'"/>
       </div>
       <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-        <img src="assets/catchow.png" alt="Cat Chow" class="h-12"/>
+        <img src="assets/catchow.png" alt="Cat Chow" class="h-12" onerror="this.src='assets/logo.png'"/>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Promos (grilla) -->
+<!-- Promos: se renderiza desde JS -->
 <section id="promos" class="py-12 bg-rose-50">
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-bold text-slate-800">Promos de la semana</h2>
       <a href="catalogo.html" class="text-rose-600 hover:underline font-semibold">Ver todas →</a>
     </div>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Producto 1 -->
-      <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
-        <img src="assets/prod1.jpg" alt="Royal Canin Gato Urinary 1.5kg" class="w-full h-48 object-contain p-4"/>
-        <div class="p-4">
-          <h3 class="font-semibold">Royal Canin Gato Urinary 1.5kg</h3>
-          <p class="text-slate-600">Precio especial esta semana</p>
-          <div class="flex gap-3 mt-3">
-            <a href="catalogo.html?marca=Royal+Canin&buscar=urinary" class="px-4 py-2 bg-rose-600 text-white rounded">Ver catálogo</a>
-            <a href="#" data-wa="Royal Canin Gato Urinary 1.5kg" class="px-4 py-2 border border-rose-600 text-rose-600 rounded waAsk">WhatsApp</a>
-          </div>
-        </div>
-      </article>
-      <!-- Producto 2 -->
-      <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
-        <img src="assets/prod2.jpg" alt="Pro Plan Cat Sterilized 1.5kg" class="w-full h-48 object-contain p-4"/>
-        <div class="p-4">
-          <h3 class="font-semibold">Pro Plan Cat Sterilized 1.5kg</h3>
-          <p class="text-slate-600">Descuento por tiempo limitado</p>
-          <div class="flex gap-3 mt-3">
-            <a href="catalogo.html?marca=Purina&buscar=sterilized" class="px-4 py-2 bg-rose-600 text-white rounded">Ver catálogo</a>
-            <a href="#" data-wa="Pro Plan Cat Sterilized 1.5kg" class="px-4 py-2 border border-rose-600 text-rose-600 rounded waAsk">WhatsApp</a>
-          </div>
-        </div>
-      </article>
-      <!-- Producto 3 -->
-      <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
-        <img src="assets/prod3.jpg" alt="Felix Travesuras Ocean Mix (pack x12)" class="w-full h-48 object-contain p-4"/>
-        <div class="p-4">
-          <h3 class="font-semibold">Felix Travesuras Ocean Mix</h3>
-          <p class="text-slate-600">Pack ahorro x 12 sobres</p>
-          <div class="flex gap-3 mt-3">
-            <a href="catalogo.html?marca=Purina&buscar=felix%20travesuras" class="px-4 py-2 bg-rose-600 text-white rounded">Ver catálogo</a>
-            <a href="#" data-wa="Felix Travesuras Ocean Mix (pack x12)" class="px-4 py-2 border border-rose-600 text-rose-600 rounded waAsk">WhatsApp</a>
-          </div>
-        </div>
-      </article>
-    </div>
+    <div id="promoGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
   </div>
 </section>
 
-<!-- FAQs (acordeón) -->
+<!-- FAQs -->
 <section id="faq" class="py-14 bg-white">
   <div class="max-w-3xl mx-auto px-4">
     <h2 class="text-2xl font-bold mb-6 text-slate-800">Preguntas frecuentes</h2>
@@ -194,7 +155,7 @@
   </div>
 </section>
 
-<!-- Footer premium -->
+<!-- Footer -->
 <footer class="bg-gray-950 text-gray-200">
   <div class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-4 gap-8">
     <div>
@@ -241,38 +202,62 @@
   const WA_PHONE = "593995315716";
 
   // ===== Util =====
-  function waUrl(){ return `https://wa.me/${WA_PHONE}`; }
-  function waForProduct(name){
-    const msg = `Hola Amicotti, quiero ${name}`;
-    return `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(msg)}`;
-  }
+  const waUrl = () => `https://wa.me/${WA_PHONE}`;
+  const waFor = (name) => `https://wa.me/${WA_PHONE}?text=${encodeURIComponent("Hola Amicotti, quiero " + name)}`;
+  const safe = (img) => { img.onerror = null; img.src = "assets/logo.png"; };
+
   function setWALinks(){
-    const top = document.getElementById('waTop');
-    const flo = document.getElementById('waFloat');
-    const foot = document.getElementById('waFooter');
-    const foot2 = document.getElementById('waFooter2');
-    const info = document.getElementById('waInfo');
-    if(top){ top.href = waUrl(); top.textContent = `Atención WhatsApp`; }
-    if(flo){ flo.href = waUrl(); }
-    if(foot){ foot.href = waUrl(); foot.textContent = `+${WA_PHONE}`; }
-    if(foot2){ foot2.href = waUrl(); foot2.textContent = `+${WA_PHONE}`; }
-    if(info){ info.href = waUrl(); info.textContent = `+${WA_PHONE}`; }
+    const ids = ["waTop","waFloat","waFooter","waFooter2","waInfo"];
+    ids.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){ el.href = waUrl(); el.textContent = el.textContent || `+${WA_PHONE}`; }
+    });
   }
 
-  // Botones WA en cards
-  function bindWAButtons(){
-    document.querySelectorAll('.waAsk').forEach(a=>{
-      const name = a.getAttribute('data-wa') || 'un producto';
-      a.setAttribute('href', waForProduct(name));
-      a.setAttribute('target','_blank');
-      a.setAttribute('rel','noopener');
-    });
+  // ===== PROMOS =====
+  // Cambia los 'img' por tus archivos REALES en /assets/ y ajusta 'href' para que el catálogo filtre (usa ?marca=...&buscar=...)
+  const PROMOS = [
+    {
+      title: "Royal Canin Gato Urinary 1.5kg",
+      subtitle: "Precio especial esta semana",
+      img: "assets/prod1.jpg",          // <-- sube este archivo o cambia la ruta
+      href: "catalogo.html?marca=Royal+Canin&buscar=urinary",
+    },
+    {
+      title: "Pro Plan Cat Sterilized 1.5kg",
+      subtitle: "Descuento por tiempo limitado",
+      img: "assets/prod2.jpg",
+      href: "catalogo.html?marca=Purina&buscar=sterilized",
+    },
+    {
+      title: "Felix Travesuras Ocean Mix",
+      subtitle: "Pack ahorro x 12 sobres",
+      img: "assets/prod3.jpg",
+      href: "catalogo.html?marca=Purina&buscar=felix%20travesuras",
+    },
+  ];
+
+  function renderPromos(){
+    const wrap = document.getElementById("promoGrid");
+    wrap.innerHTML = PROMOS.map(p => `
+      <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
+        <img src="${p.img}" alt="${p.title}" class="w-full h-48 object-contain p-4" onerror="safe(this)"/>
+        <div class="p-4">
+          <h3 class="font-semibold">${p.title}</h3>
+          <p class="text-slate-600">${p.subtitle || ""}</p>
+          <div class="flex gap-3 mt-3">
+            <a href="${p.href}" class="px-4 py-2 bg-rose-600 text-white rounded">Ver catálogo</a>
+            <a href="${waFor(p.title)}" target="_blank" rel="noopener" class="px-4 py-2 border border-rose-600 text-rose-600 rounded">WhatsApp</a>
+          </div>
+        </div>
+      </article>
+    `).join("");
   }
 
   // Init
   (function(){
     setWALinks();
-    bindWAButtons();
+    renderPromos();
     document.getElementById('yy').textContent = new Date().getFullYear();
   })();
 </script>
