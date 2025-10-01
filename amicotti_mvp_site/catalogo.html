@@ -6,94 +6,147 @@
   <title>Amicotti — Catálogo</title>
   <meta name="description" content="Catálogo de alimentos para mascotas. Entrega en Quito y Valles. Compra por WhatsApp." />
   <link rel="icon" href="/assets/logo.png" />
-
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- PapaParse -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
+    :root{
+      --pastel:#F6F3E9; /* marfil suave */
+      --pastel-2:#EFEAE0;
+    }
     .img-box{height:12rem}
     .img-box img{max-height:11rem;object-fit:contain}
     .drawer{transform:translateX(100%);transition:transform .25s ease}
     .drawer.open{transform:translateX(0)}
+    .overlay{position:fixed;inset:0;background:#0005;opacity:0;pointer-events:none;transition:.2s}
+    .overlay.show{opacity:1;pointer-events:auto}
+    .no-scroll{overflow:hidden}
+    /* compact selects in header */
+    .hctrl{min-width:10rem}
+    @media (max-width: 1024px){
+      .hctrl{min-width:auto}
+    }
   </style>
 </head>
+
 <body class="bg-white text-gray-900">
-
-  <!-- Tira superior -->
-  <div class="text-xs bg-slate-900 text-slate-200">
-    <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-1">
-      <span>Entrega en Quito y Valles</span>
-      <span>Pagos: <strong class="text-white">transferencia bancaria</strong></span>
-      <a id="waTop" target="_blank" class="underline hover:no-underline">Atención WhatsApp</a>
-    </div>
-  </div>
-
-  <!-- HEADER lila con filtros -->
-  <header class="p-4 border-b bg-[#F2F0FF]/95 backdrop-blur sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[auto,1fr,auto] items-center gap-3">
-      <!-- Logo -->
-      <a href="/index.html" class="flex items-center gap-2">
+  <!-- HEADER con filtros -->
+  <header class="sticky top-0 z-40 border-b bg-[color:var(--pastel)]/90 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+      <a href="/index.html" class="flex items-center gap-2 shrink-0">
         <img src="/assets/logo.png" class="w-9 h-9" alt="Amicotti"/>
         <span class="font-semibold">Amicotti</span>
       </a>
 
-      <!-- Filtros (desktop) -->
-      <div class="hidden md:grid grid-cols-4 gap-2 items-center">
-        <select id="fCategoria" class="w-full border p-2 rounded-xl text-sm bg-white">
-          <option value="">Categoría</option>
+      <!-- Controles (desktop) -->
+      <div class="hidden lg:flex items-center gap-2 flex-1">
+        <select id="fMarca" class="hctrl border rounded px-2 py-2 text-sm bg-white"></select>
+        <select id="fEspecie" class="hctrl border rounded px-2 py-2 text-sm bg-white"></select>
+        <select id="fCategoria" class="hctrl border rounded px-2 py-2 text-sm bg-white"></select>
+        <input id="fSearch" class="hctrl border rounded px-3 py-2 text-sm bg-white flex-1" placeholder="Buscar: nombre, SKU…" />
+        <select id="fSort" class="hctrl border rounded px-2 py-2 text-sm bg-white">
+          <option value="">Ordenar…</option>
+          <option value="precio-asc">Precio ↑</option>
+          <option value="precio-desc">Precio ↓</option>
+          <option value="nombre-asc">Nombre A–Z</option>
+          <option value="nombre-desc">Nombre Z–A</option>
         </select>
-        <select id="fMarca" class="w-full border p-2 rounded-xl text-sm bg-white">
-          <option value="">Marca</option>
-        </select>
-        <select id="fEspecie" class="w-full border p-2 rounded-xl text-sm bg-white">
-          <option value="">Especie</option>
-        </select>
-        <div class="relative">
-          <input id="fSearch" class="w-full border p-2 rounded-xl pr-10 text-sm bg-white" placeholder="Buscar producto…"/>
-          <button id="fSearchBtn" class="absolute right-1 top-1/2 -translate-y-1/2 rounded-lg border border-neutral-300 px-2 py-1 text-xs bg-white">Buscar</button>
-        </div>
+        <button id="clearFilters" class="ml-1 px-3 py-2 text-sm border rounded bg-white">Limpiar</button>
       </div>
 
+      <!-- Botón filtros (móvil) -->
+      <button id="openFilters" class="lg:hidden ml-auto px-3 py-2 border rounded bg-white">Filtros</button>
+
       <!-- Acciones -->
-      <div class="flex items-center gap-2 justify-end">
-        <a id="waHeader" target="_blank" class="hidden sm:inline-flex items-center gap-2 px-3 py-2 border rounded-xl">WhatsApp</a>
-        <button id="cartBtn" class="relative inline-flex items-center gap-2 px-3 py-2 border rounded-xl bg-white">
+      <div class="flex items-center gap-2">
+        <a id="waTop" target="_blank" class="hidden md:inline-flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded">WhatsApp</a>
+        <button id="cartBtn" class="relative inline-flex items-center gap-2 px-3 py-2 border rounded bg-white">
           🛒 <span id="cartCount" class="text-sm">0</span>
         </button>
       </div>
+    </div>
 
-      <!-- Filtros (móvil) -->
-      <div class="md:hidden grid grid-cols-2 gap-2">
-        <select id="mCategoria" class="w-full border p-2 rounded bg-white text-sm"></select>
-        <select id="mMarca" class="w-full border p-2 rounded bg-white text-sm"></select>
-        <select id="mEspecie" class="w-full border p-2 rounded bg-white text-sm"></select>
-        <input id="mSearch" class="w-full border p-2 rounded bg-white text-sm col-span-2" placeholder="Buscar…"/>
-        <button id="mApply" class="col-span-2 border p-2 rounded">Aplicar filtros</button>
+    <!-- Panel filtros móvil -->
+    <div id="filtersPanel" class="lg:hidden border-t bg-[color:var(--pastel-2)] py-3 hidden">
+      <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <select id="m_fMarca" class="border rounded px-2 py-2 text-sm bg-white"></select>
+        <select id="m_fEspecie" class="border rounded px-2 py-2 text-sm bg-white"></select>
+        <select id="m_fCategoria" class="border rounded px-2 py-2 text-sm bg-white"></select>
+        <select id="m_fSort" class="border rounded px-2 py-2 text-sm bg-white">
+          <option value="">Ordenar…</option>
+          <option value="precio-asc">Precio ↑</option>
+          <option value="precio-desc">Precio ↓</option>
+          <option value="nombre-asc">Nombre A–Z</option>
+          <option value="nombre-desc">Nombre Z–A</option>
+        </select>
+        <input id="m_fSearch" class="border rounded px-3 py-2 text-sm bg-white sm:col-span-2" placeholder="Buscar: nombre, SKU…" />
+        <button id="m_clearFilters" class="border rounded px-3 py-2 text-sm bg-white sm:col-span-2">Limpiar</button>
       </div>
     </div>
   </header>
 
   <!-- GRID -->
-  <section class="max-w-6xl mx-auto p-4">
+  <main class="max-w-7xl mx-auto p-4">
     <div id="alertBox" class="hidden mb-3 p-3 rounded bg-yellow-50 border text-sm text-yellow-900"></div>
     <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-    <p id="noResults" class="hidden text-sm text-neutral-500 mt-6">No encontramos productos con esos filtros.</p>
-  </section>
+  </main>
 
-  <!-- OVERLAY + DRAWER CARRITO -->
-  <div id="cartOverlay" class="fixed inset-0 z-40 hidden bg-black/40"></div>
-  <div id="cartDrawer" class="drawer fixed top-0 right-0 w-[480px] max-w-full h-full bg-white border-l shadow-2xl z-50 flex flex-col">
+  <!-- OVERLAY para drawer -->
+  <div id="overlay" class="overlay"></div>
+
+  <!-- DRAWER CARRITO -->
+  <div id="cartDrawer" class="drawer fixed top-0 right-0 w-[420px] max-w-full h-full bg-white border-l shadow-xl z-50 flex flex-col">
     <div class="p-4 flex items-center justify-between border-b">
       <h2 class="text-lg font-semibold">Tu pedido</h2>
-      <button id="closeCart" class="text-xl">✕</button>
+      <div class="flex items-center gap-2">
+        <a href="/cart.html" class="text-sm underline">Ver carrito</a>
+        <button id="closeCart" class="text-xl" aria-label="Cerrar">✕</button>
+      </div>
     </div>
 
-    <!-- Ítems -->
-    <div id="cartItems" class="p-4 space-y-3 overflow-y-auto" style="height:calc(100% - 12rem)"></div>
+    <!-- Lista de ítems -->
+    <div id="cartItems" class="p-4 space-y-3 overflow-y-auto" style="height:calc(100% - 22rem)"></div>
 
-    <!-- Totales + CTAs -->
+    <!-- Datos del cliente (rápido) -->
+    <div class="p-4 border-t space-y-3">
+      <form id="buyerForm" class="space-y-3" autocomplete="on">
+        <div>
+          <label for="bf_name" class="block text-xs text-gray-600 mb-1">Nombre completo *</label>
+          <input id="bf_name" type="text" required class="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-rose-200" placeholder="Ej. Mario Morales">
+        </div>
+        <div>
+          <label for="bf_address" class="block text-xs text-gray-600 mb-1">Dirección exacta *</label>
+          <textarea id="bf_address" rows="2" required class="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-rose-200" placeholder="Calle, número, referencias…"></textarea>
+          <p class="mt-1 text-[11px] text-gray-500">En WhatsApp podrás adjuntar tu ubicación (pin).</p>
+        </div>
+        <div>
+          <label for="bf_phone" class="block text-xs text-gray-600 mb-1">Teléfono (WhatsApp) *</label>
+          <input id="bf_phone" type="tel" inputmode="tel" required class="w-full border rounded px-3 py-2 outline-none focus:ring-2 focus:ring-rose-200" placeholder="099 999 9999">
+          <p id="bf_phone_help" class="mt-1 text-[11px] text-rose-600 hidden">Ingresa un número válido de Ecuador.</p>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-2">Forma de pago *</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 border rounded px-3 py-2 cursor-pointer">
+              <input type="radio" name="bf_pay" value="Transferencia Bancaria" checked>
+              <span class="text-sm">Transferencia bancaria</span>
+            </label>
+            <label class="flex items-center gap-2 border rounded px-3 py-2 cursor-pointer">
+              <input type="radio" name="bf_pay" value="Contraentrega (efectivo)">
+              <span class="text-sm">Contraentrega (efectivo)</span>
+            </label>
+          </div>
+        </div>
+        <label class="flex items-start gap-2 text-sm select-none">
+          <input id="bf_consent" type="checkbox" required class="mt-1">
+          <span>Acepto que Amicotti use mis datos para coordinar la entrega y enviar novedades. <a href="#" class="underline">Privacidad</a>.</span>
+        </label>
+      </form>
+    </div>
+
+    <!-- Totales + CTA -->
     <div class="p-4 border-t space-y-2">
       <div class="flex items-center justify-between text-sm text-gray-600">
         <span>Subtotal</span><strong id="cartSubtotal">$0.00</strong>
@@ -104,151 +157,154 @@
       <div class="flex items-center justify-between">
         <span class="font-semibold">Total estimado</span><strong id="cartTotal">$0.00</strong>
       </div>
-      <button id="btnGoToCart" class="w-full border p-2 rounded">Ver carrito</button>
       <button id="btnCheckout" class="w-full bg-rose-600 text-white py-3 rounded font-semibold hover:bg-rose-700">Finalizar pedido</button>
+      <button id="btnEmpty" class="w-full border p-2 rounded">Vaciar</button>
     </div>
   </div>
 
-  <!-- WA flotante -->
+  <!-- BOTÓN WA FLOTANTE -->
   <a id="waFloat" target="_blank" class="fixed bottom-4 right-4 md:hidden w-12 h-12 rounded-full bg-green-600 text-white grid place-items-center shadow-lg">WA</a>
 
   <footer class="border-t text-center text-xs text-gray-500 p-6">© Amicotti — Quito & Valles</footer>
 
-<script>
-/* ================= CONFIG ================= */
-const WA_PHONE = "593995315716";
-const CSV_URLS = ["/data/purina.csv","/data/royal.csv"];
-const IMG_EXTS = [".webp", ".jpg", ".jpeg", ".png", ".avif"];
+  <script>
+  /* ================ CONFIG ================ */
+  const WA_PHONE = "593995315716";
+  const CSV_URLS = ["/data/purina.csv","/data/royal.csv"];
+  const IMG_EXTS = [".webp", ".jpg", ".jpeg", ".png", ".avif"];
 
-/* ================= ESTADO ================= */
-let PRODUCTS = [];
-let CART = loadCart();
-const SELECTED = Object.create(null); // id -> índice de variante
+  /* Google Forms */
+  const FORM_ID = "1FAIpQLSfsSxhFoBs9Xkv5MmYjTwr98zTSR6IefJ-vm2p9FSUOMSs69g";
+  const ENTRY_PAYMETHOD = "entry.1704422038";
+  const ENTRY_NAME = "entry.1205890323";
+  const ENTRY_ADDRESS = "entry.1074248946";
+  const ENTRY_PHONE = "entry.646283436";
+  const ENTRY_CART = "entry.1875788310";
+  const ENTRY_TOTAL = "entry.624785838";
+  const ENTRY_SOURCE = "entry.1894560572";
 
-/* ================= HELPERS GENERALES ================= */
-function money(n){ const x=Number(n); return (Number.isFinite(x) && x>=0) ? ('$'+x.toFixed(2)) : 'Consultar'; }
-const norm = v => (v||'').toString().trim().toLowerCase();
-function gramsFromLabel(lbl){
-  if(!lbl) return null;
-  if(/unidad/i.test(lbl)) return null;
-  let m = lbl.match(/([\d.,]+)\s*kg/i); if(m){ const v=parseFloat(m[1].replace(',','.')); return isNaN(v)?null:Math.round(v*1000); }
-  m = lbl.match(/([\d.,]+)\s*g/i); if(m){ const v=parseFloat(m[1].replace(',','.')); return isNaN(v)?null:Math.round(v); }
-  return null;
-}
-function parseVariants(str){
-  if(!str) return [];
-  return String(str).split('|').map(s=>{
-    const raw = s.trim();
-    const parts = raw.split(/[:\-—]+/);
-    const label = (parts[0]||'').trim();
-    const grams = gramsFromLabel(label);
-    let price = null;
-    if(parts[1]){ const num = parseFloat(parts[1].replace('$','').trim()); if(!isNaN(num)) price = num; }
-    return label ? { label, grams, price } : null;
-  }).filter(Boolean);
-}
-function unique(arr,key){ return [...new Set(arr.map(o => (o[key]||'').trim()).filter(Boolean))].sort(); }
+  /* ================ ESTADO ================ */
+  let PRODUCTS = [];
+  let CART = loadCart();
+  const SELECTED = Object.create(null);
 
-/* ================= WHATSAPP ================= */
-function setWALinks(){
-  const url = `https://wa.me/${WA_PHONE}`;
-  const top = document.getElementById('waTop');
-  const flo = document.getElementById('waFloat');
-  const head = document.getElementById('waHeader');
-  if(top){ top.href=url; top.textContent=`Atención WhatsApp`; }
-  if(flo){ flo.href=url; }
-  if(head){ head.href=url; head.textContent='WhatsApp'; }
-}
-
-/* ================= PATCH IMÁGENES: rutas absolutas + fallback ================= */
-function absAsset(u){
-  if(!u) return '';
-  if(/^https?:\/\//i.test(u)) return u;      // URL completa
-  return u.startsWith('/') ? u : '/' + u.replace(/^(\.\/|\/)+/,'');
-}
-function swapExt(url, ext){
-  const i = url.lastIndexOf('.'); return i<0 ? url+ext : url.slice(0,i)+ext;
-}
-function onImgError(el){
-  const rest = (el.dataset.alt || "").split("|").filter(Boolean);
-  if(rest.length){ el.src = rest.shift(); el.dataset.alt = rest.join("|"); }
-  else { el.onerror = null; el.src = "/assets/logo.png"; }
-}
-function buildImgCandidates(p){
-  const raw = (p.imagen_url || p.image_url || '').trim();
-  if(raw){
-    const first = absAsset(raw);
-    const alts  = IMG_EXTS.map(e=> swapExt(first, e));
-    return [first, ...alts].filter((v,i,a)=> a.indexOf(v)===i);
+  /* ============ HELPERS TELÉFONO ============ */
+  function normalizeEcPhone(raw){
+    const digits = String(raw||'').replace(/\D+/g,'');
+    if(digits.startsWith('593')) return '593' + digits.slice(3,12);
+    if(digits.startsWith('09')) return '0' + digits.slice(1,10);
+    if(digits.startsWith('9')) return '0' + digits.slice(0,9);
+    return digits.slice(0,10);
   }
-  const brand = (p.marca||'').toLowerCase();
-  const base = brand.includes('royal') ? '/assets/royal/'
-            : brand.includes('purina') ? '/assets/purina/'
-            : '/assets/catalog/';
-  return IMG_EXTS.map(ext => `${base}${p.id}${ext}`);
-}
-
-/* ================= CARRITO (localStorage, con compatibilidad) ================= */
-const CART_KEYS = ['amicotti_cart','amicart']; // compat con versiones previas
-function loadCart(){
-  for(const k of CART_KEYS){
-    try { const v = JSON.parse(localStorage.getItem(k) || '[]'); if(Array.isArray(v) && v.length) return v; } catch{}
+  function isValidEcPhone(raw){
+    const n = normalizeEcPhone(raw);
+    return /^0?9\d{8}$/.test(n) || /^5939\d{8}$/.test(n);
   }
-  return [];
-}
-function saveCart(){
-  CART_KEYS.forEach(k => localStorage.setItem(k, JSON.stringify(CART)));
-  updateCartBadge();
-}
-function updateCartBadge(){ const c=CART.reduce((a,i)=>a+i.qty,0); document.getElementById('cartCount').textContent=c; }
-
-function addToCartById(pid){
-  const p = PRODUCTS.find(x=>x.id===pid); if(!p) return;
-  const idx = Number.isInteger(SELECTED[pid]) ? SELECTED[pid] : 0;
-  const v = (p.variants && p.variants[idx]) || null;
-  const key = pid + '::' + (v?v.label:'');
-
-  const item = {
-    key, sku: pid,
-    nombre: p.nombre,
-    presentacion: v ? v.label : '',
-    peso_g: v ? v.grams : (p.peso_g || null),
-    precio: v ? v.price : (p.precio ?? null),
-    qty: 1,
-    img: (buildImgCandidates(p)[0] || '/assets/logo.png')
-  };
-
-  const i = CART.findIndex(x=>x.key===key);
-  if(i>=0) CART[i].qty += 1; else CART.push(item);
-  saveCart(); drawCart(); openCart();
-}
-function chgQty(key,d){
-  const i=CART.findIndex(x=>x.key===key); if(i<0) return;
-  CART[i].qty += d; if(CART[i].qty<=0) CART.splice(i,1);
-  saveCart(); drawCart();
-}
-function removeFromCart(key){ CART = CART.filter(x=>x.key!==key); saveCart(); drawCart(); }
-function cartSubtotal(){ return CART.reduce((a,i)=> a + (i.precio!=null ? i.precio*i.qty : 0), 0); }
-
-function drawCart(){
-  const list = document.getElementById('cartItems');
-  const subEl = document.getElementById('cartSubtotal');
-  const totEl = document.getElementById('cartTotal');
-
-  if(!CART.length){
-    list.innerHTML = `<p class='text-sm text-gray-500'>Tu carrito está vacío.</p>`;
-    subEl.textContent = '$0.00'; totEl.textContent = '$0.00';
-    return;
+  function prettyEcPhone(raw){
+    const n = normalizeEcPhone(raw);
+    if(/^0?9\d{8}$/.test(n)){
+      const ten = n.startsWith('0') ? n : '0'+n;
+      return `${ten.slice(0,3)} ${ten.slice(3,6)} ${ten.slice(6,10)}`;
+    }
+    if(/^5939\d{8}$/.test(n)){
+      const ten = '0'+n.slice(3);
+      return `${ten.slice(0,3)} ${ten.slice(3,6)} ${ten.slice(6,10)}`;
+    }
+    return raw;
+  }
+  function money(n){ const x=Number(n); return (Number.isFinite(x)&&x>=0)?('$'+x.toFixed(2)):'Consultar'; }
+  function gramsFromLabel(lbl){
+    if(!lbl) return null;
+    if(/unidad/i.test(lbl)) return null;
+    let m = lbl.match(/([\d.,]+)\s*kg/i);
+    if(m){ const v=parseFloat(m[1].replace(',','.')); return isNaN(v)?null:Math.round(v*1000); }
+    m = lbl.match(/([\d.,]+)\s*g/i);
+    if(m){ const v=parseFloat(m[1].replace(',','.')); return isNaN(v)?null:Math.round(v); }
+    return null;
+  }
+  function parseVariants(str){
+    if(!str) return [];
+    return String(str).split('|').map(s=>{
+      const raw = s.trim();
+      const parts = raw.split(/[:\-—]+/);
+      const label = (parts[0]||'').trim();
+      const grams = gramsFromLabel(label);
+      let price = null;
+      if(parts[1]){
+        const num = parseFloat(parts[1].replace('$','').trim());
+        if(!isNaN(num)) price = num;
+      }
+      return label ? { label, grams, price } : null;
+    }).filter(Boolean);
+  }
+  function unique(arr,key){
+    return [...new Set(arr.map(o => (o[key]||'').trim()).filter(Boolean))].sort();
   }
 
-  list.innerHTML = CART.map(it=>{
-    const subtotal = it.precio!=null ? it.precio*it.qty : null;
-    return `<div class='flex items-start justify-between gap-2'>
-      <div class='flex gap-3'>
-        <img src="${absAsset(it.img)}" class="w-16 h-16 object-contain rounded border" onerror="this.onerror=null;this.src='/assets/logo.png'"/>
+  /* ================ WHATSAPP ================ */
+  function setWALinks(){
+    const url = `https://wa.me/${WA_PHONE}`;
+    const top = document.getElementById('waTop');
+    const flo = document.getElementById('waFloat');
+    if(top){ top.href=url; top.textContent=`WhatsApp ${WA_PHONE}`; }
+    if(flo){ flo.href=url; }
+  }
+
+  /* ================ CARRITO ================= */
+  function loadCart(){ try{ return JSON.parse(localStorage.getItem('amicart'))||[] }catch{ return [] } }
+  function saveCart(){ localStorage.setItem('amicart', JSON.stringify(CART)); updateCartBadge(); }
+  function updateCartBadge(){ const c=CART.reduce((a,i)=>a+i.qty,0); document.getElementById('cartCount').textContent=c; }
+
+  const body = document.body, overlay = document.getElementById('overlay');
+  function openCart(){
+    document.getElementById('cartDrawer').classList.add('open');
+    overlay.classList.add('show');
+    body.classList.add('no-scroll');
+  }
+  function closeCart(){
+    document.getElementById('cartDrawer').classList.remove('open');
+    overlay.classList.remove('show');
+    body.classList.remove('no-scroll');
+  }
+  overlay.addEventListener('click', closeCart);
+
+  function addToCartById(pid){
+    const p = PRODUCTS.find(x=>x.id===pid);
+    if(!p) return;
+    const idx = Number.isInteger(SELECTED[pid]) ? SELECTED[pid] : 0;
+    const v = (p.variants && p.variants[idx]) || null;
+    const key = pid + '::' + (v?v.label:'');
+    const item = {
+      key, sku: pid, nombre: p.nombre, presentacion: v ? v.label : '',
+      peso_g: v ? v.grams : (p.peso_g || null), precio: v ? v.price : (p.precio ?? null), qty: 1
+    };
+    const i = CART.findIndex(x=>x.key===key);
+    if(i>=0) CART[i].qty += 1; else CART.push(item);
+    saveCart(); drawCart(); openCart();
+  }
+  function chgQty(key,d){
+    const i=CART.findIndex(x=>x.key===key); if(i<0) return;
+    CART[i].qty += d; if(CART[i].qty<=0) CART.splice(i,1);
+    saveCart(); drawCart();
+  }
+  function removeFromCart(key){ CART = CART.filter(x=>x.key!==key); saveCart(); drawCart(); }
+  function cartSubtotal(){ return CART.reduce((a,i)=> a + (i.precio!=null ? i.precio*i.qty : 0), 0); }
+
+  function drawCart(){
+    const list = document.getElementById('cartItems');
+    const subEl = document.getElementById('cartSubtotal');
+    const totEl = document.getElementById('cartTotal');
+    if(!CART.length){
+      list.innerHTML = `<p class='text-sm text-gray-500'>Tu carrito está vacío.</p>`;
+      subEl.textContent = '$0.00'; totEl.textContent = '$0.00'; return;
+    }
+    list.innerHTML = CART.map(it=>{
+      const subtotal = it.precio!=null ? it.precio*it.qty : null;
+      return `
+      <div class='flex items-start justify-between gap-2'>
         <div class='text-sm'>
           <div class='font-medium'>${it.nombre}</div>
-          <div class='text-gray-500'>${it.presentacion||''}</div>
+          <div class='text-gray-500'> ${it.sku||''} ${it.presentacion?('• '+it.presentacion):''} </div>
           <div>${money(it.precio)}</div>
           <div class='flex items-center gap-2 mt-1'>
             <button class='border px-2 rounded' onclick="chgQty('${it.key}',-1)">−</button>
@@ -256,250 +312,293 @@ function drawCart(){
             <button class='border px-2 rounded' onclick="chgQty('${it.key}',1)">+</button>
           </div>
         </div>
-      </div>
-      <div class='text-right'>
-        ${subtotal!=null?`<div class='font-semibold'>${money(subtotal)}</div>`:''}
-        <button class='text-rose-600 text-xs mt-2 underline' onclick="removeFromCart('${it.key}')">Eliminar</button>
-      </div>
-    </div>`;
-  }).join('');
-
-  const sub = cartSubtotal();
-  subEl.textContent = money(sub);
-  totEl.textContent = money(sub); // envío por confirmar
-}
-
-/* ================= CSV / PRODUCTOS ================= */
-async function loadCSVs(){
-  const loads = CSV_URLS.map(url => new Promise((resolve,reject)=>{
-    Papa.parse(url,{download:true,header:true,skipEmptyLines:true,complete:r=>resolve(r.data),error:reject});
-  }));
-  const arrays = await Promise.all(loads);
-
-  PRODUCTS = arrays.flat().map((r, idx)=>{
-    const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
-    if(hasBrandSchema){
-      const specie = (r.species||'').trim().toLowerCase();
-      const categoriaRaw = (r.category||'').trim().toLowerCase();
-      const especie = specie==='cat' ? 'Gato' : specie==='dog' ? 'Perro' : '';
-      const categoria = categoriaRaw==='dry' ? 'Seco'
-                      : categoriaRaw==='wet' ? 'Húmedo'
-                      : categoriaRaw==='veterinary' ? 'Veterinario'
-                      : categoriaRaw==='treats' ? 'Snack' : '';
-      const variants = parseVariants(r.variants||'');
-      const first = variants[0] || null;
-      return {
-        id: r.id || ('row'+idx),
-        marca: (r.brand||'').toString().trim(),
-        linea: '',
-        especie,
-        categoria,
-        nombre: (r.name||'').toString().trim(),
-        peso_g: first ? first.grams : null,
-        sku: '',
-        precio: first ? first.price : null,
-        imagen_url: (r.image_url||'').toString().trim(),
-        descripcion: '',
-        disponible: true,
-        variants
-      };
-    }else{
-      const variants = parseVariants(r.variants||'');
-      const first = variants[0] || null;
-      return {
-        id: r.id || ('row'+idx),
-        marca: (r.marca||'').trim(),
-        linea: (r.linea||'').trim(),
-        especie: (r.especie||'').trim(),
-        categoria: (r.categoria||'').trim(),
-        nombre: (r.nombre||'').trim(),
-        peso_g: r.peso_g ? Number(r.peso_g) : (first?first.grams:null),
-        sku: (r.sku||'').trim(),
-        precio: (r.precio!=='' && r.precio!=null) ? Number(r.precio) : (first?first.price:null),
-        imagen_url: absAsset(r.imagen_url||''),
-        descripcion: (r.descripcion||'').trim(),
-        disponible: String(r.disponible||'1')==='1',
-        variants
-      };
-    }
-  }).filter(p=>p.disponible);
-}
-
-/* ================= FILTROS + RENDER ================= */
-const grid = document.getElementById('grid');
-const alertBox = document.getElementById('alertBox');
-
-const fMarca = document.getElementById('fMarca');
-const fEspecie = document.getElementById('fEspecie');
-const fCategoria = document.getElementById('fCategoria');
-const fSearch = document.getElementById('fSearch');
-
-const mMarca = document.getElementById('mMarca');
-const mEspecie = document.getElementById('mEspecie');
-const mCategoria = document.getElementById('mCategoria');
-const mSearch = document.getElementById('mSearch');
-
-function mapEspecie(v){
-  v = norm(v);
-  if(v==='cat' || v==='gato') return 'Gato';
-  if(v==='dog' || v==='perro') return 'Perro';
-  return '';
-}
-function mapCategoria(v){
-  v = norm(v);
-  if(v==='dry' || v==='seco') return 'Seco';
-  if(v==='wet' || v==='húmedo' || v==='humedo') return 'Húmedo';
-  if(v==='veterinary' || v==='veterinario' || v==='vet') return 'Veterinario';
-  if(v==='snack' || v==='treats') return 'Snack';
-  return '';
-}
-function fillSelect(el, values){ el.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
-function fillFilters(){
-  const marcas = ['Marca…', ...unique(PRODUCTS,'marca')];
-  const cats   = ['Categoría…', ...unique(PRODUCTS,'categoria')];
-  const esps   = ['Especie…', 'Gato', 'Perro'];
-  [fMarca,mMarca].forEach(el=> el && fillSelect(el, marcas));
-  [fCategoria,mCategoria].forEach(el=> el && fillSelect(el, cats));
-  [fEspecie,mEspecie].forEach(el=> el && fillSelect(el, esps));
-}
-function applyInitialFiltersFromURL(){
-  const u = new URLSearchParams(location.search);
-  const marcaParam = u.get('marca');
-  const espParam   = u.get('especie');
-  const catParam   = u.get('categoria');
-  const qParam     = u.get('q') || u.get('buscar');
-
-  if(fMarca) fMarca.value = marcaParam || '';
-  if(mMarca) mMarca.value = marcaParam || '';
-  if(fEspecie) fEspecie.value = mapEspecie(espParam);
-  if(mEspecie) mEspecie.value = mapEspecie(espParam);
-  if(fCategoria) fCategoria.value = mapCategoria(catParam);
-  if(mCategoria) mCategoria.value = mapCategoria(catParam);
-  if(fSearch) fSearch.value = qParam || '';
-  if(mSearch) mSearch.value = qParam || '';
-}
-function updateURLFromFilters(){
-  const params = new URLSearchParams();
-  const get = (a,b)=> (a && a.value) || (b && b.value) || '';
-  const marca = get(fMarca,mMarca), especie=get(fEspecie,mEspecie), categoria=get(fCategoria,mCategoria);
-  const q = (fSearch?.value || mSearch?.value || '').trim();
-  if(marca) params.set('marca', marca);
-  if(especie) params.set('especie', especie);
-  if(categoria) params.set('categoria', categoria);
-  if(q) params.set('q', q);
-  const qs = params.toString();
-  history.replaceState(null, '', window.location.pathname + (qs?('?'+qs):''));
-}
-function getFiltered(){
-  const m=(fMarca?.value||mMarca?.value||'');
-  const e=(fEspecie?.value||mEspecie?.value||'');
-  const c=(fCategoria?.value||mCategoria?.value||'');
-  const q=(fSearch?.value||mSearch?.value||'').trim().toLowerCase();
-
-  let out = PRODUCTS.filter(p=>
-    (!m || p.marca===m) &&
-    (!e || p.especie===e) &&
-    (!c || p.categoria===c) &&
-    (!q || p.nombre.toLowerCase().includes(q) || p.linea.toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q))
-  );
-  return out;
-}
-function onChangeVariant(pid, idx){
-  SELECTED[pid] = Number(idx)||0;
-  const p = PRODUCTS.find(x=>x.id===pid); if(!p) return;
-  const v = p.variants[SELECTED[pid]] || null;
-  const priceEl = document.getElementById('price-'+pid);
-  if(priceEl) priceEl.textContent = v ? money(v.price) : money(p.precio);
-}
-function cardHTML(p){
-  const candidates = buildImgCandidates(p);
-  const img = candidates[0];
-  const altList = candidates.slice(1).join("|");
-  const badgeVet = (p.categoria.toLowerCase()==='veterinario') ? `<span class='px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 rounded'>Veterinario</span>` : '';
-  const variantsSel = (p.variants && p.variants.length) ? `
-    <label class="block text-xs text-gray-500 mt-2">Presentación</label>
-    <select class="w-full border p-2 rounded text-sm" onchange="onChangeVariant('${p.id}', this.value)">
-      ${p.variants.map((v,i)=>`<option value="${i}">${v.label}${v.price!=null?(' — '+money(v.price)):''}</option>`).join('')}
-    </select>
-  ` : `<p class='text-xs text-gray-500 mt-1'>Presentación: ${p.peso_g? (p.peso_g>=1000? (p.peso_g/1000)+' kg' : p.peso_g+' g') : '—'}</p>`;
-  const initialPrice = (p.variants && p.variants.length) ? money(p.variants[0].price) : money(p.precio);
-  return `<article class='border rounded-2xl overflow-hidden bg-white'>
-    <div class='img-box w-full bg-gray-50 grid place-items-center'>
-      <img src='${absAsset(img)}' data-alt='${altList}' alt='${p.nombre}' loading='lazy' onerror="onImgError(this)"/>
-    </div>
-    <div class='p-3 space-y-1'>
-      <h3 class='font-medium leading-tight'>${p.nombre}</h3>
-      <p class='text-xs text-gray-500'>${p.marca} • ${p.linea || '—'} • ${p.especie} ${badgeVet}</p>
-      ${variantsSel}
-      <div class='flex items-center justify-between pt-2'>
-        <strong id="price-${p.id}">${initialPrice}</strong>
-        <button class='px-3 py-1 border rounded-xl text-sm' onclick="addToCartById('${p.id}')">Agregar</button>
-      </div>
-    </div>
-  </article>`;
-}
-function render(){
-  const items = getFiltered();
-  const noRes = document.getElementById('noResults');
-
-  if(!items.length){
-    grid.innerHTML = '';
-    noRes.classList.remove('hidden');
-    return;
+        <div class='text-right'>
+          ${subtotal!=null?`<div class='font-semibold'>${money(subtotal)}</div>`:''}
+          <button class='text-red-500 text-sm mt-2' onclick="removeFromCart('${it.key}')">Eliminar</button>
+        </div>
+      </div>`;
+    }).join('');
+    const sub = cartSubtotal(); subEl.textContent = money(sub); totEl.textContent = money(sub);
   }
-  noRes.classList.add('hidden');
-  items.forEach(p=>{ if(!(p.id in SELECTED)) SELECTED[p.id]=0; });
-  grid.innerHTML = items.map(cardHTML).join('');
-}
 
-/* ================= OVERLAY & DRAWER ================= */
-const drawer = document.getElementById('cartDrawer');
-const overlay = document.getElementById('cartOverlay');
-function openCart(){ drawer.classList.add('open'); overlay.classList.remove('hidden'); document.body.classList.add('overflow-hidden'); }
-function closeCart(){ drawer.classList.remove('open'); overlay.classList.add('hidden'); document.body.classList.remove('overflow-hidden'); }
+  /* ================ IMG FALLBACK ================ */
+  function swapExt(url, ext){ const i = url.lastIndexOf('.'); if(i<0) return url + ext; return url.slice(0,i) + ext; }
+  function buildImgCandidates(p){
+    const brand = (p.marca||'').toLowerCase();
+    if(p.imagen_url && p.imagen_url.trim()){
+      const first = p.imagen_url.trim();
+      const alts = IMG_EXTS.map(e => swapExt(first, e));
+      const uniq = [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
+      return uniq;
+    }
+    const base = brand.includes('royal') ? '/assets/royal/' : brand.includes('purina') ? '/assets/purina/' : '/assets/catalog/';
+    return IMG_EXTS.map(ext => `${base}${p.id}${ext}`);
+  }
+  function onImgError(el){
+    const rest = (el.dataset.alt || "").split("|").filter(Boolean);
+    if(rest.length){ el.src = rest.shift(); el.dataset.alt = rest.join("|"); }
+    else { el.onerror = null; el.src = "/assets/logo.png"; }
+  }
 
-/* ================= EVENTOS ================= */
-document.getElementById('cartBtn').addEventListener('click', ()=>{ drawCart(); openCart(); });
-document.getElementById('closeCart').addEventListener('click', closeCart);
-overlay.addEventListener('click', closeCart);
+  /* ================ CSV / PRODUCTOS ================ */
+  async function loadCSVs(){
+    const loads = CSV_URLS.map(url => new Promise((resolve,reject)=>{
+      Papa.parse(url,{download:true,header:true,skipEmptyLines:true,complete:r=>resolve(r.data),error:reject});
+    }));
+    const arrays = await Promise.all(loads);
+    PRODUCTS = arrays.flat().map((r, idx)=>{
+      const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
+      if(hasBrandSchema){
+        const specie = (r.species||'').trim().toLowerCase();
+        const categoriaRaw = (r.category||'').trim().toLowerCase();
+        const especie = specie==='cat' ? 'Gato' : specie==='dog' ? 'Perro' : '';
+        const categoria = categoriaRaw==='dry' ? 'Seco' : categoriaRaw==='wet' ? 'Húmedo' : categoriaRaw==='veterinary' ? 'Veterinario' : categoriaRaw==='treats' ? 'Snack' : '';
+        const variants = parseVariants(r.variants||'');
+        const first = variants[0] || null;
+        return {
+          id: r.id || ('row'+idx),
+          marca: (r.brand||'').toString().trim(),
+          linea: '',
+          especie, categoria,
+          nombre: (r.name||'').toString().trim(),
+          peso_g: first ? first.grams : null,
+          sku: '',
+          precio: first ? first.price : null,
+          imagen_url: (r.image_url||'').toString().trim(),
+          descripcion: '',
+          disponible: true,
+          variants
+        };
+      }else{
+        const variants = parseVariants(r.variants||'');
+        const first = variants[0] || null;
+        return {
+          id: r.id || ('row'+idx),
+          marca: (r.marca||'').trim(),
+          linea: (r.linea||'').trim(),
+          especie: (r.especie||'').trim(),
+          categoria: (r.categoria||'').trim(),
+          nombre: (r.nombre||'').trim(),
+          peso_g: r.peso_g ? Number(r.peso_g) : (first?first.grams:null),
+          sku: (r.sku||'').trim(),
+          precio: (r.precio!=='' && r.precio!=null) ? Number(r.precio) : (first?first.price:null),
+          imagen_url: (r.imagen_url||'').trim(),
+          descripcion: (r.descripcion||'').trim(),
+          disponible: String(r.disponible||'1')==='1',
+          variants
+        };
+      }
+    }).filter(p=>p.disponible);
+  }
 
-// Filtros desktop
-['fCategoria','fMarca','fEspecie','fSearch'].forEach(id=>{
-  const el = document.getElementById(id);
-  el?.addEventListener('input', ()=>{ render(); updateURLFromFilters(); });
-});
-document.getElementById('fSearchBtn')?.addEventListener('click', ()=>{ render(); updateURLFromFilters(); });
+  /* ================ FILTROS + RENDER ================ */
+  const grid = document.getElementById('grid');
+  const alertBox = document.getElementById('alertBox');
 
-// Filtros móvil
-['mCategoria','mMarca','mEspecie','mSearch'].forEach(id=>{
-  const el = document.getElementById(id);
-  el?.addEventListener('input', ()=>{ render(); updateURLFromFilters(); });
-});
-document.getElementById('mApply')?.addEventListener('click', ()=>{ render(); updateURLFromFilters(); });
+  // header (desktop)
+  const fMarca = document.getElementById('fMarca');
+  const fEspecie = document.getElementById('fEspecie');
+  const fCategoria = document.getElementById('fCategoria');
+  const fSearch = document.getElementById('fSearch');
+  const fSort = document.getElementById('fSort');
 
-// Navegación
-document.getElementById('btnGoToCart').addEventListener('click', ()=>{ window.location.href = '/cart.html'; });
-document.getElementById('btnCheckout').addEventListener('click', ()=>{ window.location.href = '/checkout.html'; });
+  // móvil
+  const m_fMarca = document.getElementById('m_fMarca');
+  const m_fEspecie = document.getElementById('m_fEspecie');
+  const m_fCategoria = document.getElementById('m_fCategoria');
+  const m_fSearch = document.getElementById('m_fSearch');
+  const m_fSort = document.getElementById('m_fSort');
 
-/* ================= INIT ================= */
-(async function init(){
-  setWALinks(); updateCartBadge();
-  try{
-    await loadCSVs();
-    if(!PRODUCTS.length){
+  const urlParams = new URLSearchParams(location.search);
+  const norm = v => (v||'').toString().trim().toLowerCase();
+  function mapEspecie(v){ v = norm(v); if(v==='cat'||v==='gato') return 'Gato'; if(v==='dog'||v==='perro') return 'Perro'; return ''; }
+  function mapCategoria(v){ v = norm(v);
+    if(v==='dry'||v==='seco') return 'Seco';
+    if(v==='wet'||v==='húmedo'||v==='humedo') return 'Húmedo';
+    if(v==='veterinary'||v==='veterinario'||v==='vet') return 'Veterinario';
+    if(v==='snack'||v==='treats') return 'Snack'; return '';
+  }
+
+  function updateURLFromFilters(){
+    const params = new URLSearchParams();
+    const get = (sel)=>sel?.value||'';
+    const q = (fSearch.value||'').trim();
+    if(fMarca.value) params.set('marca', fMarca.value);
+    if(fEspecie.value) params.set('especie', fEspecie.value);
+    if(fCategoria.value) params.set('categoria', fCategoria.value);
+    if(q) params.set('q', q);
+    if(fSort.value) params.set('orden', fSort.value);
+    const qs = params.toString();
+    history.replaceState(null, '', window.location.pathname + (qs?('?'+qs):''));
+  }
+  function fillSelect(sel, values){ sel.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
+  function mirrorMobileFromDesktop(){
+    m_fMarca.value = fMarca.value; m_fEspecie.value=fEspecie.value; m_fCategoria.value=fCategoria.value;
+    m_fSearch.value = fSearch.value; m_fSort.value = fSort.value;
+  }
+  function mirrorDesktopFromMobile(){
+    fMarca.value = m_fMarca.value; fEspecie.value=m_fEspecie.value; fCategoria.value=m_fCategoria.value;
+    fSearch.value = m_fSearch.value; fSort.value = m_fSort.value;
+  }
+  function fillFilters(){
+    const marcas = ['Marca…', ...unique(PRODUCTS,'marca')];
+    const cats = ['Categoría…', ...unique(PRODUCTS,'categoria')];
+    fillSelect(fMarca, marcas); fillSelect(fEspecie, ['Especie…','Gato','Perro']); fillSelect(fCategoria, cats);
+    fillSelect(m_fMarca, marcas); fillSelect(m_fEspecie, ['Especie…','Gato','Perro']); fillSelect(m_fCategoria, cats);
+  }
+  function applyInitialFiltersFromURL(){
+    const marcaParam = urlParams.get('marca'); if(marcaParam){ fMarca.value = marcaParam; }
+    const espParam = urlParams.get('especie'); if(espParam){ fEspecie.value = mapEspecie(espParam); }
+    const catParam = urlParams.get('categoria'); if(catParam){ fCategoria.value = mapCategoria(catParam); }
+    const qParam = urlParams.get('q'); if(qParam){ fSearch.value = qParam; }
+    const sortParam = urlParams.get('orden'); if(sortParam){ fSort.value = sortParam; }
+    mirrorMobileFromDesktop();
+  }
+  function getFiltered(){
+    const m=fMarca.value, e=fEspecie.value, c=fCategoria.value, q=(fSearch.value||'').trim().toLowerCase();
+    let out = PRODUCTS.filter(p=>
+      (!m || p.marca===m) && (!e || p.especie===e) && (!c || p.categoria===c) &&
+      (!q || p.nombre.toLowerCase().includes(q) || p.linea.toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q))
+    );
+    switch(fSort.value){
+      case 'precio-asc': out.sort((a,b)=>((a.variants?.[0]?.price ?? a.precio ?? 1e9) - (b.variants?.[0]?.price ?? b.precio ?? 1e9))); break;
+      case 'precio-desc': out.sort((a,b)=>((b.variants?.[0]?.price ?? b.precio ?? -1) - (a.variants?.[0]?.price ?? a.precio ?? -1))); break;
+      case 'nombre-asc': out.sort((a,b)=>a.nombre.localeCompare(b.nombre)); break;
+      case 'nombre-desc': out.sort((a,b)=>b.nombre.localeCompare(a.nombre)); break;
+    }
+    return out;
+  }
+  function onChangeVariant(pid, idx){
+    SELECTED[pid] = Number(idx)||0;
+    const p = PRODUCTS.find(x=>x.id===pid); if(!p) return;
+    const v = p.variants[SELECTED[pid]] || null;
+    const priceEl = document.getElementById('price-'+pid);
+    if(priceEl) priceEl.textContent = v ? money(v.price) : money(p.precio);
+  }
+  function cardHTML(p){
+    const candidates = buildImgCandidates(p);
+    const img = candidates[0];
+    const altList = candidates.slice(1).join("|");
+    const badgeVet = (p.categoria.toLowerCase()==='veterinario') ? `<span class='px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 rounded'>Veterinario</span>` : '';
+    const variantsSel = (p.variants && p.variants.length)
+      ? `<label class="block text-xs text-gray-500 mt-2">Presentación</label>
+         <select class="w-full border p-2 rounded text-sm" onchange="onChangeVariant('${p.id}', this.value)">
+           ${p.variants.map((v,i)=>`<option value="${i}">${v.label}${v.price!=null?(' — '+money(v.price)):''}</option>`).join('')}
+         </select>`
+      : `<p class='text-xs text-gray-500 mt-1'>Presentación: ${p.peso_g? (p.peso_g>=1000? (p.peso_g/1000)+' kg' : p.peso_g+' g') : '—'}</p>`;
+    const initialPrice = (p.variants && p.variants.length) ? money(p.variants[0].price) : money(p.precio);
+    return `<article class='border rounded-lg overflow-hidden bg-white'>
+      <div class='img-box w-full bg-gray-50 grid place-items-center'>
+        <img src='${img}' data-alt='${altList}' alt='${p.nombre}' loading='lazy' onerror="onImgError(this)"/>
+      </div>
+      <div class='p-3 space-y-1'>
+        <h3 class='font-medium leading-tight'>${p.nombre}</h3>
+        <p class='text-xs text-gray-500'>${p.marca} • ${p.linea || '—'} • ${p.especie} ${badgeVet}</p>
+        ${variantsSel}
+        <div class='flex items-center justify-between pt-2'>
+          <strong id="price-${p.id}">${initialPrice}</strong>
+          <button class='px-2 py-1 border rounded text-sm' onclick="addToCartById('${p.id}')">Agregar</button>
+        </div>
+      </div>
+    </article>`;
+  }
+  function render(){
+    const items = getFiltered();
+    if(!items.length){
+      grid.innerHTML = `<div class='col-span-full p-6 text-center text-sm text-gray-500 border rounded'>No hay productos con esos filtros.</div>`;
+      return;
+    }
+    items.forEach(p=>{ if(!(p.id in SELECTED)) SELECTED[p.id]=0; });
+    grid.innerHTML = items.map(cardHTML).join('');
+  }
+
+  /* ======== DATOS CLIENTE + PERSISTENCIA ======== */
+  function getBuyer(){
+    const rawPhone = (document.getElementById('bf_phone')?.value || '').trim();
+    const normPhone = normalizeEcPhone(rawPhone);
+    const ten = normPhone.startsWith('593') ? '0'+normPhone.slice(3) : normPhone;
+    return {
+      name: (document.getElementById('bf_name')?.value || '').trim(),
+      address: (document.getElementById('bf_address')?.value || '').trim(),
+      phone: prettyEcPhone(ten),
+      pay: (document.querySelector('input[name="bf_pay"]:checked')?.value || '').trim()
+    };
+  }
+  function persistBuyer(b){ localStorage.setItem('amicotti_buyer', JSON.stringify(b)); }
+  function prefillBuyer(){
+    try{
+      const b = JSON.parse(localStorage.getItem('amicotti_buyer')||'{}');
+      if(b.name) document.getElementById('bf_name').value = b.name;
+      if(b.address) document.getElementById('bf_address').value = b.address;
+      if(b.phone) document.getElementById('bf_phone').value = b.phone;
+    }catch(e){}
+  }
+
+  /* ======== CHECKOUT (pantalla nueva) ======== */
+  function goToCheckout(){
+    if(!CART.length){ alert('Tu carrito está vacío.'); return; }
+    const buyer = getBuyer();
+    const consent = document.getElementById('bf_consent')?.checked;
+    if(!buyer.name || !buyer.address || !buyer.phone){ alert('Por favor completa Nombre, Dirección y Teléfono.'); return; }
+    if(!isValidEcPhone(buyer.phone)){ alert('Revisa el teléfono. Debe ser móvil válido de Ecuador.'); return; }
+    if(!consent){ alert('Debes aceptar el uso de datos para continuar.'); return; }
+    persistBuyer(buyer);
+    // Guardamos un "snapshot" para la página de checkout
+    localStorage.setItem('amicotti_checkout_source', 'catalog');
+    location.href = '/checkout.html';
+  }
+
+  /* ============== EVENTOS ============== */
+  // header desktop
+  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el => el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); mirrorMobileFromDesktop(); }));
+  document.getElementById('clearFilters').addEventListener('click',()=>{ [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); render(); updateURLFromFilters(); mirrorMobileFromDesktop(); });
+
+  // móvil
+  const panel = document.getElementById('filtersPanel');
+  document.getElementById('openFilters').addEventListener('click', ()=> panel.classList.toggle('hidden'));
+  ;[m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el => el.addEventListener('input', ()=>{ mirrorDesktopFromMobile(); render(); updateURLFromFilters(); }));
+  document.getElementById('m_clearFilters').addEventListener('click',()=>{ [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el=> el.value=''); mirrorDesktopFromMobile(); render(); updateURLFromFilters(); });
+
+  // carrito
+  document.getElementById('cartBtn').addEventListener('click', openCart);
+  document.getElementById('closeCart').addEventListener('click', closeCart);
+  document.getElementById('btnEmpty').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); } });
+  document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
+
+  // formato teléfono live
+  const bfPhoneInput = document.getElementById('bf_phone');
+  const bfPhoneHelp = document.getElementById('bf_phone_help');
+  if(bfPhoneInput){
+    bfPhoneInput.addEventListener('input', () => {
+      const pos = bfPhoneInput.selectionStart;
+      const pretty = prettyEcPhone(bfPhoneInput.value);
+      bfPhoneInput.value = pretty;
+      if(isValidEcPhone(bfPhoneInput.value)){
+        bfPhoneInput.classList.remove('border-rose-400'); bfPhoneHelp?.classList.add('hidden');
+      }else{
+        bfPhoneInput.classList.add('border-rose-400'); bfPhoneHelp?.classList.remove('hidden');
+      }
+      try{ bfPhoneInput.setSelectionRange(pos,pos); }catch(e){}
+    });
+  }
+
+  /* ============== INIT ============== */
+  async function init(){
+    setWALinks(); updateCartBadge(); drawCart();
+    try{
+      await loadCSVs();
+      if(!PRODUCTS.length){
+        alertBox.classList.remove('hidden');
+        alertBox.textContent = 'No se cargaron productos. Revisa las rutas CSV.';
+      }
+      fillFilters(); applyInitialFiltersFromURL(); render(); prefillBuyer();
+    }catch(e){
+      console.error(e);
       alertBox.classList.remove('hidden');
-      alertBox.textContent = 'No se cargaron productos (0). Revisa rutas de CSV en CSV_URLS o que el servidor no devuelva 404.';
+      alertBox.textContent = 'Error cargando el catálogo. Verifica rutas y formato del CSV.';
     }
-    fillFilters();
-    applyInitialFiltersFromURL();
-    render();
-    drawCart();
-  }catch(e){
-    console.error(e);
-    alertBox.classList.remove('hidden');
-    alertBox.textContent = 'Error cargando el catálogo. Verifica rutas y formato del CSV.';
   }
-})();
-</script>
+  init();
+  </script>
 </body>
 </html>
