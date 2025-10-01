@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Amicotti — Catálogo</title>
   <meta name="description" content="Catálogo de alimentos para mascotas. Entrega en Quito y Valles. Compra por WhatsApp." />
-  <link rel="icon" href="assets/logo.png" />
+  <link rel="icon" href="/assets/logo.png" />
 
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -20,7 +20,8 @@
   </style>
 </head>
 <body class="bg-white text-gray-900">
-  <!-- TOP -->
+
+  <!-- Tira superior -->
   <div class="text-xs bg-slate-900 text-slate-200">
     <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-1">
       <span>Entrega en Quito y Valles</span>
@@ -29,7 +30,7 @@
     </div>
   </div>
 
-  <!-- HEADER con filtros -->
+  <!-- HEADER lila con filtros -->
   <header class="p-4 border-b bg-[#F2F0FF]/95 backdrop-blur sticky top-0 z-40">
     <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[auto,1fr,auto] items-center gap-3">
       <!-- Logo -->
@@ -124,8 +125,9 @@ let PRODUCTS = [];
 let CART = loadCart();
 const SELECTED = Object.create(null); // id -> índice de variante
 
-/* ================= HELPERS ================= */
+/* ================= HELPERS GENERALES ================= */
 function money(n){ const x=Number(n); return (Number.isFinite(x) && x>=0) ? ('$'+x.toFixed(2)) : 'Consultar'; }
+const norm = v => (v||'').toString().trim().toLowerCase();
 function gramsFromLabel(lbl){
   if(!lbl) return null;
   if(/unidad/i.test(lbl)) return null;
@@ -158,28 +160,36 @@ function setWALinks(){
   if(head){ head.href=url; head.textContent='WhatsApp'; }
 }
 
-/* ================= IMÁGENES (fallback robusto) ================= */
-function swapExt(url, ext){ const i = url.lastIndexOf('.'); if(i<0) return url + ext; return url.slice(0,i) + ext; }
-function buildImgCandidates(p){
-  const brand = (p.marca||'').toLowerCase();
-  if(p.imagen_url && p.imagen_url.trim()){
-    const first = p.imagen_url.trim();
-    const alts = IMG_EXTS.map(e => swapExt(first, e));
-    const uniq = [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
-    return uniq;
-  }
-  const base = brand.includes('royal') ? '/assets/royal/' :
-               brand.includes('purina') ? '/assets/purina/' : '/assets/catalog/';
-  return IMG_EXTS.map(ext => `${base}${p.id}${ext}`);
+/* ================= PATCH IMÁGENES: rutas absolutas + fallback ================= */
+function absAsset(u){
+  if(!u) return '';
+  if(/^https?:\/\//i.test(u)) return u;      // URL completa
+  return u.startsWith('/') ? u : '/' + u.replace(/^(\.\/|\/)+/,'');
+}
+function swapExt(url, ext){
+  const i = url.lastIndexOf('.'); return i<0 ? url+ext : url.slice(0,i)+ext;
 }
 function onImgError(el){
   const rest = (el.dataset.alt || "").split("|").filter(Boolean);
   if(rest.length){ el.src = rest.shift(); el.dataset.alt = rest.join("|"); }
   else { el.onerror = null; el.src = "/assets/logo.png"; }
 }
+function buildImgCandidates(p){
+  const raw = (p.imagen_url || p.image_url || '').trim();
+  if(raw){
+    const first = absAsset(raw);
+    const alts  = IMG_EXTS.map(e=> swapExt(first, e));
+    return [first, ...alts].filter((v,i,a)=> a.indexOf(v)===i);
+  }
+  const brand = (p.marca||'').toLowerCase();
+  const base = brand.includes('royal') ? '/assets/royal/'
+            : brand.includes('purina') ? '/assets/purina/'
+            : '/assets/catalog/';
+  return IMG_EXTS.map(ext => `${base}${p.id}${ext}`);
+}
 
-/* ================= CARRITO (localStorage) ================= */
-const CART_KEYS = ['amicotti_cart','amicart']; // compat.
+/* ================= CARRITO (localStorage, con compatibilidad) ================= */
+const CART_KEYS = ['amicotti_cart','amicart']; // compat con versiones previas
 function loadCart(){
   for(const k of CART_KEYS){
     try { const v = JSON.parse(localStorage.getItem(k) || '[]'); if(Array.isArray(v) && v.length) return v; } catch{}
@@ -235,7 +245,7 @@ function drawCart(){
     const subtotal = it.precio!=null ? it.precio*it.qty : null;
     return `<div class='flex items-start justify-between gap-2'>
       <div class='flex gap-3'>
-        <img src="${it.img}" class="w-16 h-16 object-contain rounded border"/>
+        <img src="${absAsset(it.img)}" class="w-16 h-16 object-contain rounded border" onerror="this.onerror=null;this.src='/assets/logo.png'"/>
         <div class='text-sm'>
           <div class='font-medium'>${it.nombre}</div>
           <div class='text-gray-500'>${it.presentacion||''}</div>
@@ -306,7 +316,7 @@ async function loadCSVs(){
         peso_g: r.peso_g ? Number(r.peso_g) : (first?first.grams:null),
         sku: (r.sku||'').trim(),
         precio: (r.precio!=='' && r.precio!=null) ? Number(r.precio) : (first?first.price:null),
-        imagen_url: (r.imagen_url||'').trim(),
+        imagen_url: absAsset(r.imagen_url||''),
         descripcion: (r.descripcion||'').trim(),
         disponible: String(r.disponible||'1')==='1',
         variants
@@ -329,8 +339,6 @@ const mEspecie = document.getElementById('mEspecie');
 const mCategoria = document.getElementById('mCategoria');
 const mSearch = document.getElementById('mSearch');
 
-const urlParams = new URLSearchParams(location.search);
-const norm = v => (v||'').toString().trim().toLowerCase();
 function mapEspecie(v){
   v = norm(v);
   if(v==='cat' || v==='gato') return 'Gato';
@@ -345,28 +353,30 @@ function mapCategoria(v){
   if(v==='snack' || v==='treats') return 'Snack';
   return '';
 }
-function fillSelect(sel, values){ sel.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
+function fillSelect(el, values){ el.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
 function fillFilters(){
   const marcas = ['Marca…', ...unique(PRODUCTS,'marca')];
   const cats   = ['Categoría…', ...unique(PRODUCTS,'categoria')];
   const esps   = ['Especie…', 'Gato', 'Perro'];
-
   [fMarca,mMarca].forEach(el=> el && fillSelect(el, marcas));
   [fCategoria,mCategoria].forEach(el=> el && fillSelect(el, cats));
   [fEspecie,mEspecie].forEach(el=> el && fillSelect(el, esps));
 }
 function applyInitialFiltersFromURL(){
-  const marcaParam = urlParams.get('marca');
-  const espParam = urlParams.get('especie');
-  const catParam = urlParams.get('categoria');
-  const qParam = urlParams.get('q') || urlParams.get('buscar');
+  const u = new URLSearchParams(location.search);
+  const marcaParam = u.get('marca');
+  const espParam   = u.get('especie');
+  const catParam   = u.get('categoria');
+  const qParam     = u.get('q') || u.get('buscar');
 
-  const setVal = (el,val)=>{ if(el) el.value = val||''; }
-
-  setVal(fMarca, marcaParam); setVal(mMarca, marcaParam);
-  setVal(fEspecie, mapEspecie(espParam)); setVal(mEspecie, mapEspecie(espParam));
-  setVal(fCategoria, mapCategoria(catParam)); setVal(mCategoria, mapCategoria(catParam));
-  setVal(fSearch, qParam||''); setVal(mSearch, qParam||'');
+  if(fMarca) fMarca.value = marcaParam || '';
+  if(mMarca) mMarca.value = marcaParam || '';
+  if(fEspecie) fEspecie.value = mapEspecie(espParam);
+  if(mEspecie) mEspecie.value = mapEspecie(espParam);
+  if(fCategoria) fCategoria.value = mapCategoria(catParam);
+  if(mCategoria) mCategoria.value = mapCategoria(catParam);
+  if(fSearch) fSearch.value = qParam || '';
+  if(mSearch) mSearch.value = qParam || '';
 }
 function updateURLFromFilters(){
   const params = new URLSearchParams();
@@ -415,7 +425,7 @@ function cardHTML(p){
   const initialPrice = (p.variants && p.variants.length) ? money(p.variants[0].price) : money(p.precio);
   return `<article class='border rounded-2xl overflow-hidden bg-white'>
     <div class='img-box w-full bg-gray-50 grid place-items-center'>
-      <img src='${img}' data-alt='${altList}' alt='${p.nombre}' loading='lazy' onerror="onImgError(this)"/>
+      <img src='${absAsset(img)}' data-alt='${altList}' alt='${p.nombre}' loading='lazy' onerror="onImgError(this)"/>
     </div>
     <div class='p-3 space-y-1'>
       <h3 class='font-medium leading-tight'>${p.nombre}</h3>
@@ -430,7 +440,6 @@ function cardHTML(p){
 }
 function render(){
   const items = getFiltered();
-  const grid = document.getElementById('grid');
   const noRes = document.getElementById('noResults');
 
   if(!items.length){
@@ -454,18 +463,21 @@ document.getElementById('cartBtn').addEventListener('click', ()=>{ drawCart(); o
 document.getElementById('closeCart').addEventListener('click', closeCart);
 overlay.addEventListener('click', closeCart);
 
+// Filtros desktop
 ['fCategoria','fMarca','fEspecie','fSearch'].forEach(id=>{
   const el = document.getElementById(id);
   el?.addEventListener('input', ()=>{ render(); updateURLFromFilters(); });
 });
 document.getElementById('fSearchBtn')?.addEventListener('click', ()=>{ render(); updateURLFromFilters(); });
 
+// Filtros móvil
 ['mCategoria','mMarca','mEspecie','mSearch'].forEach(id=>{
   const el = document.getElementById(id);
   el?.addEventListener('input', ()=>{ render(); updateURLFromFilters(); });
 });
 document.getElementById('mApply')?.addEventListener('click', ()=>{ render(); updateURLFromFilters(); });
 
+// Navegación
 document.getElementById('btnGoToCart').addEventListener('click', ()=>{ window.location.href = '/cart.html'; });
 document.getElementById('btnCheckout').addEventListener('click', ()=>{ window.location.href = '/checkout.html'; });
 
@@ -476,7 +488,7 @@ document.getElementById('btnCheckout').addEventListener('click', ()=>{ window.lo
     await loadCSVs();
     if(!PRODUCTS.length){
       alertBox.classList.remove('hidden');
-      alertBox.textContent = 'No se cargaron productos. Revisa las rutas CSV.';
+      alertBox.textContent = 'No se cargaron productos (0). Revisa rutas de CSV en CSV_URLS o que el servidor no devuelva 404.';
     }
     fillFilters();
     applyInitialFiltersFromURL();
