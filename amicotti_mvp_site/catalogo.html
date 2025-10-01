@@ -546,16 +546,34 @@ function sendToGoogleForms(buyer){
 }
 async function finalizarPedido(){
   if(!CART.length){ alert('Tu carrito está vacío.'); return; }
-  const buyer = getBuyer();
+
+  const buyer   = getBuyer();
+  const consent = document.getElementById('bf_consent')?.checked;
+
   if(!buyer.name || !buyer.address || !buyer.phone){
     alert('Por favor completa Nombre, Dirección y Teléfono.'); return;
   }
+  if(!isValidEcPhone(buyer.phone)){
+    alert('Revisa el teléfono. Debe ser un móvil válido de Ecuador (09xxxxxxxx o +5939xxxxxxxx).');
+    return;
+  }
+  if(!consent){
+    alert('Debes aceptar el uso de datos para continuar.'); return;
+  }
+
   persistBuyer(buyer);
   sendToGoogleForms(buyer); // no bloquea
+
   const text = buildWAMessage(buyer);
   const url  = `https://wa.me/${WA_PHONE}?text=${encodeURIComponent(text)}`;
   window.open(url, '_blank', 'noopener');
+
+  // Limpia carrito después de abrir WhatsApp
+  CART = [];
+  saveCart();
+  drawCart();
 }
+
 
 /* ================= EVENTOS ================= */
 [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el =>
