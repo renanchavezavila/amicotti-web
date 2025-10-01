@@ -571,6 +571,25 @@ document.getElementById('btnEmpty').addEventListener('click', ()=>{
   if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); }
 });
 document.getElementById('btnCheckout').addEventListener('click', finalizarPedido);
+// Formato en vivo del teléfono
+const bfPhoneInput = document.getElementById('bf_phone');
+const bfPhoneHelp  = document.getElementById('bf_phone_help');
+if(bfPhoneInput){
+  bfPhoneInput.addEventListener('input', () => {
+    const pos = bfPhoneInput.selectionStart;
+    const pretty = prettyEcPhone(bfPhoneInput.value);
+    bfPhoneInput.value = pretty;
+    if(isValidEcPhone(bfPhoneInput.value)){
+      bfPhoneInput.classList.remove('border-rose-400');
+      bfPhoneHelp?.classList.add('hidden');
+    }else{
+      bfPhoneInput.classList.add('border-rose-400');
+      bfPhoneHelp?.classList.remove('hidden');
+    }
+    try{ bfPhoneInput.setSelectionRange(pos,pos); }catch(e){}
+  });
+}
+    
 
 /* ================= INIT ================= */
 (async function init(){
