@@ -548,17 +548,15 @@
       if(b.phone) document.getElementById('bf_phone').value = b.phone;
     }catch(e){}
   }
-
-<!-- === CHECKOUT + EVENTOS + INIT (PARCHE LIMPIO) === -->
+<!-- === CHECKOUT (llevar a página nueva; no valida el form oculto) === -->
 <script>
-// === CHECKOUT (llevar a página nueva; no valida el form oculto) ===
 function goToCheckout(){
   if(!CART.length){
     alert('Tu carrito está vacío.');
     return;
   }
   localStorage.setItem('amicotti_checkout_source', 'catalog'); // opcional
-  location.href = 'checkout.html'; // ruta RELATIVA (funciona en subcarpetas)
+  location.href = 'checkout.html'; // RELATIVO
 }
 
 /* ============== EVENTOS ============== */
@@ -602,6 +600,8 @@ document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
 
 // Evita submit del formulario oculto (si existe)
 document.getElementById('buyerForm')?.addEventListener('submit', e => e.preventDefault());
+
+
 
 /* ============== INIT ============== */
 (async function init(){
