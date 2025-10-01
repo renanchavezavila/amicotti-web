@@ -143,6 +143,31 @@ const ENTRY_PHONE   = "entry.646283436"; // Teléfono
 const ENTRY_CART    = "entry.1875788310"; // JSON carrito
 const ENTRY_TOTAL   = "entry.614785838"; // Total $
 const ENTRY_SOURCE  = "entry.1894560572"; // (opcional) "site-amicotti"
+    
+/* ==== Envío a Google Forms (usa tus IDs de arriba) ==== */
+    
+function sendToGoogleForms(buyer){
+  if(!FORM_ID) return Promise.resolve();
+
+  // OJO: tu formulario es de tipo /d/e/
+  const endpoint = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
+
+  const payload = new URLSearchParams();
+  const sub = cartSubtotal().toFixed(2);
+
+  if(ENTRY_NAME)    payload.append(ENTRY_NAME, buyer.name);
+  if(ENTRY_ADDRESS) payload.append(ENTRY_ADDRESS, buyer.address);
+  if(ENTRY_PHONE)   payload.append(ENTRY_PHONE, buyer.phone);
+  if(ENTRY_TOTAL)   payload.append(ENTRY_TOTAL, sub);
+  if(ENTRY_CART)    payload.append(ENTRY_CART, JSON.stringify(CART));
+  if(ENTRY_SOURCE)  payload.append(ENTRY_SOURCE, 'site-amicotti');
+
+  // No bloquea el flujo si falla
+  return fetch(endpoint, { method:'POST', mode:'no-cors', body: payload }).catch(()=>{});
+}
+function cartSubtotal(){ 
+  return CART.reduce((a,i)=> a + (i.precio!=null ? i.precio*i.qty : 0), 0); 
+}
 
 /* ================= ESTADO ================= */
 let PRODUCTS = [];
