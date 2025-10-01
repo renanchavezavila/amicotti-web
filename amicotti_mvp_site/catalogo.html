@@ -504,12 +504,15 @@ function getBuyer(){
   const rawPhone  = (document.getElementById('bf_phone')?.value || '').trim();
   const normPhone = normalizeEcPhone(rawPhone);
   const ten = normPhone.startsWith('593') ? '0'+normPhone.slice(3) : normPhone;
+
   return {
     name:    (document.getElementById('bf_name')?.value || '').trim(),
     address: (document.getElementById('bf_address')?.value || '').trim(),
-    phone:   prettyEcPhone(ten)
+    phone:   prettyEcPhone(ten),
+    pay:     (document.querySelector('input[name="bf_pay"]:checked')?.value || '').trim()
   };
 }
+
 
 function persistBuyer(b){
   localStorage.setItem('amicotti_buyer', JSON.stringify(b));
