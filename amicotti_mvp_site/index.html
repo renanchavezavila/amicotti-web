@@ -241,7 +241,9 @@
 
         return `
           <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
-            <img src="${p.img}" alt="${p.title}" class="w-full h-48 object-contain p-4" loading="lazy" onerror="safe(this)"/>
+           <img src="${p.img}" alt="${p.title}"
+     class="w-full h-64 sm:h-72 lg:h-80 object-contain p-4"
+     loading="lazy" onerror="safe(this)"/> 
             <div class="p-4">
               <h3 class="font-semibold">${p.title}</h3>
               <p class="text-slate-600">${p.subtitle || ""}</p>
