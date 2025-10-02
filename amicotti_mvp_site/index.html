@@ -21,21 +21,36 @@
 </div>
 
 
-  <!-- Header (sin Promos / sin Catálogo) -->
-  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-      <a href="index.html" class="flex items-center gap-2">
-        <img src="assets/logo.png" class="w-9 h-9" alt="Amicotti"/>
-        <span class="font-semibold tracking-tight">Amicotti</span>
+<!-- Header -->
+<header class="sticky top-0 z-40 bg-white/85 backdrop-blur border-b">
+  <div class="max-w-7xl mx-auto px-4 py-2 md:py-3 flex items-center justify-between gap-3">
+    <a href="index.html" class="flex items-center gap-2">
+      <img src="assets/logo.png" class="w-9 h-9" alt="Amicotti"/>
+      <span class="font-semibold tracking-tight">Amicotti</span>
+    </a>
+
+    <nav class="flex items-center gap-2">
+      <!-- Móvil: solo Catálogo (CTA principal) -->
+      <a href="catalogo.html"
+         class="md:hidden px-3 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700">
+        Catálogo
       </a>
-      <nav class="flex flex-wrap items-center gap-2">
-        <a href="#marcas" class="px-4 py-2 rounded-xl hover:bg-rose-50">Marcas</a>
-        <a href="#promos" class="px-4 py-2 rounded-xl hover:bg-rose-50">Promos</a>
-        <a href="#faq" class="px-4 py-2 rounded-xl hover:bg-rose-50">Preguntas</a>
-        <a href="#contacto" class="px-4 py-2 rounded-xl hover:bg-rose-50">Contacto</a>
-      </nav>
-    </div>
-  </header>
+
+      <!-- Desktop: navegación completa + Catálogo -->
+      <div class="hidden md:flex items-center gap-2">
+        <a href="#marcas"   class="px-3 py-2 rounded-lg hover:bg-rose-50">Marcas</a>
+        <a href="#promos"   class="px-3 py-2 rounded-lg hover:bg-rose-50">Promos</a>
+        <a href="#faq"      class="px-3 py-2 rounded-lg hover:bg-rose-50">Preguntas</a>
+        <a href="#contacto" class="px-3 py-2 rounded-lg hover:bg-rose-50">Contacto</a>
+        <a href="catalogo.html"
+           class="px-3 py-2 rounded-lg bg-rose-600 text-white hover:bg-rose-700">
+          Catálogo
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
 
   <!-- Hero (sin CTAs) -->
   <section class="bg-gradient-to-r from-rose-50 to-rose-100 py-12 md:py-16">
