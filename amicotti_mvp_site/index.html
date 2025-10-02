@@ -7,9 +7,6 @@
   <meta name="description" content="Entrega rápida en Quito y Valles. Compra por WhatsApp. Productos oficiales Royal Canin y Purina."/>
   <link rel="icon" href="assets/logo.png"/>
 
-  <!-- Preload de la imagen hero (mejora LCP) -->
-  <link rel="preload" as="image" href="assets/home/hero-pet.webp"/>
-
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
@@ -67,15 +64,11 @@
         </ul>
       </div>
 
-      <!-- Imagen hero con picture y fallback -->
+      <!-- Si no existe la imagen, muestra el logo y NO bloquea la carga -->
       <div class="hidden md:block">
-        <picture>
-          <source srcset="assets/home/hero-pet.avif" type="image/avif">
-          <source srcset="assets/home/hero-pet.webp" type="image/webp">
-          <img src="assets/home/hero-pet.jpg" alt="Mascotas felices con Amicotti"
-               class="rounded-2xl shadow-xl" width="1400" height="840" loading="eager"
-               onerror="this.src='assets/logo.png'"/>
-        </picture>
+        <img src="assets/home/hero-pet.webp" alt="Mascotas felices con Amicotti"
+             class="rounded-2xl shadow-xl" width="1200" height="720" loading="eager"
+             onerror="this.onerror=null; this.src='assets/logo.png'"/>
       </div>
     </div>
   </section>
@@ -95,22 +88,22 @@
       <h2 class="text-2xl font-bold mb-6 text-slate-800">Marcas que confían en nosotros</h2>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
         <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-          <img src="assets/brands/royal.png" alt="Royal Canin" class="h-12" loading="lazy" onerror="this.src='assets/logo.png'"/>
+          <img src="assets/brands/royal.png" alt="Royal Canin" class="h-12" loading="lazy" onerror="this.onerror=null; this.src='assets/logo.png'"/>
         </div>
         <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-          <img src="assets/brands/purina.png" alt="Purina" class="h-12" loading="lazy" onerror="this.src='assets/logo.png'"/>
+          <img src="assets/brands/purina.png" alt="Purina" class="h-12" loading="lazy" onerror="this.onerror=null; this.src='assets/logo.png'"/>
         </div>
         <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-          <img src="assets/brands/dogchow.png" alt="Dog Chow" class="h-12" loading="lazy" onerror="this.src='assets/logo.png'"/>
+          <img src="assets/brands/dogchow.png" alt="Dog Chow" class="h-12" loading="lazy" onerror="this.onerror=null; this.src='assets/logo.png'"/>
         </div>
         <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-          <img src="assets/brands/catchow.png" alt="Cat Chow" class="h-12" loading="lazy" onerror="this.src='assets/logo.png'"/>
+          <img src="assets/brands/catchow.png" alt="Cat Chow" class="h-12" loading="lazy" onerror="this.onerror=null; this.src='assets/logo.png'"/>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Promos (grilla, se inyecta por JS desde assets/home/promos.js) -->
+  <!-- Promos -->
   <section id="promos" class="py-12 bg-rose-50">
     <div class="max-w-7xl mx-auto px-4">
       <div class="flex items-center justify-between mb-6">
@@ -210,11 +203,11 @@
   <!-- WA flotante móvil -->
   <a id="waFloat" class="fixed bottom-4 right-4 md:hidden w-12 h-12 rounded-full bg-rose-600 text-white grid place-items-center shadow-xl" target="_blank" rel="noopener" aria-label="WhatsApp">WA</a>
 
-  <!-- ① Carga la lista de promos del home -->
-  <script src="assets/home/promos.js"></script>
+  <!-- Lista de promos del home (no bloqueante). Si falta, no se rompe. -->
+  <script src="assets/home/promos.js" defer></script>
 
-  <script>
-    // ====== Config y utilidades ======
+  <!-- Lógica propia del home -->
+  <script defer>
     const WA_PHONE = "593995315716";
     const waUrl = () => `https://wa.me/${WA_PHONE}`;
     const waFor = (name) => `https://wa.me/${WA_PHONE}?text=${encodeURIComponent("Hola Amicotti, quiero " + name)}`;
@@ -228,17 +221,16 @@
       });
     }
 
-    // ====== Carrito compartido (opcional por promo) ======
+    // carrito opcional (si alguna promo lo permite)
     const CART_KEY = 'amicotti_cart';
     const getCart = () => { try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch { return []; } };
     const setCart = (c) => localStorage.setItem(CART_KEY, JSON.stringify(c));
-
     function addToCart(sku, qty = 1, meta = {}){
-      const cart = getCart();
-      const i = cart.findIndex(x => x.sku === sku);
-      if(i >= 0) cart[i] = { ...cart[i], ...meta, qty: cart[i].qty + qty };
-      else cart.push({ sku, qty, ...meta });
-      setCart(cart);
+      const c = getCart();
+      const i = c.findIndex(x => x.sku === sku);
+      if(i >= 0) c[i] = { ...c[i], ...meta, qty: c[i].qty + qty };
+      else c.push({ sku, qty, ...meta });
+      setCart(c);
       toast(`${meta.name || sku} agregado al carrito`);
     }
     function buyNow(sku, qty = 1, meta = {}){
@@ -253,29 +245,22 @@
       setTimeout(()=> t.remove(), 1400);
     }
 
-    // ====== Render de promos desde assets/home/promos.js ======
-    function renderPromos(){
+    // Render seguro: espera a que promos.js cargue, pero con timeout
+    function renderPromosSafely(){
       const wrap = document.getElementById("promoGrid");
-      const data = Array.isArray(window.PROMOS_HOME) ? window.PROMOS_HOME : [];
       if(!wrap) return;
-
+      const data = Array.isArray(window.PROMOS_HOME) ? window.PROMOS_HOME : [];
+      if(data.length === 0){
+        wrap.innerHTML = `<div class="text-sm text-slate-500">No hay promos disponibles por el momento.</div>`;
+        return;
+      }
       wrap.innerHTML = data.map(p => {
         const btnCatalogo = `<a href="${p.href}" class="px-4 py-2 bg-rose-600 text-white rounded">Ver catálogo</a>`;
         const btnWA       = `<a href="${waFor(p.title)}" target="_blank" rel="noopener" class="px-4 py-2 border border-rose-600 text-rose-600 rounded">WhatsApp</a>`;
-
-        // si allow_cart === true, muestra botones de carrito
-        const btnAdd = p.allow_cart
-          ? `<button class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50"
-               onclick='addToCart(${JSON.stringify(p.sku)},1,${JSON.stringify({name:p.title,image:p.img})})'>
-               Agregar al carrito
-             </button>` : "";
-
-        const btnBuy = p.allow_cart
-          ? `<button class="px-4 py-2 border border-rose-600 text-rose-600 rounded hover:bg-rose-50"
-               onclick='buyNow(${JSON.stringify(p.sku)},1,${JSON.stringify({name:p.title,image:p.img})})'>
-               Comprar ahora
-             </button>` : "";
-
+        const btnAdd = p.allow_cart ? `<button class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50"
+              onclick='addToCart(${JSON.stringify(p.sku)},1,${JSON.stringify({name:p.title,image:p.img})})'>Agregar al carrito</button>` : "";
+        const btnBuy = p.allow_cart ? `<button class="px-4 py-2 border border-rose-600 text-rose-600 rounded hover:bg-rose-50"
+              onclick='buyNow(${JSON.stringify(p.sku)},1,${JSON.stringify({name:p.title,image:p.img})})'>Comprar ahora</button>` : "";
         return `
           <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
             <img src="${p.img}" alt="${p.title}" class="w-full h-48 object-contain p-4" loading="lazy"
@@ -284,21 +269,25 @@
               <h3 class="font-semibold">${p.title}</h3>
               <p class="text-slate-600">${p.subtitle || ""}</p>
               <div class="flex flex-wrap gap-3 mt-3">
-                ${btnCatalogo}
-                ${btnWA}
-                ${btnAdd}
-                ${btnBuy}
+                ${btnCatalogo}${btnWA}${btnAdd}${btnBuy}
               </div>
             </div>
-          </article>
-        `;
+          </article>`;
       }).join("");
     }
 
-    // Init
+    // init
     (function(){
       setWALinks();
-      renderPromos();
+      // intenta renderizar promos después de que promos.js (defer) se cargue
+      let tries = 0;
+      const iv = setInterval(()=>{
+        tries++;
+        if (Array.isArray(window.PROMOS_HOME) || tries > 20){ // ~2s timeout
+          clearInterval(iv);
+          renderPromosSafely();
+        }
+      }, 100);
       const y = document.getElementById('yy');
       if (y) y.textContent = new Date().getFullYear();
     })();
