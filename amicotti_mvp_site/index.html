@@ -245,37 +245,69 @@
       setTimeout(()=> t.remove(), 1400);
     }
 
-    // Render seguro: espera a que promos.js cargue, pero con timeout
-    function renderPromosSafely(){
-      const wrap = document.getElementById("promoGrid");
-      if(!wrap) return;
-      const data = Array.isArray(window.PROMOS_HOME) ? window.PROMOS_HOME : [];
-      if(data.length === 0){
-        wrap.innerHTML = `<div class="text-sm text-slate-500">No hay promos disponibles por el momento.</div>`;
-        return;
-      }
-      wrap.innerHTML = data.map(p => {
-        const btnCatalogo = `<a href="${p.href}" class="px-4 py-2 bg-rose-600 text-white rounded">Ver catálogo</a>`;
-        const btnWA       = `<a href="${waFor(p.title)}" target="_blank" rel="noopener" class="px-4 py-2 border border-rose-600 text-rose-600 rounded">WhatsApp</a>`;
-        const btnAdd = p.allow_cart ? `<button class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50"
-              onclick='addToCart(${JSON.stringify(p.sku)},1,${JSON.stringify({name:p.title,image:p.img})})'>Agregar al carrito</button>` : "";
-        const btnBuy = p.allow_cart ? `<button class="px-4 py-2 border border-rose-600 text-rose-600 rounded hover:bg-rose-50"
-              onclick='buyNow(${JSON.stringify(p.sku)},1,${JSON.stringify({name:p.title,image:p.img})})'>Comprar ahora</button>` : "";
-        return `
-          <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
-            <img src="${p.img}" alt="${p.title}" class="w-full h-48 object-contain p-4" loading="lazy"
-                 onerror="safe(this)"/>
-            <div class="p-4">
-              <h3 class="font-semibold">${p.title}</h3>
-              <p class="text-slate-600">${p.subtitle || ""}</p>
-              <div class="flex flex-wrap gap-3 mt-3">
-                ${btnCatalogo}${btnWA}${btnAdd}${btnBuy}
-              </div>
-            </div>
-          </article>`;
-      }).join("");
+  <script defer>
+  // …deja el resto igual…
+
+  const fmtUSD = n => (typeof n === "number")
+    ? n.toLocaleString("en-US",{style:"currency", currency:"USD"})
+    : "";
+
+  function renderPromosSafely(){
+    const wrap = document.getElementById("promoGrid");
+    const data = Array.isArray(window.PROMOS_HOME) ? window.PROMOS_HOME : [];
+    if(!wrap) return;
+
+    if(data.length === 0){
+      wrap.innerHTML = `<div class="text-sm text-slate-500">No hay promos disponibles por el momento.</div>`;
+      return;
     }
 
+    wrap.innerHTML = data.map(p => {
+      const priceBlock = (p.price)
+        ? `
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-bold text-rose-700">${fmtUSD(p.price)}</span>
+            ${p.price_old ? `<span class="text-sm line-through text-slate-400">${fmtUSD(p.price_old)}</span>` : ""}
+            ${p.badge ? `<span class="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">${p.badge}</span>` : ""}
+          </div>
+          ${p.unit ? `<div class="text-xs text-slate-500">${p.unit}</div>` : ""}
+        ` : "";
+
+      const btnCatalogo = `<a href="${p.href}" class="px-4 py-2 bg-rose-600 text-white rounded">Ver catálogo</a>`;
+      const btnWA       = `<a href="${waFor(p.title)}" target="_blank" rel="noopener" class="px-4 py-2 border border-rose-600 text-rose-600 rounded">WhatsApp</a>`;
+
+      const btnAdd = p.allow_cart ? `
+        <button class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50"
+          onclick='addToCart(${JSON.stringify(p.sku)},1,${JSON.stringify({name:p.title,image:p.img,price_hint:p.price})})'>
+          Agregar al carrito
+        </button>` : "";
+
+      const btnBuy = p.allow_cart ? `
+        <button class="px-4 py-2 border border-rose-600 text-rose-600 rounded hover:bg-rose-50"
+          onclick='buyNow(${JSON.stringify(p.sku)},1,${JSON.stringify({name:p.title,image:p.img,price_hint:p.price})})'>
+          Comprar ahora
+        </button>` : "";
+
+      return `
+        <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
+          <img src="${p.img}" alt="${p.title}" class="w-full h-48 object-contain p-4" loading="lazy"
+               onerror="safe(this)"/>
+          <div class="p-4">
+            <h3 class="font-semibold">${p.title}</h3>
+            <p class="text-slate-600">${p.subtitle || ""}</p>
+            ${priceBlock}
+            <div class="flex flex-wrap gap-3 mt-3">
+              ${btnCatalogo}${btnWA}${btnAdd}${btnBuy}
+            </div>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  // …deja el resto igual…
+</script>
+ 
     // init
     (function(){
       setWALinks();
