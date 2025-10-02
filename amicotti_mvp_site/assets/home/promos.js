@@ -3,7 +3,7 @@ window.PROMOS_HOME = [
   {
     title: "Royal Canin Gato Urinary 1.5kg",
     sku: "RC-URIN-15",
-    img: "assets/home/promos/promo-urinary.jpg",
+    img: "assets/home/promos/promo-urinary.webp",
     href: "catalogo.html?marca=Royal+Canin&buscar=urinary",
     subtitle: "Precio especial esta semana",
     unit: "1.5 kg",
