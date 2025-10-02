@@ -6,260 +6,302 @@
   <title>Amicotti — Salud y bienestar para tus mascotas</title>
   <meta name="description" content="Entrega rápida en Quito y Valles. Compra por WhatsApp. Productos oficiales Royal Canin y Purina."/>
   <link rel="icon" href="assets/logo.png"/>
+
+  <!-- Preload de la imagen hero (mejora LCP) -->
+  <link rel="preload" as="image" href="assets/home/hero-pet.webp"/>
+
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
     .chip{font-size:.7rem}
   </style>
 </head>
 <body class="bg-white text-gray-900 selection:bg-rose-100 selection:text-rose-700">
 
-<!-- Top strip -->
-<div class="text-xs bg-slate-900 text-slate-200">
-  <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-1">
-    <span>Entrega en Quito y Valles</span>
-    <span>Pagos: <strong class="text-white">transferencia bancaria</strong> o efectivo</span>
-    <a id="waTop" class="underline hover:no-underline" target="_blank" rel="noopener">Atención WhatsApp</a>
-  </div>
-</div>
-
-<!-- Header -->
-<header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
-  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-    <a href="index.html" class="flex items-center gap-2">
-      <img src="assets/logo.png" class="w-9 h-9" alt="Amicotti"/>
-      <span class="font-semibold tracking-tight">Amicotti</span>
-    </a>
-    <nav class="flex flex-wrap items-center gap-2">
-      <a href="#marcas" class="px-4 py-2 rounded-xl hover:bg-rose-50">Marcas</a>
-      <a href="#promos" class="px-4 py-2 rounded-xl bg-rose-600 text-white hover:bg-rose-700">Promos</a>
-      <a href="catalogo.html" class="px-4 py-2 rounded-xl border border-rose-600 text-rose-600 hover:bg-rose-50">Catálogo</a>
-      <a href="#faq" class="px-4 py-2 rounded-xl hover:bg-rose-50">Preguntas</a>
-      <a href="#contacto" class="px-4 py-2 rounded-xl hover:bg-rose-50">Contacto</a>
-    </nav>
-  </div>
-</header>
-
-<!-- Hero -->
-<section class="bg-gradient-to-r from-rose-50 to-rose-100 py-12 md:py-16">
-  <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-8 items-center">
-    <div class="space-y-6">
-      <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
-        Salud y bienestar <span class="text-rose-600">para tus mascotas</span>
-      </h1>
-      <p class="text-slate-700 text-lg">
-        Entrega rápida en Quito y Valles. Productos oficiales <strong>Royal Canin</strong> y <strong>Purina</strong>.
-        Compra segura y asesoría por WhatsApp.
-      </p>
-      <div class="flex flex-wrap gap-3">
-        <a href="catalogo.html" class="px-6 py-3 rounded-lg bg-rose-600 text-white font-semibold shadow hover:bg-rose-700">Ver catálogo</a>
-        <a href="#promos" class="px-6 py-3 rounded-lg border border-rose-600 text-rose-600 font-semibold hover:bg-rose-50">Promos</a>
-      </div>
-      <ul class="text-sm text-slate-600 grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
-        <li class="flex items-center gap-2"><span class="text-rose-600">•</span> Entrega el mismo día*</li>
-        <li class="flex items-center gap-2"><span class="text-rose-600">•</span> Pago transferencia o efectivo</li>
-        <li class="flex items-center gap-2"><span class="text-rose-600">•</span> Atención personalizada</li>
-      </ul>
-    </div>
-    <div class="hidden md:block">
-      <!-- Coloca aquí tu imagen real -->
-      <img src="assets/hero-pet.png" alt="Mascotas felices con Amicotti" class="rounded-2xl shadow-xl" onerror="this.src='assets/logo.png'"/>
+  <!-- Top strip -->
+  <div class="text-xs bg-slate-900 text-slate-200">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-1">
+      <span>Entrega en Quito y Valles</span>
+      <span>Pagos: <strong class="text-white">transferencia bancaria</strong> o efectivo</span>
+      <a id="waTop" class="underline hover:no-underline" target="_blank" rel="noopener">Atención WhatsApp</a>
     </div>
   </div>
-</section>
 
-<!-- Cinta info -->
-<section class="bg-white border-y">
-  <div class="max-w-7xl mx-auto px-4 py-4 grid sm:grid-cols-3 gap-4 text-sm text-slate-700">
-    <div><span class="font-semibold text-slate-900">Cobertura:</span> Quito y Valles</div>
-    <div><span class="font-semibold text-slate-900">Horario:</span> Lun–Sáb 9:00–18:00</div>
-    <div><span class="font-semibold text-slate-900">Contacto:</span> <a class="text-rose-600 hover:underline" id="waInfo" target="_blank" rel="noopener"></a></div>
-  </div>
-</section>
-
-<!-- Marcas -->
-<section id="marcas" class="py-12 bg-white">
-  <div class="max-w-7xl mx-auto px-4">
-    <h2 class="text-2xl font-bold mb-6 text-slate-800">Marcas que confían en nosotros</h2>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-      <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-        <img src="assets/royal.png" alt="Royal Canin" class="h-12" onerror="this.src='assets/logo.png'"/>
-      </div>
-      <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-        <img src="assets/purina.png" alt="Purina" class="h-12" onerror="this.src='assets/logo.png'"/>
-      </div>
-      <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-        <img src="assets/dogchow.png" alt="Dog Chow" class="h-12" onerror="this.src='assets/logo.png'"/>
-      </div>
-      <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
-        <img src="assets/catchow.png" alt="Cat Chow" class="h-12" onerror="this.src='assets/logo.png'"/>
-      </div>
+  <!-- Header -->
+  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/logo.png" class="w-9 h-9" alt="Amicotti"/>
+        <span class="font-semibold tracking-tight">Amicotti</span>
+      </a>
+      <nav class="flex flex-wrap items-center gap-2">
+        <a href="#marcas" class="px-4 py-2 rounded-xl hover:bg-rose-50">Marcas</a>
+        <a href="#promos" class="px-4 py-2 rounded-xl bg-rose-600 text-white hover:bg-rose-700">Promos</a>
+        <a href="catalogo.html" class="px-4 py-2 rounded-xl border border-rose-600 text-rose-600 hover:bg-rose-50">Catálogo</a>
+        <a href="#faq" class="px-4 py-2 rounded-xl hover:bg-rose-50">Preguntas</a>
+        <a href="#contacto" class="px-4 py-2 rounded-xl hover:bg-rose-50">Contacto</a>
+      </nav>
     </div>
-  </div>
-</section>
+  </header>
 
-<!-- Promos: se renderiza desde JS -->
-<section id="promos" class="py-12 bg-rose-50">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-bold text-slate-800">Promos de la semana</h2>
-      <a href="catalogo.html" class="text-rose-600 hover:underline font-semibold">Ver todas →</a>
-    </div>
-    <div id="promoGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-  </div>
-</section>
-
-<!-- FAQs -->
-<section id="faq" class="py-14 bg-white">
-  <div class="max-w-3xl mx-auto px-4">
-    <h2 class="text-2xl font-bold mb-6 text-slate-800">Preguntas frecuentes</h2>
-    <div class="space-y-4">
-      <details class="group border rounded-lg p-4 open:shadow-sm">
-        <summary class="flex cursor-pointer list-none items-center justify-between">
-          <span class="font-semibold">¿Cómo funcionan los envíos?</span>
-          <span class="transition group-open:rotate-180">▾</span>
-        </summary>
-        <p class="mt-3 text-slate-700">Entregamos en Quito y Valles el mismo día para pedidos confirmados antes de las 15:00. Coordinamos la hora por WhatsApp.</p>
-      </details>
-      <details class="group border rounded-lg p-4">
-        <summary class="flex cursor-pointer list-none items-center justify-between">
-          <span class="font-semibold">¿Qué métodos de pago aceptan?</span>
-          <span class="transition group-open:rotate-180">▾</span>
-        </summary>
-        <p class="mt-3 text-slate-700">Transferencia bancaria y efectivo contra entrega. Próximamente, tarjeta.</p>
-      </details>
-      <details class="group border rounded-lg p-4">
-        <summary class="flex cursor-pointer list-none items-center justify-between">
-          <span class="font-semibold">¿Los productos son originales?</span>
-          <span class="transition group-open:rotate-180">▾</span>
-        </summary>
-        <p class="mt-3 text-slate-700">Sí. Trabajamos con distribuidores oficiales de Royal Canin y Purina.</p>
-      </details>
-    </div>
-  </div>
-</section>
-
-<!-- Contacto -->
-<section id="contacto" class="max-w-7xl mx-auto px-4 pt-2 pb-16 grid md:grid-cols-3 gap-8">
-  <div>
-    <h3 class="font-semibold mb-2">Amicotti</h3>
-    <p class="text-slate-600">Quito — Ecuador.</p>
-  </div>
-  <div>
-    <h3 class="font-semibold mb-2">Contacto</h3>
-    <p class="text-slate-600">WhatsApp: <a id="waFooter" class="text-rose-600 underline" target="_blank" rel="noopener"></a></p>
-    <p class="text-slate-600">Email: amicotti.uio@gmail.com</p>
-  </div>
-  <div>
-    <h3 class="font-semibold mb-2">Redes</h3>
-    <p class="text-slate-600"><a href="#" class="underline">Instagram</a> · <a href="#" class="underline">Facebook</a></p>
-  </div>
-</section>
-
-<!-- Footer -->
-<footer class="bg-gray-950 text-gray-200">
-  <div class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-4 gap-8">
-    <div>
-      <img src="assets/logo.png" alt="Amicotti" class="h-9 w-auto mb-4"/>
-      <p class="text-sm text-gray-400">Amicotti — Amigos sanos. Cuidado y nutrición para tus mascotas con servicio cercano y confiable.</p>
-    </div>
-    <div>
-      <h3 class="font-semibold mb-3">Navegación</h3>
-      <ul class="space-y-2 text-sm">
-        <li><a class="hover:text-white" href="catalogo.html">Catálogo</a></li>
-        <li><a class="hover:text-white" href="#promos">Promos</a></li>
-        <li><a class="hover:text-white" href="#faq">Preguntas</a></li>
-      </ul>
-    </div>
-    <div>
-      <h3 class="font-semibold mb-3">Contacto</h3>
-      <ul class="space-y-2 text-sm">
-        <li>Quito — Ecuador</li>
-        <li>WhatsApp: <a class="text-rose-400 hover:text-white" id="waFooter2" target="_blank" rel="noopener"></a></li>
-        <li>Email: <a class="text-rose-400 hover:text-white" href="mailto:amicotti.uio@gmail.com">amicotti.uio@gmail.com</a></li>
-      </ul>
-    </div>
-    <div>
-      <h3 class="font-semibold mb-3">Legal</h3>
-      <ul class="space-y-2 text-sm">
-        <li><a class="hover:text-white" href="#">Términos y condiciones</a></li>
-        <li><a class="hover:text-white" href="#">Política de privacidad</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="border-t border-white/10">
-    <div class="max-w-7xl mx-auto px-4 py-4 text-xs text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-2">
-      <p>© <span id="yy"></span> Amicotti. Todos los derechos reservados.</p>
-      <p>* Aplican condiciones de cobertura y horario.</p>
-    </div>
-  </div>
-</footer>
-
-<!-- WA flotante -->
-<a id="waFloat" class="fixed bottom-4 right-4 md:hidden w-12 h-12 rounded-full bg-rose-600 text-white grid place-items-center shadow-xl" target="_blank" rel="noopener" aria-label="WhatsApp">WA</a>
-
-<script>
-  // ===== Config =====
-  const WA_PHONE = "593995315716";
-
-  // ===== Util =====
-  const waUrl = () => `https://wa.me/${WA_PHONE}`;
-  const waFor = (name) => `https://wa.me/${WA_PHONE}?text=${encodeURIComponent("Hola Amicotti, quiero " + name)}`;
-  const safe = (img) => { img.onerror = null; img.src = "assets/logo.png"; };
-
-  function setWALinks(){
-    const ids = ["waTop","waFloat","waFooter","waFooter2","waInfo"];
-    ids.forEach(id=>{
-      const el = document.getElementById(id);
-      if(el){ el.href = waUrl(); el.textContent = el.textContent || `+${WA_PHONE}`; }
-    });
-  }
-
-  // ===== PROMOS =====
-  // Cambia los 'img' por tus archivos REALES en /assets/ y ajusta 'href' para que el catálogo filtre (usa ?marca=...&buscar=...)
-  const PROMOS = [
-    {
-      title: "Urinary Feline SO",
-      subtitle: "Precio especial esta semana",
-      img: "assets/prod1.jpg",          // <-- sube este archivo o cambia la ruta
-      href: "catalogo.html?marca=Royal+Canin&buscar=Urinary",
-    },
-    {
-      title: "Pro Plan Cat Sterilized 1.5kg",
-      subtitle: "Descuento por tiempo limitado",
-      img: "assets/prod2.jpg",
-      href: "catalogo.html?marca=Purina&buscar=sterilized",
-    },
-    {
-      title: "Felix Travesuras Ocean Mix",
-      subtitle: "Pack ahorro x 12 sobres",
-      img: "assets/prod3.jpg",
-      href: "catalogo.html?marca=Purina&buscar=felix%20travesuras",
-    },
-  ];
-
-  function renderPromos(){
-    const wrap = document.getElementById("promoGrid");
-    wrap.innerHTML = PROMOS.map(p => `
-      <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
-        <img src="${p.img}" alt="${p.title}" class="w-full h-48 object-contain p-4" onerror="safe(this)"/>
-        <div class="p-4">
-          <h3 class="font-semibold">${p.title}</h3>
-          <p class="text-slate-600">${p.subtitle || ""}</p>
-          <div class="flex gap-3 mt-3">
-            <a href="${p.href}" class="px-4 py-2 bg-rose-600 text-white rounded">Ver catálogo</a>
-            <a href="${waFor(p.title)}" target="_blank" rel="noopener" class="px-4 py-2 border border-rose-600 text-rose-600 rounded">WhatsApp</a>
-          </div>
+  <!-- Hero -->
+  <section class="bg-gradient-to-r from-rose-50 to-rose-100 py-12 md:py-16">
+    <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-8 items-center">
+      <div class="space-y-6">
+        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
+          Salud y bienestar <span class="text-rose-600">para tus mascotas</span>
+        </h1>
+        <p class="text-slate-700 text-lg">
+          Entrega rápida en Quito y Valles. Productos oficiales <strong>Royal Canin</strong> y <strong>Purina</strong>.
+          Compra segura y asesoría por WhatsApp.
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="catalogo.html" class="px-6 py-3 rounded-lg bg-rose-600 text-white font-semibold shadow hover:bg-rose-700">Ver catálogo</a>
+          <a href="#promos" class="px-6 py-3 rounded-lg border border-rose-600 text-rose-600 font-semibold hover:bg-rose-50">Promos</a>
         </div>
-      </article>
-    `).join("");
-  }
+        <ul class="text-sm text-slate-600 grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2">
+          <li class="flex items-center gap-2"><span class="text-rose-600">•</span> Entrega el mismo día*</li>
+          <li class="flex items-center gap-2"><span class="text-rose-600">•</span> Transferencia o efectivo</li>
+          <li class="flex items-center gap-2"><span class="text-rose-600">•</span> Atención personalizada</li>
+        </ul>
+      </div>
 
-  // Init
-  (function(){
-    setWALinks();
-    renderPromos();
-    document.getElementById('yy').textContent = new Date().getFullYear();
-  })();
-</script>
+      <!-- Imagen hero con picture y fallback -->
+      <div class="hidden md:block">
+        <picture>
+          <source srcset="assets/home/hero-pet.avif" type="image/avif">
+          <source srcset="assets/home/hero-pet.webp" type="image/webp">
+          <img src="assets/home/hero-pet.jpg" alt="Mascotas felices con Amicotti"
+               class="rounded-2xl shadow-xl" width="1400" height="840" loading="eager"
+               onerror="this.src='assets/logo.png'"/>
+        </picture>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cinta info -->
+  <section class="bg-white border-y">
+    <div class="max-w-7xl mx-auto px-4 py-4 grid sm:grid-cols-3 gap-4 text-sm text-slate-700">
+      <div><span class="font-semibold text-slate-900">Cobertura:</span> Quito y Valles</div>
+      <div><span class="font-semibold text-slate-900">Horario:</span> Lun–Sáb 9:00–18:00</div>
+      <div><span class="font-semibold text-slate-900">Contacto:</span> <a class="text-rose-600 hover:underline" id="waInfo" target="_blank" rel="noopener"></a></div>
+    </div>
+  </section>
+
+  <!-- Marcas -->
+  <section id="marcas" class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+      <h2 class="text-2xl font-bold mb-6 text-slate-800">Marcas que confían en nosotros</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
+          <img src="assets/brands/royal.png" alt="Royal Canin" class="h-12" loading="lazy" onerror="this.src='assets/logo.png'"/>
+        </div>
+        <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
+          <img src="assets/brands/purina.png" alt="Purina" class="h-12" loading="lazy" onerror="this.src='assets/logo.png'"/>
+        </div>
+        <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
+          <img src="assets/brands/dogchow.png" alt="Dog Chow" class="h-12" loading="lazy" onerror="this.src='assets/logo.png'"/>
+        </div>
+        <div class="p-4 border rounded-lg bg-slate-50 flex justify-center items-center">
+          <img src="assets/brands/catchow.png" alt="Cat Chow" class="h-12" loading="lazy" onerror="this.src='assets/logo.png'"/>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Promos (grilla, se inyecta por JS desde assets/home/promos.js) -->
+  <section id="promos" class="py-12 bg-rose-50">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-slate-800">Promos de la semana</h2>
+        <a href="catalogo.html" class="text-rose-600 hover:underline font-semibold">Ver todas →</a>
+      </div>
+      <div id="promoGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+  </section>
+
+  <!-- FAQs -->
+  <section id="faq" class="py-14 bg-white">
+    <div class="max-w-3xl mx-auto px-4">
+      <h2 class="text-2xl font-bold mb-6 text-slate-800">Preguntas frecuentes</h2>
+      <div class="space-y-4">
+        <details class="group border rounded-lg p-4 open:shadow-sm">
+          <summary class="flex cursor-pointer list-none items-center justify-between">
+            <span class="font-semibold">¿Cómo funcionan los envíos?</span>
+            <span class="transition group-open:rotate-180">▾</span>
+          </summary>
+          <p class="mt-3 text-slate-700">Entregamos en Quito y Valles el mismo día para pedidos confirmados antes de las 15:00. Coordinamos la hora por WhatsApp.</p>
+        </details>
+        <details class="group border rounded-lg p-4">
+          <summary class="flex cursor-pointer list-none items-center justify-between">
+            <span class="font-semibold">¿Qué métodos de pago aceptan?</span>
+            <span class="transition group-open:rotate-180">▾</span>
+          </summary>
+          <p class="mt-3 text-slate-700">Transferencia bancaria y efectivo contra entrega. Próximamente, tarjeta.</p>
+        </details>
+        <details class="group border rounded-lg p-4">
+          <summary class="flex cursor-pointer list-none items-center justify-between">
+            <span class="font-semibold">¿Los productos son originales?</span>
+            <span class="transition group-open:rotate-180">▾</span>
+          </summary>
+          <p class="mt-3 text-slate-700">Sí. Trabajamos con distribuidores oficiales de Royal Canin y Purina.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section id="contacto" class="max-w-7xl mx-auto px-4 pt-2 pb-16 grid md:grid-cols-3 gap-8">
+    <div>
+      <h3 class="font-semibold mb-2">Amicotti</h3>
+      <p class="text-slate-600">Quito — Ecuador.</p>
+    </div>
+    <div>
+      <h3 class="font-semibold mb-2">Contacto</h3>
+      <p class="text-slate-600">WhatsApp: <a id="waFooter" class="text-rose-600 underline" target="_blank" rel="noopener"></a></p>
+      <p class="text-slate-600">Email: amicotti.uio@gmail.com</p>
+    </div>
+    <div>
+      <h3 class="font-semibold mb-2">Redes</h3>
+      <p class="text-slate-600"><a href="#" class="underline">Instagram</a> · <a href="#" class="underline">Facebook</a></p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-950 text-gray-200">
+    <div class="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-4 gap-8">
+      <div>
+        <img src="assets/logo.png" alt="Amicotti" class="h-9 w-auto mb-4"/>
+        <p class="text-sm text-gray-400">Amicotti — Amigos sanos. Cuidado y nutrición para tus mascotas con servicio cercano y confiable.</p>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-3">Navegación</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a class="hover:text-white" href="catalogo.html">Catálogo</a></li>
+          <li><a class="hover:text-white" href="#promos">Promos</a></li>
+          <li><a class="hover:text-white" href="#faq">Preguntas</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-3">Contacto</h3>
+        <ul class="space-y-2 text-sm">
+          <li>Quito — Ecuador</li>
+          <li>WhatsApp: <a class="text-rose-400 hover:text-white" id="waFooter2" target="_blank" rel="noopener"></a></li>
+          <li>Email: <a class="text-rose-400 hover:text-white" href="mailto:amicotti.uio@gmail.com">amicotti.uio@gmail.com</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="font-semibold mb-3">Legal</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a class="hover:text-white" href="#">Términos y condiciones</a></li>
+          <li><a class="hover:text-white" href="#">Política de privacidad</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-4 py-4 text-xs text-gray-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <p>© <span id="yy"></span> Amicotti. Todos los derechos reservados.</p>
+        <p>* Aplican condiciones de cobertura y horario.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WA flotante móvil -->
+  <a id="waFloat" class="fixed bottom-4 right-4 md:hidden w-12 h-12 rounded-full bg-rose-600 text-white grid place-items-center shadow-xl" target="_blank" rel="noopener" aria-label="WhatsApp">WA</a>
+
+  <!-- ① Carga la lista de promos del home -->
+  <script src="assets/home/promos.js"></script>
+
+  <script>
+    // ====== Config y utilidades ======
+    const WA_PHONE = "593995315716";
+    const waUrl = () => `https://wa.me/${WA_PHONE}`;
+    const waFor = (name) => `https://wa.me/${WA_PHONE}?text=${encodeURIComponent("Hola Amicotti, quiero " + name)}`;
+    const safe = (img) => { img.onerror = null; img.src = "assets/logo.png"; };
+
+    function setWALinks(){
+      const ids = ["waTop","waFloat","waFooter","waFooter2","waInfo"];
+      ids.forEach(id=>{
+        const el = document.getElementById(id);
+        if(el){ el.href = waUrl(); el.textContent = el.textContent || `+${WA_PHONE}`; }
+      });
+    }
+
+    // ====== Carrito compartido (opcional por promo) ======
+    const CART_KEY = 'amicotti_cart';
+    const getCart = () => { try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch { return []; } };
+    const setCart = (c) => localStorage.setItem(CART_KEY, JSON.stringify(c));
+
+    function addToCart(sku, qty = 1, meta = {}){
+      const cart = getCart();
+      const i = cart.findIndex(x => x.sku === sku);
+      if(i >= 0) cart[i] = { ...cart[i], ...meta, qty: cart[i].qty + qty };
+      else cart.push({ sku, qty, ...meta });
+      setCart(cart);
+      toast(`${meta.name || sku} agregado al carrito`);
+    }
+    function buyNow(sku, qty = 1, meta = {}){
+      addToCart(sku, qty, meta);
+      location.href = 'catalogo.html?open=cart';
+    }
+    function toast(msg){
+      const t = document.createElement('div');
+      t.textContent = msg;
+      t.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-rose-600 text-white px-4 py-2 rounded shadow z-50';
+      document.body.appendChild(t);
+      setTimeout(()=> t.remove(), 1400);
+    }
+
+    // ====== Render de promos desde assets/home/promos.js ======
+    function renderPromos(){
+      const wrap = document.getElementById("promoGrid");
+      const data = Array.isArray(window.PROMOS_HOME) ? window.PROMOS_HOME : [];
+      if(!wrap) return;
+
+      wrap.innerHTML = data.map(p => {
+        const btnCatalogo = `<a href="${p.href}" class="px-4 py-2 bg-rose-600 text-white rounded">Ver catálogo</a>`;
+        const btnWA       = `<a href="${waFor(p.title)}" target="_blank" rel="noopener" class="px-4 py-2 border border-rose-600 text-rose-600 rounded">WhatsApp</a>`;
+
+        // si allow_cart === true, muestra botones de carrito
+        const btnAdd = p.allow_cart
+          ? `<button class="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50"
+               onclick='addToCart(${JSON.stringify(p.sku)},1,${JSON.stringify({name:p.title,image:p.img})})'>
+               Agregar al carrito
+             </button>` : "";
+
+        const btnBuy = p.allow_cart
+          ? `<button class="px-4 py-2 border border-rose-600 text-rose-600 rounded hover:bg-rose-50"
+               onclick='buyNow(${JSON.stringify(p.sku)},1,${JSON.stringify({name:p.title,image:p.img})})'>
+               Comprar ahora
+             </button>` : "";
+
+        return `
+          <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
+            <img src="${p.img}" alt="${p.title}" class="w-full h-48 object-contain p-4" loading="lazy"
+                 onerror="safe(this)"/>
+            <div class="p-4">
+              <h3 class="font-semibold">${p.title}</h3>
+              <p class="text-slate-600">${p.subtitle || ""}</p>
+              <div class="flex flex-wrap gap-3 mt-3">
+                ${btnCatalogo}
+                ${btnWA}
+                ${btnAdd}
+                ${btnBuy}
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    // Init
+    (function(){
+      setWALinks();
+      renderPromos();
+      const y = document.getElementById('yy');
+      if (y) y.textContent = new Date().getFullYear();
+    })();
+  </script>
 </body>
 </html>
