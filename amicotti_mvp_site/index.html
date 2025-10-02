@@ -212,49 +212,85 @@
     </svg>
   </a>
 
-  <!-- Datos de promos del home -->
-  <script src="assets/home/promos.js" defer></script>
+<!-- Datos de promos del home -->
+<script src="assets/home/promos.js" defer></script>
 
-  <!-- Lógica del home (solo informativa, sin CTAs ni WhatsApp duplicado) -->
- <script defer>
-  // --- Config WhatsApp con referencia de origen ---
+<!-- Lógica del home -->
+<script defer>
+  // --- WhatsApp con referencia de origen ---
   const WA_PHONE = "593995315716";
-
-  // Genera el link a WhatsApp con un mensaje y una referencia
   function waLink(ref = 'wa_float_home', msg = null) {
     const base = `https://wa.me/${WA_PHONE}`;
     const text = msg ?? `Hola Amicotti, quisiera asesoría. [ref:${ref}]`;
     return `${base}?text=${encodeURIComponent(text)}`;
   }
 
-  // Utilidades existentes
-  const safe = (img) => { img.onerror = null; img.src = "assets/logo.png"; };
+  // Utils
+  const safe  = (img) => { img.onerror = null; img.src = "assets/logo.png"; };
   const fmtUSD = n => (typeof n === "number") ? n.toLocaleString("en-US",{style:"currency", currency:"USD"}) : "";
 
-  function renderPromos(){ /* (deja aquí tu función tal como la tienes) */ }
+  // --- RENDER PROMOS (restaurado) ---
+  function renderPromos(){
+    const wrap = document.getElementById("promoGrid");
+    const data = Array.isArray(window.PROMOS_HOME) ? window.PROMOS_HOME : [];
+    if(!wrap) return;
 
+    if(data.length === 0){
+      wrap.innerHTML = `<div class="text-sm text-slate-500">No hay promos disponibles por el momento.</div>`;
+      return;
+    }
+
+    wrap.innerHTML = data.map(p => {
+      const priceBlock = (p.price)
+        ? `
+          <div class="mt-2 flex items-baseline gap-2">
+            <span class="text-2xl font-bold text-rose-700">${fmtUSD(p.price)}</span>
+            ${p.price_old ? `<span class="text-sm line-through text-slate-400">${fmtUSD(p.price_old)}</span>` : ""}
+            ${p.badge ? `<span class="text-xs px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">${p.badge}</span>` : ""}
+          </div>
+          ${p.unit ? `<div class="text-xs text-slate-500">${p.unit}</div>` : ""}
+        ` : "";
+
+      return `
+        <article class="border rounded-lg bg-white shadow-sm hover:shadow-md transition">
+          <img src="${p.img}" alt="${p.title}"
+               class="w-full h-64 sm:h-72 lg:h-80 object-contain p-4"
+               loading="lazy" onerror="safe(this)"/>
+          <div class="p-4">
+            <h3 class="font-semibold">${p.title}</h3>
+            <p class="text-slate-600">${p.subtitle || ""}</p>
+            ${priceBlock}
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  // --- Init ---
   (function(){
-    // ÚNICO WhatsApp: el flotante, con ref
+    // Único WhatsApp: el flotante con ref
     const flo = document.getElementById('waFloat');
     if (flo) {
       flo.href = waLink('wa_float_home');
-      // (Opcional) Evento GA4 si más adelante activas gtag
-      flo.addEventListener('click', () => {
-        if (window.gtag) {
-          window.gtag('event','wa_click', { source:'home', placement:'float' });
-        }
-      });
+      if (window.gtag) {
+        flo.addEventListener('click', () => window.gtag('event','wa_click',{source:'home', placement:'float'}));
+      }
     }
 
-    // Render promos cuando cargue PROMOS_HOME (deja tu lógica actual)
-    let tries = 0;
-    const iv = setInterval(()=>{
-      tries++;
-      if (Array.isArray(window.PROMOS_HOME) || tries > 20){
-        clearInterval(iv);
-        renderPromos();
-      }
-    }, 100);
+    // Asegura que PROMOS_HOME esté disponible y luego renderiza
+    function afterReady(){
+      if (Array.isArray(window.PROMOS_HOME)) { renderPromos(); return; }
+      let tries = 0;
+      const iv = setInterval(()=>{
+        tries++;
+        if (Array.isArray(window.PROMOS_HOME) || tries > 30){
+          clearInterval(iv);
+          renderPromos();
+        }
+      }, 100);
+    }
+    if (document.readyState === 'complete') afterReady();
+    else window.addEventListener('load', afterReady);
 
     const y = document.getElementById('yy');
     if (y) y.textContent = new Date().getFullYear();
