@@ -11,7 +11,7 @@
 <body class="bg-white text-gray-900">
   <header class="border-b bg-[color:var(--pastel)]">
     <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="/catalogo.html" class="flex items-center gap-2"><img src="/assets/logo.png" class="w-8 h-8"><strong>Amicotti</strong></a>
+      <a href="/catalogo.html" class="flex items-center gap-2"><img src="/assets/logo.png" class="w-8 h-8" alt="Logo Amicotti"><strong>Amicotti</strong></a>
       <a href="/cart.html" class="px-3 py-2 border rounded">Ver carrito</a>
     </div>
   </header>
@@ -23,22 +23,22 @@
       <form id="form" class="space-y-3">
         <div>
           <label class="block text-sm text-gray-600 mb-1">Correo electrónico (opcional)</label>
-          <input id="email" type="email" class="w-full border rounded px-3 py-2">
+          <input id="email" type="email" class="w-full border rounded px-3 py-2" autocomplete="email">
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
           <div>
             <label class="block text-sm text-gray-600 mb-1">Nombre</label>
-            <input id="name" class="w-full border rounded px-3 py-2" required>
+            <input id="name" class="w-full border rounded px-3 py-2" required autocomplete="name">
           </div>
           <div>
             <label class="block text-sm text-gray-600 mb-1">Teléfono (WhatsApp)</label>
-            <input id="phone" class="w-full border rounded px-3 py-2" required>
+            <input id="phone" class="w-full border rounded px-3 py-2" required inputmode="tel" autocomplete="tel">
             <p id="phone_help" class="hidden text-[11px] text-rose-600 mt-1">Número móvil de Ecuador.</p>
           </div>
         </div>
         <div>
           <label class="block text-sm text-gray-600 mb-1">Dirección exacta</label>
-          <input id="address" class="w-full border rounded px-3 py-2" required>
+          <input id="address" class="w-full border rounded px-3 py-2" required autocomplete="street-address">
           <p class="text-[11px] text-gray-500 mt-1">Podrás compartir tu ubicación (pin) en el chat.</p>
         </div>
         <div>
@@ -61,7 +61,12 @@
       </form>
       <div class="flex gap-2">
         <a href="/catalogo.html" class="px-3 py-2 border rounded">Volver al catálogo</a>
-        <button id="finalize" class="px-4 py-2 rounded bg-rose-600 text-white">Enviar por WhatsApp</button>
+        <!-- Importante: <a> en vez de <button> para que la navegación a WhatsApp sea inmediata -->
+        <a id="waSend"
+           role="button"
+           class="px-4 py-2 rounded bg-rose-600 text-white hover:bg-rose-700"
+           href="#"
+           target="_self">Enviar por WhatsApp</a>
       </div>
     </section>
 
@@ -78,10 +83,12 @@
   </main>
 
   <script>
-    // Reutilizar helpers básicos del catálogo (pequeña versión)
-    const WA_PHONE="593995315716";
-    const FORM_ID="1FAIpQLSfsSxhFoBs9Xkv5MmYjTwr98zTSR6IefJ-vm2p9FSUOMSs69g";
+    // Config
+    const WA_PHONE = "593995315716"; // E.164 sin '+'
+    const FORM_ID = "1FAIpQLSfsSxhFoBs9Xkv5MmYjTwr98zTSR6IefJ-vm2p9FSUOMSs69g";
     const ENTRY_PAYMETHOD="entry.1704422038",ENTRY_NAME="entry.1205890323",ENTRY_ADDRESS="entry.1074248946",ENTRY_PHONE="entry.646283436",ENTRY_CART="entry.1875788310",ENTRY_TOTAL="entry.624785838",ENTRY_SOURCE="entry.1894560572";
+
+    // Utils
     function money(n){const x=Number(n);return (Number.isFinite(x)&&x>=0)?('$'+x.toFixed(2)):'Consultar';}
     function normalizeEcPhone(raw){const d=String(raw||'').replace(/\D+/g,'');if(d.startsWith('593'))return'593'+d.slice(3,12);if(d.startsWith('09'))return'0'+d.slice(1,10);if(d.startsWith('9'))return'0'+d.slice(0,9);return d.slice(0,10);}
     function isValidEcPhone(raw){const n=normalizeEcPhone(raw);return /^0?9\d{8}$/.test(n)||/^5939\d{8}$/.test(n);}
@@ -127,21 +134,33 @@
       lines.push(''); lines.push(`Subtotal: $${sub}`); lines.push('Envío: por confirmar (Quito/Valles)'); lines.push(`Total Estimado : $${sub}`); lines.push(''); lines.push('Por favor comparte tu ubicación (pin) en este chat. ¡Gracias! 🐾');
       return lines.join('\n');
     }
-    function sendToGoogleForms(buyer){
-      if(!FORM_ID) return Promise.resolve();
+
+    // Envío a Google Forms en segundo plano (iOS-friendly)
+    function sendToGoogleFormsBeacon(buyer){
+      if(!FORM_ID) return;
       const endpoint=`https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
-      const payload=new URLSearchParams(); const sub=subtotal().toFixed(2);
-      if(ENTRY_NAME) payload.append(ENTRY_NAME, buyer.name);
-      if(ENTRY_ADDRESS) payload.append(ENTRY_ADDRESS, buyer.address);
-      if(ENTRY_PHONE) payload.append(ENTRY_PHONE, buyer.phone);
-      if(ENTRY_PAYMETHOD) payload.append(ENTRY_PAYMETHOD, buyer.pay);
-      if(ENTRY_TOTAL) payload.append(ENTRY_TOTAL, sub);
-      if(ENTRY_CART) payload.append(ENTRY_CART, localStorage.getItem('amicart')||'[]');
-      if(ENTRY_SOURCE) payload.append(ENTRY_SOURCE, 'site-amicotti');
-      return fetch(endpoint,{method:'POST',mode:'no-cors',body:payload}).catch(()=>{});
+      const params=new URLSearchParams();
+      const sub = subtotal().toFixed(2);
+      if(ENTRY_NAME) params.append(ENTRY_NAME, buyer.name);
+      if(ENTRY_ADDRESS) params.append(ENTRY_ADDRESS, buyer.address);
+      if(ENTRY_PHONE) params.append(ENTRY_PHONE, buyer.phone);
+      if(ENTRY_PAYMETHOD) params.append(ENTRY_PAYMETHOD, buyer.pay);
+      if(ENTRY_TOTAL) params.append(ENTRY_TOTAL, sub);
+      if(ENTRY_CART) params.append(ENTRY_CART, localStorage.getItem('amicart')||'[]');
+      if(ENTRY_SOURCE) params.append(ENTRY_SOURCE, 'site-amicotti');
+
+      try{
+        if (navigator.sendBeacon) {
+          const blob = new Blob([params.toString()], { type: 'application/x-www-form-urlencoded;charset=UTF-8' });
+          navigator.sendBeacon(endpoint, blob);
+        } else {
+          // Respaldo: fetch "fire-and-forget"
+          fetch(endpoint,{method:'POST',body:params,keepalive:true,mode:'no-cors'}).catch(()=>{});
+        }
+      } catch(_) {}
     }
 
-    // eventos
+    // Eventos de ayuda de teléfono
     const phoneInput=document.getElementById('phone'); const phoneHelp=document.getElementById('phone_help');
     phoneInput.addEventListener('input',()=>{
       const pos=phoneInput.selectionStart; const pretty=prettyEcPhone(phoneInput.value);
@@ -151,7 +170,8 @@
       try{ phoneInput.setSelectionRange(pos,pos); }catch(e){}
     });
 
-    document.getElementById('finalize').addEventListener('click', async ()=>{
+    // Handler principal (sin await, sin window.open)
+    document.getElementById('waSend').addEventListener('click', function () {
       const name=document.getElementById('name').value.trim();
       const address=document.getElementById('address').value.trim();
       const phone=document.getElementById('phone').value.trim();
@@ -165,16 +185,20 @@
 
       const buyer={name, address, phone:prettyEcPhone(phone), pay};
       localStorage.setItem('amicotti_buyer', JSON.stringify(buyer));
-      await sendToGoogleForms(buyer);
 
-      const text=encodeURIComponent(buildWAMessage(buyer));
-      const url=`https://wa.me/${WA_PHONE}?text=${text}`;
-      window.open(url,'_blank','noopener');
+      // 1) Dispara guardado en segundo plano (no bloquea la navegación)
+      sendToGoogleFormsBeacon(buyer);
 
-      // limpiar carrito
+      // 2) Prepara mensaje y limpia carrito ANTES de salir
+      const text = encodeURIComponent(buildWAMessage(buyer));
+      const waUrl = `https://api.whatsapp.com/send?phone=${WA_PHONE}&text=${text}`;
       localStorage.setItem('amicart','[]');
-      location.href = '/catalogo.html';
-    });
+
+      // 3) Navega a WhatsApp en la MISMA pestaña (gesto de usuario – iOS ok)
+      this.href = waUrl;
+      this.target = '_self';
+      // No preventDefault, no window.open
+    }, { passive: true });
 
     // init
     drawSummary(); prefill();
