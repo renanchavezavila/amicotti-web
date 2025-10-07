@@ -351,6 +351,9 @@
         flo.addEventListener('click', () => window.gtag('event','wa_click',{source:'home', placement:'float'}));
       }
     }
+    
+    setWATop();
+    setSocialLinks();
 
     // Asegura que PROMOS_HOME esté disponible y luego renderiza
     function afterReady(){
