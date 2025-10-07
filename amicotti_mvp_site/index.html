@@ -438,14 +438,14 @@
   }
 
   // ---------- Correo (EmailJS) ----------
-  const EMAILJS_PUBLIC_KEY  = "PLACEHOLDER_PUBLIC_KEY";
-  const EMAILJS_SERVICE_ID  = "PLACEHOLDER_SERVICE_ID";
-  const EMAILJS_TEMPLATE_ID = "PLACEHOLDER_TEMPLATE_ID";
+ const EMAILJS_PUBLIC_KEY  = "5yJPwhQjaay9VLqIR";   // Account → API Keys
+const EMAILJS_SERVICE_ID  = "service_wqxnv95";      // tu Service ID
+const EMAILJS_TEMPLATE_ID = "template_zfgs1fm";      // tu Template ID
 
-  // Init EmailJS
-  if (window.emailjs) {
-    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-  }
+if (window.emailjs) {
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+}
+
 
   function showToast(msg){
     const t = document.getElementById('toast');
