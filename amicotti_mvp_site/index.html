@@ -277,7 +277,33 @@
   // Utils
   const safe  = (img) => { img.onerror = null; img.src = "assets/logo.png"; };
   const fmtUSD = n => (typeof n === "number") ? n.toLocaleString("en-US",{style:"currency", currency:"USD"}) : "";
+  // --- Social profiles (edita tus URLs oficiales) ---
+  const IG_URL = "https://www.instagram.com/amicotti.ec";  // TODO: cambia al handle real
+  const FB_URL = "https://www.facebook.com/amicotti.ec";    // TODO: cambia a tu página real
 
+  function setSocialLinks(){
+    const pairs = [
+      ["ig1", IG_URL], ["fb1", FB_URL],
+      ["ig2", IG_URL], ["fb2", FB_URL],
+      ["igBtn", IG_URL], ["fbBtn", FB_URL], // header (opcional)
+    ];
+    pairs.forEach(([id, url]) => {
+      const el = document.getElementById(id);
+      if (el && url){
+        el.href = url;
+        if (!el.textContent.trim()) {
+          el.textContent = url.includes("instagram") ? "Instagram" : "Facebook";
+        }
+      }
+    });
+  }
+
+  function setWATop(){
+    const top = document.getElementById("waTop");
+    if (top) top.href = waLink('wa_top');
+  }
+
+  
   // --- RENDER PROMOS (restaurado) ---
   function renderPromos(){
     const wrap = document.getElementById("promoGrid");
