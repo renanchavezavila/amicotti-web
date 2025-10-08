@@ -455,6 +455,32 @@ if (window.emailjs) {
     t.classList.remove('hidden');
     setTimeout(()=> t.classList.add('hidden'), 3200);
   }
+<script>
+// ... deja arriba lo que ya tienes ...
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  const m = document.getElementById('toastMsg');
+  if (!t || !m) return;
+  m.textContent = msg;
+  t.classList.remove('hidden');
+  setTimeout(()=> t.classList.add('hidden'), 3200);
+}
+
+/* ✅ PLAN B: abre el cliente de correo del usuario con todo pre-llenado */
+function fallbackMailto(payload){
+  const to = "amicotti.uio@gmail.com"; // tu destino
+  const subj = `[Amicotti] ${payload.type} — ${payload.subject || '(sin asunto)'} (${payload.name})`;
+  const body =
+    `Nombre: ${payload.name}\n` +
+    `Email: ${payload.email}\n` +
+    `Motivo: ${payload.type}\n` +
+    `Nº de pedido: ${payload.order || '-'}\n\n` +
+    `Mensaje:\n${payload.message}\n\n` +
+    `---\nPágina: ${payload.page_url}\nFecha/Hora: ${payload.timestamp}`;
+  window.location.href = `mailto:${to}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+}
+</script>
 
   function openEmailModal(){
     const modal = document.getElementById('emailModal');
