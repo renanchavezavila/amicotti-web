@@ -455,32 +455,6 @@ if (window.emailjs) {
     t.classList.remove('hidden');
     setTimeout(()=> t.classList.add('hidden'), 3200);
   }
-<script>
-// ... deja arriba lo que ya tienes ...
-
-function showToast(msg){
-  const t = document.getElementById('toast');
-  const m = document.getElementById('toastMsg');
-  if (!t || !m) return;
-  m.textContent = msg;
-  t.classList.remove('hidden');
-  setTimeout(()=> t.classList.add('hidden'), 3200);
-}
-
-/* ✅ PLAN B: abre el cliente de correo del usuario con todo pre-llenado */
-function fallbackMailto(payload){
-  const to = "amicotti.uio@gmail.com"; // tu destino
-  const subj = `[Amicotti] ${payload.type} — ${payload.subject || '(sin asunto)'} (${payload.name})`;
-  const body =
-    `Nombre: ${payload.name}\n` +
-    `Email: ${payload.email}\n` +
-    `Motivo: ${payload.type}\n` +
-    `Nº de pedido: ${payload.order || '-'}\n\n` +
-    `Mensaje:\n${payload.message}\n\n` +
-    `---\nPágina: ${payload.page_url}\nFecha/Hora: ${payload.timestamp}`;
-  window.location.href = `mailto:${to}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
-}
-</script>
 
   function openEmailModal(){
     const modal = document.getElementById('emailModal');
@@ -522,84 +496,62 @@ function fallbackMailto(payload){
     }
 
     // Envío
-   <script>
-function wireEmailModal(){
-  // Abrir/cerrar (déjalo como ya lo tienes) ...
+    const form = document.getElementById('emailForm');
+    const state = document.getElementById('em_state');
+    const btn   = document.getElementById('em_submit');
 
-  const form = document.getElementById('emailForm');
-  const state = document.getElementById('em_state');
-  const btn   = document.getElementById('em_submit');
+    if (form && btn) {
+      form.addEventListener('submit', async (e)=>{
+        e.preventDefault();
+        if (!window.emailjs) {
+          showToast('No se pudo inicializar el envío de correo.');
+          return;
+        }
 
-  if (form && btn) {
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
+        // Validación simple
+        const payload = {
+          name:    form.name.value.trim(),
+          email:   form.email.value.trim(),
+          subject: form.subject.value.trim(),
+          type:    form.type.value,
+          order:   form.order.value.trim(),
+          message: form.message.value.trim(),
+          page_url: window.location.href,
+          timestamp: new Date().toISOString()
+        };
 
-      // Arma el payload
-      const payload = {
-        name:    form.name.value.trim(),
-        email:   form.email.value.trim(),
-        subject: form.subject.value.trim(),
-        type:    form.type.value,
-        order:   form.order.value.trim(),
-        message: form.message.value.trim(),
-        page_url: window.location.href,
-        timestamp: new Date().toISOString()
-      };
+        if (!payload.name || !payload.email || !payload.subject || !payload.type || !payload.message) {
+          showToast('Completa los campos requeridos (*)');
+          return;
+        }
 
-      // Validación simple
-      if (!payload.name || !payload.email || !payload.subject || !payload.type || !payload.message) {
-        showToast('Completa los campos requeridos (*)');
-        return;
-      }
+        // Estado de envío
+        btn.disabled = true;
+        btn.textContent = 'Enviando…';
+        state?.classList.remove('hidden');
+        if (state) state.textContent = 'Enviando tu mensaje, por favor espera…';
 
-      // Estado de envío
-      btn.disabled = true;
-      btn.textContent = 'Enviando…';
-      state?.classList.remove('hidden');
-      if (state) state.textContent = 'Enviando tu mensaje, por favor espera…';
+        try {
+          const res = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, payload);
+          // Opcional: gtag
+          if (window.gtag) window.gtag('event','email_sent',{source:'home', status:'ok'});
 
-      // Si EmailJS no está disponible, vamos directo a plan B
-      if (!window.emailjs) {
-        fallbackMailto(payload);
-        showToast('No pudimos enviar desde este dominio. Abrí tu correo 💌');
-        btn.disabled = false;
-        btn.textContent = 'Enviar correo';
-        state?.classList.add('hidden');
-        return;
-      }
-
-      try {
-        const res = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, payload);
-        if (window.gtag) window.gtag('event','email_sent',{source:'home', status:'ok'});
-
-        showToast('¡Mensaje enviado! Te responderemos pronto.');
-        form.reset();
-        // cierra el modal si lo deseas:
-        document.querySelector('[data-close-email]')?.click();
-      } catch (err) {
-        if (window.gtag) window.gtag('event','email_sent',{source:'home', status:'error'});
-        console.error(err);
-
-        // Detecta error típico de dominio/origen no permitido
-        const msg = (err && (err.text || err.message)) ? String(err.text || err.message).toLowerCase() : '';
-        const originBlocked = msg.includes('origin') || msg.includes('domain') || msg.includes('permission') || msg.includes('not allowed') || msg.includes('unauthorized');
-
-        if (originBlocked) {
-          fallbackMailto(payload);
-          showToast('No pudimos enviar desde este dominio. Abrí tu correo 💌');
-        } else {
+          showToast('¡Mensaje enviado! Te responderemos pronto.');
+          form.reset();
+          closeEmailModal();
+        } catch (err) {
+          if (window.gtag) window.gtag('event','email_sent',{source:'home', status:'error'});
+          console.error(err);
           showToast('No se pudo enviar. Intenta más tarde o usa WhatsApp.');
           state && (state.textContent = 'Error al enviar. Intenta más tarde.');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Enviar correo';
+          state?.classList.add('hidden');
         }
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Enviar correo';
-        state?.classList.add('hidden');
-      }
-    });
+      });
+    }
   }
-}
-</script>
 
   // --- Init ---
   (function(){
