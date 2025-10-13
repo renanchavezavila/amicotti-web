@@ -301,6 +301,70 @@
   }
 
   /* ================ CSV / PRODUCTOS ================ */
+  // =========================
+// PATCH 1: Helpers CSV + precio
+// =========================
+function parseCsv(url){
+  return new Promise((resolve) => {
+    Papa.parse(url, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (r)=> resolve(r.data)
+    });
+  });
+}
+function toPrice(x){
+  if (x == null) return null;
+  const s = String(x).replace(/US?\$|USD|\s/gi,'').replace(',', '.');
+  const n = parseFloat(s.replace(/[^0-9.]/g,''));
+  return Number.isFinite(n) ? n : null;
+}
+// =========================
+// PATCH 2: Transform Ferplast CSV -> objeto de catálogo
+// =========================
+// Espera columnas: id, brand, name, species, category, variants, image_url
+function transformFerplast(rows){
+  return rows.map(r => {
+    const id = (r.id || r.name || '').trim();
+
+    // especie: 'cat dog' | 'cat' | 'dog' -> 'Gato' | 'Perro' | ''
+    let especie = '';
+    const sp = String(r.species || '').toLowerCase();
+    if (sp.includes('cat') && !sp.includes('dog')) especie = 'Gato';
+    else if (sp.includes('dog') && !sp.includes('cat')) especie = 'Perro';
+
+    // variants: "Small:$7.90|Medium:$11.90|Large:$14.90"
+    const variants = String(r.variants || '')
+      .split('|').map(s => s.trim()).filter(Boolean)
+      .map(v => {
+        if (v.includes(':')){
+          const [label, price] = v.split(':');
+          return { label: (label||'').trim(), price: toPrice(price) };
+        }
+        return { label: null, price: toPrice(v) };
+      });
+
+    // imagen: usa image_url si hay; si no, genera ruta por id
+    const img = (r.image_url && r.image_url.trim())
+      ? r.image_url.trim()
+      : `assets/products/ferplast/${id}.webp`;
+
+    return {
+      id: id,                                // ⚠️ tu UI lo usa en SELECTED y onChangeVariant
+      sku: (id || '').toUpperCase(),
+      marca: 'Ferplast',
+      nombre: (r.name || '').trim(),
+      especie: especie,                      // 'Gato' | 'Perro' | ''
+      categoria: (r.category || 'Accesorios').trim(),
+      linea: 'Accesorios',
+      precio: variants.length ? null : toPrice(r.variants),
+      variants: variants,                    // [{label, price}, ...]
+      img: img
+    };
+  });
+}
+  
   async function loadCSVs(){
     const loads = CSV_URLS.map(url => new Promise((resolve,reject)=>{
       Papa.parse(url,{download:true,header:true,skipEmptyLines:true,complete:r=>resolve(r.data),error:reject});
