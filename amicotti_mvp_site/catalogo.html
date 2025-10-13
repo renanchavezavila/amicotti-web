@@ -300,116 +300,145 @@ function buildImgCandidates(p){
 }
 </script>
 
-  /* ================ CSV / PRODUCTOS ================ */
-
-  // PATCH 1: Helpers CSV + precio
-  function parseCsv(url){
-    return new Promise((resolve) => {
-      Papa.parse(url, {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: (r)=> resolve(r.data)
-      });
+<script>
+// =========================
+// PATCH CSV A: helpers de carga y precios
+// =========================
+async function parseCsv(url){
+  return new Promise((resolve, reject) => {
+    Papa.parse(url, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: r => resolve(r.data),
+      error: err => reject(err)
     });
-  }
-  function toPrice(x){
-    if (x == null) return null;
-    const s = String(x).replace(/US?\$|USD|\s/gi,'').replace(',', '.');
-    const n = parseFloat(s.replace(/[^0-9.]/g,''));
-    return Number.isFinite(n) ? n : null;
-  }
+  });
+}
+function toPrice(x){
+  if (x == null) return null;
+  const s = String(x).replace(/US?\$|USD|\s/gi,'').replace(',', '.');
+  const n = parseFloat(s.replace(/[^0-9.]/g,''));
+  return Number.isFinite(n) ? n : null;
+}
 
-  // PATCH 2: Transform Ferplast CSV -> objeto de catálogo
-  // Espera columnas: id, brand, name, species, category, variants, image_url
-  function transformFerplast(rows){
-    return rows.map(r => {
-      const id = (r.id || r.name || '').trim();
+// =========================
+// PATCH CSV B: transformador Ferplast
+// Espera columnas: id, brand, name, species, category, variants, image_url
+// =========================
+function transformFerplast(rows){
+  return rows.map(r => {
+    const id = (r.id || r.name || '').trim();
 
-      // especie: 'cat dog' | 'cat' | 'dog' -> 'Gato' | 'Perro' | ''
-      let especie = '';
-      const sp = String(r.species || '').toLowerCase();
+    // especie: 'cat dog' | 'cat' | 'dog' -> 'Gato' | 'Perro' | ''
+    let especie = '';
+    const sp = String(r.species || '').toLowerCase();
+    if (sp.includes('cat') && !sp.includes('dog')) especie = 'Gato';
+    else if (sp.includes('dog') && !sp.includes('cat')) especie = 'Perro';
+
+    // variants: "Small:$7.90|Medium:$11.90|Large:$14.90"
+    const variants = String(r.variants || '')
+      .split('|').map(s => s.trim()).filter(Boolean)
+      .map(v => {
+        if (v.includes(':')){
+          const [label, price] = v.split(':');
+          return { label: (label||'').trim(), price: toPrice(price) };
+        }
+        return { label: (v||'').trim(), price: toPrice(v) };
+      });
+
+    // imagen
+    const img = (r.image_url && r.image_url.trim())
+      ? r.image_url.trim()
+      : `assets/ferplast/${id}.webp`;
+
+    return {
+      id,
+      sku: (id || '').toUpperCase(),
+      marca: 'Ferplast',
+      nombre: (r.name || '').trim(),
+      especie,
+      categoria: (r.category || 'Accesorios').trim(),
+      linea: 'Accesorios',
+      precio: variants.length ? null : toPrice(r.variants),
+      variants,
+      imagen_url: img
+    };
+  });
+}
+
+// =========================
+// PATCH CSV C: detección de carpeta /data (local) con fallback a GitHub Raw
+// (deja el fallback: te permite probar aunque el hosting no sirva /data)
+// =========================
+async function findCsvBase(){
+  const gh = "https://raw.githubusercontent.com/renanchavezavila/amicotti-web/main/amicotti_mvp_site/data/";
+  const candidates = [
+    "data/",
+    "/data/",
+    "amicotti_mvp_site/data/",
+    "/amicotti_mvp_site/data/",
+    gh
+  ];
+  for (const b of candidates){
+    try {
+      const res = await fetch(b + "royal.csv", { cache: "no-store" });
+      if (res.ok) return b;
+    } catch(e){}
+  }
+  throw new Error("No se encontró la carpeta /data con royal.csv");
+}
+
+// =========================
+// PATCH CSV D: carga total de catálogos (Royal, Purina, Ferplast)
+// Unifica al formato que tu UI espera
+// =========================
+async function loadCSVs(){
+  const base = await findCsvBase();
+  console.log('[catalog] CSV base ->', base);
+
+  const [royalCSV, purinaCSV, ferplastCSV] = await Promise.all([
+    parseCsv(base + 'royal.csv'),
+    parseCsv(base + 'purina.csv'),
+    parseCsv(base + 'ferplast.csv'),
+  ]);
+
+  // Si ya tienes transformadores propios para royal/purina, se usarán;
+  // si no, pasarán tal cual y se normalizan abajo.
+  const royal    = (window.transformRoyal  ? window.transformRoyal(royalCSV)   : royalCSV);
+  const purina   = (window.transformPurina ? window.transformPurina(purinaCSV) : purinaCSV);
+  const ferplast = transformFerplast(ferplastCSV);
+
+  // Normalización a las claves que usa la UI
+  window.PRODUCTS = [...royal, ...purina, ...ferplast].map(p => {
+    // mapear especie si viene como 'cat'/'dog'
+    let especie = p.especie || '';
+    if(!especie && p.species){
+      const sp = String(p.species).toLowerCase();
       if (sp.includes('cat') && !sp.includes('dog')) especie = 'Gato';
       else if (sp.includes('dog') && !sp.includes('cat')) especie = 'Perro';
-
-      // variants: "Small:$7.90|Medium:$11.90|Large:$14.90"
-      const variants = String(r.variants || '')
-        .split('|').map(s => s.trim()).filter(Boolean)
-        .map(v => {
-          if (v.includes(':')){
-            const [label, price] = v.split(':');
-            return { label: (label||'').trim(), price: toPrice(price) };
-          }
-          return { label: null, price: toPrice(v) };
-        });
-
-      // imagen: usa image_url si hay; si no, genera ruta por id
-      const img = (r.image_url && r.image_url.trim())
-        ? r.image_url.trim()
-        : `assets/products/ferplast/${id}.webp`;
-
-      return {
-        id: id,                                // ⚠️ usado por SELECTED y render
-        sku: (id || '').toUpperCase(),
-        marca: 'Ferplast',
-        nombre: (r.name || '').trim(),
-        especie: especie,                      // 'Gato' | 'Perro' | ''
-        categoria: (r.category || 'Accesorios').trim(),
-        linea: 'Accesorios',
-        precio: variants.length ? null : toPrice(r.variants),
-        variants: variants,                    // [{label, price}, ...]
-        img: img
-      };
-    });
-  }
-
-  // Detección de carpeta /data en producción o subcarpeta
-  async function findCsvBase(){
-    const candidates = [
-      'data/', '/data/',
-      'amicotti_mvp_site/data/', '/amicotti_mvp_site/data/'
-    ];
-    for (const b of candidates){
-      try {
-        const res = await fetch(b + 'royal.csv', { cache: 'no-store' });
-        if (res.ok) return b;
-      } catch (e) {}
     }
-    throw new Error('No se encontró la carpeta /data con royal.csv');
-  }
-
-  // PATCH 3: Carga CSVs y normaliza al arreglo global PRODUCTS
-  async function loadCSVs(){
-    const base = await findCsvBase();
-    console.log('[catalog] CSV base ->', base);
-
-    // 1) Leer CSVs
-    const [royalCSV, purinaCSV, ferplastCSV] = await Promise.all([
-      parseCsv(base + 'royal.csv'),
-      parseCsv(base + 'purina.csv'),
-      parseCsv(base + 'ferplast.csv'),
-    ]);
-    console.log('[catalog] loaded rows =', { royal: royalCSV.length, purina: purinaCSV.length, ferplast: ferplastCSV.length });
-
-    // 2) Transformar (si tienes transformadores de royal/purina, se respetan)
-    const royal    = (window.transformRoyal  ? window.transformRoyal(royalCSV)   : royalCSV);
-    const purina   = (window.transformPurina ? window.transformPurina(purinaCSV) : purinaCSV);
-    const ferplast = transformFerplast(ferplastCSV);
-
-    // 3) Unificar y normalizar claves que la UI espera
-    window.PRODUCTS = [...royal, ...purina, ...ferplast].map(p => ({
-      id: p.id || p.sku || (p.nombre||'').toLowerCase().replace(/[^a-z0-9]+/g,'-'),
+    return {
+      id: p.id || p.sku || (p.nombre||p.name||'').toLowerCase().replace(/[^a-z0-9]+/g,'-'),
       marca: p.marca || p.brand || '',
       nombre: p.nombre || p.name || '',
-      especie: p.especie || '',
+      especie,
       categoria: p.categoria || p.category || '',
       linea: p.linea || p.line || '',
       sku: p.sku || '',
-      precio: (typeof p.precio === 'number') ? p.precio : (p.precio ? toPrice(p.precio) : null),
-      variants: Array.isArray(p.variants) ? p.variants : [],
-      img: p.img || p.img1 || p.image_url || ''
-    }));
-  }
+      precio: (typeof p.precio === 'number') ? p.precio :
+              (p.precio ? toPrice(p.precio) : null),
+      variants: Array.isArray(p.variants) ? p.variants :
+                (p.variants ? parseVariants(p.variants) : []),
+      imagen_url: p.img || p.imagen_url || p.image_url || ''
+    };
+  });
+
+  console.log('[catalog] loaded rows =',
+    { royal: royalCSV.length, purina: purinaCSV.length, ferplast: ferplastCSV.length });
+}
+</script>
+
 
   /* ================ FILTROS + RENDER ================ */
   const grid = document.getElementById('grid');
