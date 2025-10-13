@@ -282,28 +282,23 @@
   }
 
   /* ================ IMG FALLBACK ================ */
-  const swapExt = (url,ext)=>{ const i=url.lastIndexOf('.'); return i<0? url+ext : url.slice(0,i)+ext; };
-  function buildImgCandidates(p){
-    const cands = [];
-    // 1) si viene 'img' o 'imagen_url' en el producto (Ferplast usa 'img'):
-    if (p.img){ cands.push(p.img, ...IMG_EXTS.map(e=>swapExt(p.img,e))); }
-    if (p.imagen_url){ cands.push(p.imagen_url, ...IMG_EXTS.map(e=>swapExt(p.imagen_url,e))); }
-    // 2) por marca (royal/purina) o genérico
-    const brand=(p.marca||'').toLowerCase();
-    const base = brand.includes('royal') ? 'assets/royal/' :
-                 brand.includes('purina') ? 'assets/purina/' :
-                 brand.includes('ferplast') ? 'assets/products/ferplast/' :
-                 'assets/catalog/';
-    cands.push(...IMG_EXTS.map(ext => `${base}${p.id}${ext}`));
-    // 3) fallback final
-    cands.push('assets/logo.png');
-    // quitar duplicados
-    return cands.filter((v,i,a)=> v && a.indexOf(v)===i);
+ <script>
+// ============ PATCH IMG: base por marca (agrega Ferplast) ============
+const swapExt = (url,ext)=>{ const i=url.lastIndexOf('.'); return i<0? url+ext : url.slice(0,i)+ext; };
+function buildImgCandidates(p){
+  const brand=(p.marca||'').toLowerCase();
+  if(p.imagen_url && p.imagen_url.trim()){
+    const first=p.imagen_url.trim(); const alts=[".webp",".jpg",".jpeg",".png",".avif"].map(e=>swapExt(first,e));
+    return [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
   }
-  function onImgError(el){
-    const rest=(el.dataset.alt||"").split("|").filter(Boolean);
-    if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); } else { el.onerror=null; el.src="assets/logo.png"; }
-  }
+  const base =
+    brand.includes('royal')    ? 'assets/royal/'    :
+    brand.includes('purina')   ? 'assets/purina/'   :
+    brand.includes('ferplast') ? 'assets/ferplast/' :
+                                 'assets/catalog/';
+  return [".webp",".jpg",".jpeg",".png",".avif"].map(ext => `${base}${p.id}${ext}`);
+}
+</script>
 
   /* ================ CSV / PRODUCTOS ================ */
 
