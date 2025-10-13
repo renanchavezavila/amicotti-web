@@ -365,11 +365,18 @@ function transformFerplast(rows){
   });
 }
   
+<script>
 // =========================
 // PATCH 3: Carga CSVs y normaliza al arreglo global PRODUCTS
 // =========================
 async function loadCSVs(){
-  const base = '/amicotti_mvp_site/data/';
+  // Usa data/ relativo al sitio en producción; si abres el HTML desde una subcarpeta,
+  // esta heurística sigue funcionando.
+  const base = (location.pathname.includes('/amicotti_mvp_site/'))
+    ? '/amicotti_mvp_site/data/'
+    : 'data/';
+
+  console.log('CSV base:', base);
 
   // 1) Leer CSVs
   const [royalCSV, purinaCSV, ferplastCSV] = await Promise.all([
@@ -378,7 +385,7 @@ async function loadCSVs(){
     parseCsv(base + 'ferplast.csv'),
   ]);
 
-  // 2) Transformar (si ya tienes transformadores para royal/purina, se respetan)
+  // 2) Transformar
   const royal    = (window.transformRoyal  ? window.transformRoyal(royalCSV)   : royalCSV);
   const purina   = (window.transformPurina ? window.transformPurina(purinaCSV) : purinaCSV);
   const ferplast = transformFerplast(ferplastCSV);
@@ -397,6 +404,7 @@ async function loadCSVs(){
     img: p.img || p.img1 || p.image_url || ''
   }));
 }
+</script>
 
 
   /* ================ FILTROS + RENDER ================ */
