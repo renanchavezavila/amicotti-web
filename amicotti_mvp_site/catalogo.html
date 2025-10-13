@@ -4,11 +4,11 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Amicotti — Catálogo</title>
-  <meta name="description" content="Catálogo de alimentos para mascotas. Entrega en Quito y Valles. Compra por WhatsApp." />
+  <meta name="description" content="Catálogo de alimentos y accesorios para mascotas. Entrega en Quito y Valles. Compra por WhatsApp." />
   <link rel="icon" href="assets/logo.png" />
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PapaParse -->
+  <!-- PapaParse (usamos en modo no-download; parseamos texto de fetch) -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
@@ -166,7 +166,14 @@
   <script>
   /* ================ CONFIG ================ */
   const WA_PHONE = "593995315716";
-  const CSV_URLS = ["data/purina.csv","data/royal.csv"];
+
+  /* CSVs con rutas alternativas por si cambian de carpeta */
+  const CSV_SOURCES = [
+    { name: "purina",    paths: ["data/purina.csv","assets/data/purina.csv","assets/purina.csv","purina.csv"] },
+    { name: "royal",     paths: ["data/royal.csv", "assets/data/royal.csv", "assets/royal.csv", "royal.csv"] },
+    { name: "ferplast",  paths: ["data/ferplast.csv","assets/data/ferplast.csv","assets/ferplast.csv","ferplast.csv"] }
+  ];
+
   const IMG_EXTS = [".webp",".jpg",".jpeg",".png",".avif"];
 
   /* Google Forms (se usan en checkout, aquí no bloquean) */
@@ -221,6 +228,7 @@
     }).filter(Boolean);
   }
   const unique = (arr,key)=>[...new Set(arr.map(o => (o[key]||'').trim()).filter(Boolean))].sort();
+  const cap = s => (s||'').toString().trim().replace(/\s+/g,' ').toLowerCase().replace(/^\w/, c=>c.toUpperCase());
 
   /* ================ WHATSAPP ================ */
   function setWALinks(){
@@ -292,42 +300,109 @@
       const first=p.imagen_url.trim(); const alts=IMG_EXTS.map(e=>swapExt(first,e));
       return [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
     }
-    const base = brand.includes('royal') ? 'assets/royal/' : brand.includes('purina') ? 'assets/purina/' : 'assets/catalog/';
+    const base = brand.includes('royal') ? 'assets/royal/'
+             : brand.includes('purina') ? 'assets/purina/'
+             : brand.includes('ferplast') ? 'assets/ferplast/'
+             : 'assets/catalog/';
     return IMG_EXTS.map(ext => `${base}${p.id}${ext}`);
   }
   function onImgError(el){
     const rest=(el.dataset.alt||"").split("|").filter(Boolean);
-    if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); } else { el.onerror=null; el.src="assets/logo.png"; }
+    if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); }
+    else { el.onerror=null; el.src="assets/logo.png"; }
   }
 
   /* ================ CSV / PRODUCTOS ================ */
+
+  // Mapea especies Ferplast/brand-schema -> etiquetas visibles
+  function mapSpeciesBrand(spec){
+    const s = (spec||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
+    if(s==='cat') return 'Gato';
+    if(s==='dog') return 'Perro';
+    if(s==='cat dog' || s==='dog cat' || (s.includes('cat') && s.includes('dog'))) return 'Ambos';
+    if(!s) return 'Accesorios';
+    return cap(s); // fallback legible
+  }
+
+  // Mapea categorías (incluye alimentos + accesorios comunes)
+  function mapCategoryBrand(cat){
+    const c = (cat||'').toString().trim().toLowerCase();
+    const dict = {
+      dry:'Seco', wet:'Húmedo', veterinary:'Veterinario', treats:'Snack',
+      treat:'Snack', snacks:'Snack', snack:'Snack',
+      carrier:'Transportadoras', carriers:'Transportadoras',
+      bowl:'Platos', bowls:'Platos', feeder:'Bebederos', feeders:'Bebederos',
+      bed:'Camas', beds:'Camas',
+      toy:'Juguetes', toys:'Juguetes',
+      leash:'Correas', harness:'Arnés', harnesses:'Arnés',
+      litter:'Arena', grooming:'Cuidado', cleaning:'Limpieza',
+      cage:'Jaulas', cages:'Jaulas'
+    };
+    return dict[c] || (c ? cap(c) : '');
+  }
+
+  async function fetchCsvText(paths){
+    for(const url of paths){
+      try{
+        const resp = await fetch(url, {cache:'no-store'});
+        if(resp.ok){
+          const text = await resp.text();
+          // Evita parsear HTML por error 200 de algún hosting
+          if(!/^<!doctype\s+html/i.test(text.trim())){
+            return { url, text };
+          }
+        }
+      }catch(e){}
+    }
+    return null;
+  }
+
   async function loadCSVs(){
-    const loads = CSV_URLS.map(url => new Promise((resolve,reject)=>{
-      Papa.parse(url,{download:true,header:true,skipEmptyLines:true,complete:r=>resolve(r.data),error:reject});
-    }));
-    const arrays = await Promise.all(loads);
-    PRODUCTS = arrays.flat().map((r, idx)=>{
-      const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
-      if(hasBrandSchema){
-        const specie=(r.species||'').trim().toLowerCase();
-        const categoriaRaw=(r.category||'').trim().toLowerCase();
-        const especie = specie==='cat'?'Gato': specie==='dog'?'Perro':'';
-        const categoria = categoriaRaw==='dry'?'Seco': categoriaRaw==='wet'?'Húmedo': categoriaRaw==='veterinary'?'Veterinario': categoriaRaw==='treats'?'Snack':'';
-        const variants = parseVariants(r.variants||'');
-        const first = variants[0] || null;
-        return { id:r.id||('row'+idx), marca:(r.brand||'').toString().trim(), linea:'', especie, categoria,
-          nombre:(r.name||'').toString().trim(), peso_g:first?first.grams:null, sku:'', precio:first?first.price:null,
-          imagen_url:(r.image_url||'').toString().trim(), descripcion:'', disponible:true, variants };
-      }else{
-        const variants=parseVariants(r.variants||''); const first=variants[0]||null;
-        return { id:r.id||('row'+idx), marca:(r.marca||'').trim(), linea:(r.linea||'').trim(), especie:(r.especie||'').trim(),
-          categoria:(r.categoria||'').trim(), nombre:(r.nombre||'').trim(),
-          peso_g:r.peso_g?Number(r.peso_g):(first?first.grams:null), sku:(r.sku||'').trim(),
-          precio:(r.precio!=='' && r.precio!=null)?Number(r.precio):(first?first.price:null),
-          imagen_url:(r.imagen_url||'').trim(), descripcion:(r.descripcion||'').trim(),
-          disponible:String(r.disponible||'1')==='1', variants };
-      }
-    }).filter(p=>p.disponible);
+    const arrays = [];
+    for(const src of CSV_SOURCES){
+      const got = await fetchCsvText(src.paths);
+      if(!got) continue;
+      const parsed = Papa.parse(got.text, {header:true, skipEmptyLines:true});
+      const rows = parsed.data || [];
+
+      const normalized = rows.map((r, idx)=>{
+        const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
+        if(hasBrandSchema){
+          const especie = mapSpeciesBrand(r.species);
+          const categoria = mapCategoryBrand(r.category);
+          const variants = parseVariants(r.variants||'');
+          const first = variants[0] || null;
+          return {
+            id: (r.id||('row'+idx)).toString().trim(),
+            marca: (r.brand||src.name||'').toString().trim().replace(/\s+/g,' ').replace(/^\w/,c=>c.toUpperCase()),
+            linea:'', especie, categoria,
+            nombre:(r.name||'').toString().trim(),
+            peso_g:first?first.grams:null, sku:'', precio:first?first.price:null,
+            imagen_url:(r.image_url||'').toString().trim(), descripcion:'', disponible:true, variants
+          };
+        }else{
+          const variants=parseVariants(r.variants||''); const first=variants[0]||null;
+          return {
+            id:(r.id||('row'+idx)).toString().trim(),
+            marca:(r.marca||src.name||'').toString().trim(),
+            linea:(r.linea||'').toString().trim(),
+            especie:(r.especie||'').toString().trim(),
+            categoria:(r.categoria||'').toString().trim(),
+            nombre:(r.nombre||'').toString().trim(),
+            peso_g:r.peso_g?Number(r.peso_g):(first?first.grams:null),
+            sku:(r.sku||'').toString().trim(),
+            precio:(r.precio!=='' && r.precio!=null)?Number(r.precio):(first?first.price:null),
+            imagen_url:(r.imagen_url||'').toString().trim(),
+            descripcion:(r.descripcion||'').toString().trim(),
+            disponible:String(r.disponible||'1')==='1',
+            variants
+          };
+        }
+      }).filter(p=>p.disponible);
+
+      arrays.push(normalized);
+    }
+    PRODUCTS = arrays.flat();
   }
 
   /* ================ FILTROS + RENDER ================ */
@@ -350,12 +425,22 @@
 
   const urlParams = new URLSearchParams(location.search);
   const norm = v => (v||'').toString().trim().toLowerCase();
-  function mapEspecie(v){ v=norm(v); if(v==='cat'||v==='gato') return 'Gato'; if(v==='dog'||v==='perro') return 'Perro'; return ''; }
-  function mapCategoria(v){ v=norm(v);
+  function mapEspecie(v){
+    v=norm(v);
+    if(v==='cat'||v==='gato') return 'Gato';
+    if(v==='dog'||v==='perro') return 'Perro';
+    if(v==='ambos'||v==='both') return 'Ambos';
+    if(v==='accesorios'||v==='accesorio') return 'Accesorios';
+    return '';
+  }
+  function mapCategoria(v){
+    v=norm(v);
     if(v==='dry'||v==='seco') return 'Seco';
     if(v==='wet'||v==='húmedo'||v==='humedo') return 'Húmedo';
     if(v==='veterinary'||v==='veterinario'||v==='vet') return 'Veterinario';
-    if(v==='snack'||v==='treats') return 'Snack'; return '';
+    if(v==='snack'||v==='treats'||v==='treat') return 'Snack';
+    if(v==='carrier') return 'Transportadoras';
+    return v ? cap(v) : '';
   }
 
   function updateURLFromFilters(){
@@ -366,7 +451,7 @@
     if(fSearch.value.trim()) params.set('q', fSearch.value.trim());
     if(fSort.value) params.set('orden', fSort.value);
     const qs=params.toString();
-    history.replaceState(null,'',window.location.pathname+(qs?('?'+qs):''));
+    history.replaceState(null,'',window.location.pathname+(qs?('?'+qs):'')); 
   }
   function fillSelect(sel, values){ sel.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
   function mirrorMobileFromDesktop(){ m_fMarca.value=fMarca.value; m_fEspecie.value=fEspecie.value; m_fCategoria.value=fCategoria.value; m_fSearch.value=fSearch.value; m_fSort.value=fSort.value; }
@@ -374,10 +459,17 @@
 
   function fillFilters(){
     const marcas=['Marca…', ...unique(PRODUCTS,'marca')];
+
+    // especies dinámicas (Gato/Perro/Ambos/Accesorios/otros) presentes en datos
+    const especiesSet = [...new Set(PRODUCTS.map(p=>p.especie).filter(Boolean))].sort();
+    const especies = ['Especie…', ...especiesSet];
+
     const cats=['Categoría…', ...unique(PRODUCTS,'categoria')];
-    fillSelect(fMarca,marcas); fillSelect(fEspecie,['Especie…','Gato','Perro']); fillSelect(fCategoria,cats);
-    fillSelect(m_fMarca,marcas); fillSelect(m_fEspecie,['Especie…','Gato','Perro']); fillSelect(m_fCategoria,cats);
+
+    fillSelect(fMarca,marcas); fillSelect(fEspecie,especies); fillSelect(fCategoria,cats);
+    fillSelect(m_fMarca,marcas); fillSelect(m_fEspecie,especies); fillSelect(m_fCategoria,cats);
   }
+
   function applyInitialFiltersFromURL(){
     const marcaParam=urlParams.get('marca'); if(marcaParam){ fMarca.value=marcaParam; }
     const espParam=urlParams.get('especie'); if(espParam){ fEspecie.value=mapEspecie(espParam); }
@@ -401,6 +493,7 @@
     }
     return out;
   }
+
   function onChangeVariant(pid, idx){
     SELECTED[pid]=Number(idx)||0;
     const p=PRODUCTS.find(x=>x.id===pid); if(!p) return;
@@ -408,10 +501,12 @@
     const priceEl=document.getElementById('price-'+pid);
     if(priceEl) priceEl.textContent = v ? money(v.price) : money(p.precio);
   }
+
   function cardHTML(p){
     const candidates=buildImgCandidates(p);
     const img=candidates[0], altList=candidates.slice(1).join("|");
-    const badgeVet = (p.categoria.toLowerCase()==='veterinario') ? `<span class='px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 rounded'>Veterinario</span>` : '';
+    const isVet = (p.categoria.toLowerCase()==='veterinario');
+    const badgeVet = isVet ? `<span class='px-2 py-0.5 text-[10px] bg-rose-100 text-rose-700 rounded'>Veterinario</span>` : '';
     const variantsSel = (p.variants && p.variants.length)
       ? `<label class="block text-xs text-gray-500 mt-2">Presentación</label>
          <select class="w-full border p-2 rounded text-sm" onchange="onChangeVariant('${p.id}', this.value)">
@@ -425,7 +520,8 @@
       </div>
       <div class='p-3 space-y-1'>
         <h3 class='font-medium leading-tight'>${p.nombre}</h3>
-        <p class='text-xs text-gray-500'>${p.marca} • ${p.linea || '—'} • ${p.especie} ${badgeVet}</p>
+        <p class='text-xs text-gray-500'>${p.marca} • ${p.linea || '—'} • ${p.especie}${badgeVet?(' '+badgeVet):''}</p>
+        <p class='text-[11px] text-gray-400'>${p.categoria||'—'}</p>
         ${variantsSel}
         <div class='flex items-center justify-between pt-2'>
           <strong id="price-${p.id}">${initialPrice}</strong>
@@ -434,6 +530,7 @@
       </div>
     </article>`;
   }
+
   function render(){
     const items=getFiltered();
     if(!items.length){ grid.innerHTML = `<div class='col-span-full p-6 text-center text-sm text-gray-500 border rounded'>No hay productos con esos filtros.</div>`; return; }
@@ -485,6 +582,8 @@
         alertBox.classList.remove('hidden');
         alertBox.textContent='No se cargaron productos. Revisa las rutas CSV.';
       }
+      // Normaliza mayúsculas de marca por estética
+      PRODUCTS = PRODUCTS.map(p => ({...p, marca: cap(p.marca)}));
       fillFilters(); applyInitialFiltersFromURL(); render();
       // prefill de buyer (no afecta aunque esté oculto):
       try{
