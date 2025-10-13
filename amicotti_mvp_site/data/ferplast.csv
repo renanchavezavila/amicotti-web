@@ -1,38 +1,38 @@
-id	brand	name	species	category	variants	image_url
-Atlas-5-transportino-puppy	ferplast	Atlas 5 Transportino Puppy	cat dog	carrier	28x25.5x42cm:$25.90	
-Carrier-atlas-20	ferplast	Carrier Atlas 20	cat dog	carrier	37x58x32cm:$29.90	
-Atlas-deluxe-10-open	ferplast	Atlas Deluxe 10 Open	cat dog	carrier	37x32x52cm:$65.90	
-carrier-atlas-10-trendy	ferplast	Carrier Atlas 10 Trendy	cat dog	carrier	34x30x48cm:$69.90	
-jet-10-transportino-plt	ferplast	Jet 10 Transportino PLT	cat dog	carrier	32x47x29cm:$24.90	
-Bowl-magnus-slow	ferplast	Comedero Anti Ansiedad	dog	bowl	Small:$7.90|Medium:$11.90|Large:$14.90	
-thea-small-bowl	ferplast	Thea Comedero Pequeño	dog	bowl	13x4.5cm:$13.90	
-clip-drinker	ferplast	Bebedero con clip	dog	bowl	large0.55Lt:$9.90|Small0.3Lt:$6.90	
-drinky-dog-abbeverato	ferplast	Bebedero Drinky para perros	dog		0.6Lt:$28.90	
-dudu-classic-bag-dispenser	ferplast	Soporte para bolsas higiènicas para perros 	dog	hygiene	$9.90	
-pa-6720-sachetti-x2	ferplast	Bolsas higiènicas de repuesto 	cat dog	hygiene	$3.50	
-gro-5939-small-brush	ferplast	Cepillo de dientes doble cara GRO 5939	cat dog	hygiene	$3.00	
-prima-toilette-decor	ferplast	Caja de Arena decorada paras gatos	cat	hygiene	39,5x52.5x38Oro:$57.90|39.5x52.5x38Rosa:$57.90	
-paletta-higienica	ferplast	Paleta higiènica	cat	hygiene	red:$3.90|blue:$3.90	
-gro-5790-cat-comb	ferplast	Cepillo para mascotas con dientes de plàstico GRO  5790	cat dog	Cuidado	$9.90	
-gro-5792-cat-comb	ferplast	Cepilo para mascotas de pelo largo GRO 5792 	cat	Cuidado	$13.90	
-gro-5799-cat-carder	ferplast	Cepillo para gato cuidado de pelaje GRO 5799	cat	Cuidado	$8.90	
-gro-5800-slicker-small-cat	ferplast	Cepillo pequeño para gatos GRO 5800 	cat	Cuidado	$9.90	
-gro-5929-spazzola-small	ferplast	Cepillo para mascotas grnade GRO 5929 	cat dog	Cuidado	$9.90	
-gro-5874-rake-rotating-teeth	ferplast	Cepillo con dientes giratorios GRO 5874 	cat dog	Cuidado	$13.9	
-dental-toy	ferplast	Juguete Dispensador de comida d	dog	Jueguetes	Small:$6.90|Medium:$13.00|Osso-medium:$6.90	
-soft-ball-small	ferplast	Pelota fabricada en goma Blanda	dog	Jueguetes	$3.50	
-fluorescent-ball	ferplast	Pelota fabricada en goma Blanda para jugar en las noches 	dog	Jueguetes	$5.90	
-ball-large	ferplast	Pelota fabricada en goma Rigida	dog	Jueguetes	$9.90	
-funny-faces	ferplast	Juguete de Vinilo Chirriante para perros	dog	Jueguetes	$5.50	
-zoo-toys	ferplast	Juguete para perros de latex	dog	Jueguetes	$15.00	
-rubb-bone-tire	ferplast	Juguete fabricado en algodón y goma resistente	dog	Jueguetes	$15.9	
-cat-whip	ferplast	Juguete Varita para gato hecho en plastico y lana sintetica  	cat	Jueguetes	PA 4998:$7.90|PA 5000:$5.90|PA 5002:$5.90	
-mouse-x2	ferplast	Juguete para gataos Mouse x 2 de poliester y plumas	cat	Jueguetes	$7.90	
-palla-cordino	ferplast	Pelota para gatos en goma blanda para jugar en las noches	cat	Jueguetes	$2.90	
-cat-plumed	ferplast	Juguete para gatos de latex con cascabel Cat plumed	cat	Jueguetes	$13.90	
-gat-5624-c10-31-collar	ferplast	Collar de gato	cat	collar	31x1cm(silver|gold):$7.90	
-ergofluo-collar	ferplast	Collar para perros con acolchado suave y cierre con microregulaciòn	dog	collar	C15/33:$16.90|C15/42:$17.00|C15/51:$21.00(pink|green|yellow)	
-ergofluo-lead	ferplast	Correa ergonòmicapara perros mango acolchado	dog	collar	G15mmx120cm:$17.90|G20mmx120cm:$18.50|G25mmx120cm:$19.90(pink|green|black)	
-ergofluo-matic-guinz	ferplast	Correa para perros completa con gancho automatico	dog	collar	15mmx120cm:$21.00|20mmx120cm:$23.00|25mmx120cm:$23.90	
-cricket-matic-lead	ferplast	correa que asegura un agarre firme y confortable con control seguro	dog	collar	G15/120:$16.90|G20/120:$17.90|G25/120:$19.90(red|blue|black|beige)	
-cricket-harness	ferplast	Harness para perrro comodo y paractico de usar 	dog	collar	Small:$16.50|Medium:$17.50|Large:$25.00|Xlarge:$33.90(red|blue|black|beige)	
+id,brand,name,species,category,variants,image_url
+Atlas-5-transportino-puppy,ferplast,Atlas 5 Transportino Puppy,cat dog,carrier,28x25.5x42cm:$25.90,
+Carrier-atlas-20,ferplast,Carrier Atlas 20,cat dog,carrier,37x58x32cm:$29.90,
+Atlas-deluxe-10-open,ferplast,Atlas Deluxe 10 Open,cat dog,carrier,37x32x52cm:$65.90,
+carrier-atlas-10-trendy,ferplast,Carrier Atlas 10 Trendy,cat dog,carrier,34x30x48cm:$69.90,
+jet-10-transportino-plt,ferplast,Jet 10 Transportino PLT,cat dog,carrier,32x47x29cm:$24.90,
+Bowl-magnus-slow,ferplast,Comedero Anti Ansiedad,dog,bowl,Small:$7.90|Medium:$11.90|Large:$14.90,
+thea-small-bowl,ferplast,Thea Comedero PequeÃ±o,dog,bowl,13x4.5cm:$13.90,
+clip-drinker,ferplast,Bebedero con clip,dog,bowl,large0.55Lt:$9.90|Small0.3Lt:$6.90,
+drinky-dog-abbeverato,ferplast,Bebedero Drinky para perros,dog,,0.6Lt:$28.90,
+dudu-classic-bag-dispenser,ferplast,Soporte para bolsas higiÃ¨nicas para perros,dog,hygiene,$9.90,
+pa-6720-sachetti-x2,ferplast,Bolsas higiÃ¨nicas de repuesto,cat dog,hygiene,$3.50,
+gro-5939-small-brush,ferplast,Cepillo de dientes doble cara GRO 5939,cat dog,hygiene,$3.00,
+prima-toilette-decor,ferplast,Caja de Arena decorada paras gatos,cat,hygiene,"39,5x52.5x38Oro:$57.90|39.5x52.5x38Rosa:$57.90",
+paletta-higienica,ferplast,Paleta higiÃ¨nica,cat,hygiene,red:$3.90|blue:$3.90,
+gro-5790-cat-comb,ferplast,Cepillo para mascotas con dientes de plÃ stico GRO 5790,cat dog,Cuidado,$9.90,
+gro-5792-cat-comb,ferplast,Cepilo para mascotas de pelo largo GRO 5792,cat,Cuidado,$13.90,
+gro-5799-cat-carder,ferplast,Cepillo para gato cuidado de pelaje GRO 5799,cat,Cuidado,$8.90,
+gro-5800-slicker-small-cat,ferplast,Cepillo pequeÃ±o para gatos GRO 5800,cat,Cuidado,$9.90,
+gro-5929-spazzola-small,ferplast,Cepillo para mascotas grnade GRO 5929,cat dog,Cuidado,$9.90,
+gro-5874-rake-rotating-teeth,ferplast,Cepillo con dientes giratorios GRO 5874,cat dog,Cuidado,$13.90,
+dental-toy,ferplast,Juguete Dispensador de comida d,dog,Jueguetes,Small:$6.90|Medium:$13.00|Osso-medium:$6.90,
+soft-ball-small,ferplast,Pelota fabricada en goma Blanda,dog,Jueguetes,$3.50,
+fluorescent-ball,ferplast,Pelota fabricada en goma Blanda para jugar en las noches,dog,Jueguetes,$5.90,
+ball-large,ferplast,Pelota fabricada en goma Rigida,dog,Jueguetes,$9.90,
+funny-faces,ferplast,Juguete de Vinilo Chirriante para perros,dog,Jueguetes,$5.50,
+zoo-toys,ferplast,Juguete para perros de latex,dog,Jueguetes,$15.00,
+rubb-bone-tire,ferplast,Juguete fabricado en algodÃ³n y goma resistente,dog,Jueguetes,$15.90,
+cat-whip,ferplast,Juguete Varita para gato hecho en plastico y lana sintetica,cat,Jueguetes,PA 4998:$7.90|PA 5000:$5.90|PA 5002:$5.90,
+mouse-x2,ferplast,Juguete para gataos Mouse x 2 de poliester y plumas,cat,Jueguetes,$7.90,
+palla-cordino,ferplast,Pelota para gatos en goma blanda para jugar en las noches,cat,Jueguetes,$2.90,
+cat-plumed,ferplast,Juguete para gatos de latex con cascabel Cat plumed,cat,Jueguetes,$13.90,
+gat-5624-c10-31-collar,ferplast,Collar de gato,cat,collar,31x1cm(silver|gold):$7.90,
+ergofluo-collar,ferplast,Collar para perros con acolchado suave y cierre con microregulaciÃ²n,dog,collar,C15/33:$16.90|C15/42:$17.00|C15/51:$21.00(pink|green|yellow),
+ergofluo-lead,ferplast,Correa ergonÃ²micapara perros mango acolchado,dog,collar,G15mmx120cm:$17.90|G20mmx120cm:$18.50|G25mmx120cm:$19.90(pink|green|black),
+ergofluo-matic-guinz,ferplast,Correa para perros completa con gancho automatico,dog,collar,15mmx120cm:$21.00|20mmx120cm:$23.00|25mmx120cm:$23.90,
+cricket-matic-lead,ferplast,correa que asegura un agarre firme y confortable con control seguro,dog,collar,G15/120:$16.90|G20/120:$17.90|G25/120:$19.90(red|blue|black|beige),
+cricket-harness,ferplast,Harness para perrro comodo y paractico de usar,dog,collar,Small:$16.50|Medium:$17.50|Large:$25.00|Xlarge:$33.90(red|blue|black|beige),
