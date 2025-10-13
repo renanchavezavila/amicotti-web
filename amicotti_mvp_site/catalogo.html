@@ -365,34 +365,39 @@ function transformFerplast(rows){
   });
 }
   
-  async function loadCSVs(){
-    const loads = CSV_URLS.map(url => new Promise((resolve,reject)=>{
-      Papa.parse(url,{download:true,header:true,skipEmptyLines:true,complete:r=>resolve(r.data),error:reject});
-    }));
-    const arrays = await Promise.all(loads);
-    PRODUCTS = arrays.flat().map((r, idx)=>{
-      const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
-      if(hasBrandSchema){
-        const specie=(r.species||'').trim().toLowerCase();
-        const categoriaRaw=(r.category||'').trim().toLowerCase();
-        const especie = specie==='cat'?'Gato': specie==='dog'?'Perro':'';
-        const categoria = categoriaRaw==='dry'?'Seco': categoriaRaw==='wet'?'Húmedo': categoriaRaw==='veterinary'?'Veterinario': categoriaRaw==='treats'?'Snack':'';
-        const variants = parseVariants(r.variants||'');
-        const first = variants[0] || null;
-        return { id:r.id||('row'+idx), marca:(r.brand||'').toString().trim(), linea:'', especie, categoria,
-          nombre:(r.name||'').toString().trim(), peso_g:first?first.grams:null, sku:'', precio:first?first.price:null,
-          imagen_url:(r.image_url||'').toString().trim(), descripcion:'', disponible:true, variants };
-      }else{
-        const variants=parseVariants(r.variants||''); const first=variants[0]||null;
-        return { id:r.id||('row'+idx), marca:(r.marca||'').trim(), linea:(r.linea||'').trim(), especie:(r.especie||'').trim(),
-          categoria:(r.categoria||'').trim(), nombre:(r.nombre||'').trim(),
-          peso_g:r.peso_g?Number(r.peso_g):(first?first.grams:null), sku:(r.sku||'').trim(),
-          precio:(r.precio!=='' && r.precio!=null)?Number(r.precio):(first?first.price:null),
-          imagen_url:(r.imagen_url||'').trim(), descripcion:(r.descripcion||'').trim(),
-          disponible:String(r.disponible||'1')==='1', variants };
-      }
-    }).filter(p=>p.disponible);
-  }
+// =========================
+// PATCH 3: Carga CSVs y normaliza al arreglo global PRODUCTS
+// =========================
+async function loadCSVs(){
+  const base = '/amicotti_mvp_site/data/';
+
+  // 1) Leer CSVs
+  const [royalCSV, purinaCSV, ferplastCSV] = await Promise.all([
+    parseCsv(base + 'royal.csv'),
+    parseCsv(base + 'purina.csv'),
+    parseCsv(base + 'ferplast.csv'),
+  ]);
+
+  // 2) Transformar (si ya tienes transformadores para royal/purina, se respetan)
+  const royal    = (window.transformRoyal  ? window.transformRoyal(royalCSV)   : royalCSV);
+  const purina   = (window.transformPurina ? window.transformPurina(purinaCSV) : purinaCSV);
+  const ferplast = transformFerplast(ferplastCSV);
+
+  // 3) Unificar y normalizar claves que tu UI espera
+  window.PRODUCTS = [...royal, ...purina, ...ferplast].map(p => ({
+    id: p.id || p.sku || (p.nombre||'').toLowerCase().replace(/[^a-z0-9]+/g,'-'),
+    marca: p.marca || p.brand || '',
+    nombre: p.nombre || p.name || '',
+    especie: p.especie || '',
+    categoria: p.categoria || p.category || '',
+    linea: p.linea || p.line || '',
+    sku: p.sku || '',
+    precio: (typeof p.precio === 'number') ? p.precio : (p.precio ? toPrice(p.precio) : null),
+    variants: Array.isArray(p.variants) ? p.variants : [],
+    img: p.img || p.img1 || p.image_url || ''
+  }));
+}
+
 
   /* ================ FILTROS + RENDER ================ */
   const grid = document.getElementById('grid');
