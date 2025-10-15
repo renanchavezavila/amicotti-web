@@ -6,9 +6,7 @@
   <title>Amicotti — Catálogo</title>
   <meta name="description" content="Catálogo de alimentos y accesorios para mascotas. Entrega en Quito y Valles. Compra por WhatsApp." />
   <link rel="icon" href="assets/logo.png" />
-  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- PapaParse (usamos en modo no-download; parseamos texto de fetch) -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
@@ -26,7 +24,6 @@
 </head>
 
 <body class="bg-white text-gray-900">
-  <!-- HEADER con filtros -->
   <header class="sticky top-0 z-40 border-b bg-[color:var(--pastel)]/90 backdrop-blur">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
       <a href="index.html" class="flex items-center gap-2 shrink-0">
@@ -34,7 +31,6 @@
         <span class="font-semibold">Amicotti</span>
       </a>
 
-      <!-- Controles (desktop) -->
       <div class="hidden lg:flex items-center gap-2 flex-1">
         <select id="fMarca" class="hctrl border rounded px-2 py-2 text-sm bg-white"></select>
         <select id="fEspecie" class="hctrl border rounded px-2 py-2 text-sm bg-white"></select>
@@ -50,10 +46,8 @@
         <button id="clearFilters" class="ml-1 px-3 py-2 text-sm border rounded bg-white">Limpiar</button>
       </div>
 
-      <!-- Botón filtros (móvil) -->
       <button id="openFilters" class="lg:hidden ml-auto px-3 py-2 border rounded bg-white">Filtros</button>
 
-      <!-- Acciones -->
       <div class="flex items-center gap-2">
         <a id="waTop" target="_blank" class="hidden md:inline-flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded">WhatsApp</a>
         <button id="cartBtn" class="relative inline-flex items-center gap-2 px-3 py-2 border rounded bg-white">
@@ -62,7 +56,6 @@
       </div>
     </div>
 
-    <!-- Panel filtros móvil -->
     <div id="filtersPanel" class="lg:hidden border-t bg-[color:var(--pastel-2)] py-3 hidden">
       <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
         <select id="m_fMarca" class="border rounded px-2 py-2 text-sm bg-white"></select>
@@ -81,16 +74,13 @@
     </div>
   </header>
 
-  <!-- GRID -->
   <main class="max-w-7xl mx-auto p-4">
     <div id="alertBox" class="hidden mb-3 p-3 rounded bg-yellow-50 border text-sm text-yellow-900"></div>
     <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
   </main>
 
-  <!-- OVERLAY -->
   <div id="overlay" class="overlay"></div>
 
-  <!-- DRAWER CARRITO -->
   <div id="cartDrawer" class="drawer fixed top-0 right-0 w-[420px] max-w-full h-full bg-white border-l shadow-xl z-50 flex flex-col">
     <div class="p-4 flex items-center justify-between border-b">
       <h2 class="text-lg font-semibold">Tu pedido</h2>
@@ -100,10 +90,8 @@
       </div>
     </div>
 
-    <!-- Items -->
     <div id="cartItems" class="p-4 space-y-3 overflow-y-auto" style="height:calc(100% - 20rem)"></div>
 
-    <!-- Datos del cliente (OCULTO EN CATALOGO) -->
     <div id="buyerBlock" class="p-4 border-t space-y-3 hidden">
       <form id="buyerForm" class="space-y-3" autocomplete="on">
         <div>
@@ -140,7 +128,6 @@
       </form>
     </div>
 
-    <!-- Totales + CTA -->
     <div class="p-4 border-t space-y-2">
       <div class="flex items-center justify-between text-sm text-gray-600">
         <span>Subtotal</span><strong id="cartSubtotal">$0.00</strong>
@@ -157,26 +144,23 @@
     </div>
   </div>
 
-  <!-- BOTÓN WA FLOTANTE -->
   <a id="waFloat" target="_blank" class="fixed bottom-4 right-4 md:hidden w-12 h-12 rounded-full bg-green-600 text-white grid place-items-center shadow-lg">WA</a>
 
   <footer class="border-t text-center text-xs text-gray-500 p-6">© Amicotti — Quito & Valles</footer>
 
-  <!-- === JS ÚNICO (checkout + eventos + init) === -->
   <script>
   /* ================ CONFIG ================ */
   const WA_PHONE = "593995315716";
 
-  /* CSVs con rutas alternativas por si cambian de carpeta */
+  /* Nuevo: agregamos catit.csv a las fuentes */
   const CSV_SOURCES = [
     { name: "purina",    paths: ["data/purina.csv","assets/data/purina.csv","assets/purina.csv","purina.csv"] },
     { name: "royal",     paths: ["data/royal.csv", "assets/data/royal.csv", "assets/royal.csv", "royal.csv"] },
-    { name: "ferplast",  paths: ["data/ferplast.csv","assets/data/ferplast.csv","assets/ferplast.csv","ferplast.csv"] }
+    { name: "ferplast",  paths: ["data/ferplast.csv","assets/data/ferplast.csv","assets/ferplast.csv","ferplast.csv"] },
+    { name: "catit",     paths: ["data/catit.csv","assets/data/catit.csv","assets/catit.csv","catit.csv"] }
   ];
 
   const IMG_EXTS = [".webp",".jpg",".jpeg",".png",".avif"];
-
-  /* Google Forms (se usan en checkout, aquí no bloquean) */
   const FORM_ID="1FAIpQLSfsSxhFoBs9Xkv5MmYjTwr98zTSR6IefJ-vm2p9FSUOMSs69g";
 
   /* ================ ESTADO ================ */
@@ -202,7 +186,13 @@
     if(/^5939\d{8}$/.test(n)){ const t = '0'+n.slice(3); return `${t.slice(0,3)} ${t.slice(3,6)} ${t.slice(6,10)}`; }
     return raw;
   }
-  const money = n => (Number.isFinite(+n) && +n>=0) ? ('$'+(+n).toFixed(2)) : 'Consultar';
+
+  /* Ajuste: cuando no hay precio => "Consultar" (evita $0.00) */
+  const money = (n) => {
+    if (n === null || n === undefined || n === '') return 'Consultar';
+    const num = +n;
+    return (Number.isFinite(num) && num >= 0) ? ('$' + num.toFixed(2)) : 'Consultar';
+  };
 
   function gramsFromLabel(lbl){
     if(!lbl) return null; if(/unidad/i.test(lbl)) return null;
@@ -216,7 +206,7 @@
     if(!str) return [];
     return String(str).split('|').map(s=>{
       const raw = s.trim();
-      const parts = raw.split(/[:\-—]+/);
+      const parts = raw.split(/[:\-—]+/);   // etiqueta : $precio  |  etiqueta — texto
       const label = (parts[0]||'').trim();
       const grams = gramsFromLabel(label);
       let price = null;
@@ -303,6 +293,7 @@
     const base = brand.includes('royal') ? 'assets/royal/'
              : brand.includes('purina') ? 'assets/purina/'
              : brand.includes('ferplast') ? 'assets/ferplast/'
+             : brand.includes('catit') ? 'assets/catit/'
              : 'assets/catalog/';
     return IMG_EXTS.map(ext => `${base}${p.id}${ext}`);
   }
@@ -313,18 +304,14 @@
   }
 
   /* ================ CSV / PRODUCTOS ================ */
-
-  // Mapea especies Ferplast/brand-schema -> etiquetas visibles
   function mapSpeciesBrand(spec){
     const s = (spec||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
     if(s==='cat') return 'Gato';
     if(s==='dog') return 'Perro';
     if(s==='cat dog' || s==='dog cat' || (s.includes('cat') && s.includes('dog'))) return 'Ambos';
     if(!s) return 'Accesorios';
-    return cap(s); // fallback legible
+    return cap(s);
   }
-
-  // Mapea categorías (incluye alimentos + accesorios comunes)
   function mapCategoryBrand(cat){
     const c = (cat||'').toString().trim().toLowerCase();
     const dict = {
@@ -332,11 +319,9 @@
       treat:'Snack', snacks:'Snack', snack:'Snack',
       carrier:'Transportadoras', carriers:'Transportadoras',
       bowl:'Platos', bowls:'Platos', feeder:'Bebederos', feeders:'Bebederos',
-      bed:'Camas', beds:'Camas',
-      toy:'Juguetes', toys:'Juguetes',
+      bed:'Camas', beds:'Camas', toy:'Juguetes', toys:'Juguetes',
       leash:'Correas', harness:'Arnés', harnesses:'Arnés',
-      litter:'Arena', grooming:'Cuidado', cleaning:'Limpieza',
-      cage:'Jaulas', cages:'Jaulas'
+      litter:'Arena', grooming:'Cuidado', cleaning:'Limpieza', cage:'Jaulas', cages:'Jaulas'
     };
     return dict[c] || (c ? cap(c) : '');
   }
@@ -347,7 +332,6 @@
         const resp = await fetch(url, {cache:'no-store'});
         if(resp.ok){
           const text = await resp.text();
-          // Evita parsear HTML por error 200 de algún hosting
           if(!/^<!doctype\s+html/i.test(text.trim())){
             return { url, text };
           }
@@ -408,15 +392,11 @@
   /* ================ FILTROS + RENDER ================ */
   const grid = document.getElementById('grid');
   const alertBox = document.getElementById('alertBox');
-
-  // header (desktop)
   const fMarca = document.getElementById('fMarca');
   const fEspecie = document.getElementById('fEspecie');
   const fCategoria = document.getElementById('fCategoria');
   const fSearch = document.getElementById('fSearch');
   const fSort = document.getElementById('fSort');
-
-  // móvil
   const m_fMarca = document.getElementById('m_fMarca');
   const m_fEspecie = document.getElementById('m_fEspecie');
   const m_fCategoria = document.getElementById('m_fCategoria');
@@ -459,11 +439,8 @@
 
   function fillFilters(){
     const marcas=['Marca…', ...unique(PRODUCTS,'marca')];
-
-    // especies dinámicas (Gato/Perro/Ambos/Accesorios/otros) presentes en datos
     const especiesSet = [...new Set(PRODUCTS.map(p=>p.especie).filter(Boolean))].sort();
     const especies = ['Especie…', ...especiesSet];
-
     const cats=['Categoría…', ...unique(PRODUCTS,'categoria')];
 
     fillSelect(fMarca,marcas); fillSelect(fEspecie,especies); fillSelect(fCategoria,cats);
@@ -538,15 +515,12 @@
     grid.innerHTML = items.map(cardHTML).join('');
   }
 
-  /* ======== CHECKOUT (llevar a página nueva; no valida el form oculto) ======== */
   function goToCheckout(){
     if(!CART.length){ alert('Tu carrito está vacío.'); return; }
     localStorage.setItem('amicotti_checkout_source','catalog');
-    location.href = 'checkout.html'; // ruta RELATIVA
+    location.href = 'checkout.html';
   }
 
-  /* ============== EVENTOS ============== */
-  // header desktop
   [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el =>
     el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); mirrorMobileFromDesktop(); })
   );
@@ -554,7 +528,6 @@
     [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); render(); updateURLFromFilters(); mirrorMobileFromDesktop();
   });
 
-  // móvil
   const panel=document.getElementById('filtersPanel');
   document.getElementById('openFilters').addEventListener('click', ()=> panel.classList.toggle('hidden'));
   [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el =>
@@ -564,28 +537,25 @@
     [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el=> el.value=''); mirrorDesktopFromMobile(); render(); updateURLFromFilters();
   });
 
-  // drawer / carrito
   document.getElementById('cartBtn').addEventListener('click', openCart);
   document.getElementById('closeCart').addEventListener('click', closeCart);
   document.getElementById('btnEmpty').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); } });
   document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
-
-  // Evita submit del formulario oculto (si por error se mostrara)
   document.getElementById('buyerForm')?.addEventListener('submit', e => e.preventDefault());
 
-  /* ============== INIT ============== */
   (async function init(){
-    setWALinks(); updateCartBadge(); drawCart();
+    const top = document.getElementById('waTop'), flo = document.getElementById('waFloat');
+    if(top){ top.href=`https://wa.me/${WA_PHONE}`; top.textContent=`WhatsApp ${WA_PHONE}`; }
+    if(flo){ flo.href=`https://wa.me/${WA_PHONE}`; }
+    updateCartBadge(); drawCart();
     try{
       await loadCSVs();
       if(!PRODUCTS.length){
         alertBox.classList.remove('hidden');
         alertBox.textContent='No se cargaron productos. Revisa las rutas CSV.';
       }
-      // Normaliza mayúsculas de marca por estética
       PRODUCTS = PRODUCTS.map(p => ({...p, marca: cap(p.marca)}));
       fillFilters(); applyInitialFiltersFromURL(); render();
-      // prefill de buyer (no afecta aunque esté oculto):
       try{
         const b=JSON.parse(localStorage.getItem('amicotti_buyer')||'{}');
         if(b.name) document.getElementById('bf_name').value=b.name;
