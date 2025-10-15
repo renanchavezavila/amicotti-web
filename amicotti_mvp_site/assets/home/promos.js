@@ -18,12 +18,12 @@ window.PROMOS_HOME = [
     price: 17.40, price_old: 19.17, badge: "HOT"
   },
   {
-    title: "Felix Travesuras Ocean Mix (x12)",
+    title: "Catit Creamy",
     sku: "FX-OCN-12",
-    img: "assets/home/promos/felix-travesuras-ocean-mix-12.webp",
-    href: "catalogo.html?marca=Purina&buscar=felix%20travesuras",
-    subtitle: "Pack ahorro x 12 sobres",
+    img: "assets/home/promos/Catit-creamy.webp",
+    href: "catalogo.html?marca=Catit&buscar=Catit%creamy",
+    subtitle: "Pack ahorro x 10 ",
     unit: "x12 sobres",
-    price: 9.90, price_old: 11.50, badge: "-14%"
+    price: 44.44, price_old: 60.00, badge: "-35%"
   }
 ];
