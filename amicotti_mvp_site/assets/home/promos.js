@@ -6,7 +6,7 @@ window.PROMOS_HOME = [
     href: "catalogo.html?marca=Royal+Canin&buscar=urinary",
     subtitle: "Precio especial esta semana",
     unit: "1.5 kg",
-    price: 24.99, price_old: 27.99, badge: "-11%"
+    price: 40.50, price_old: 44.55, badge: "-10%"
   },
   {
     title: "Pro Plan Cat Sterilized 1.5kg",
