@@ -9,13 +9,13 @@ window.PROMOS_HOME = [
     price: 40.50, price_old: 44.55, badge: "-10%"
   },
   {
-    title: "Pro Plan Cat Sterilized 1.5kg",
+    title: "Arena TIDY CATS",
     sku: "PP-STC-15",
-    img: "assets/home/promos/pro-plan-sterilized-1-5kg.webp",
-    href: "catalogo.html?marca=Purina&buscar=sterilized",
+    img: "assets/home/promos/Purina-tidy-cats-20lb.webp",
+    href: "catalogo.html?marca=Purina&buscar=Tidycats",
     subtitle: "Descuento por tiempo limitado",
-    unit: "1.5 kg",
-    price: 22.50, price_old: 25.00, badge: "HOT"
+    unit: "20 Lb",
+    price: 17.40, price_old: 19.17, badge: "HOT"
   },
   {
     title: "Felix Travesuras Ocean Mix (x12)",
