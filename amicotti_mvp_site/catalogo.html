@@ -12,7 +12,8 @@
   <style>
     :root{ --pastel:#F6F3E9; --pastel-2:#EFEAE0; }
     .img-box{height:12rem}
-    .img-box img{max-height:11rem;object-fit:contain}
+    .img-box img{max-height:11rem;object-fit:contain;opacity:0;transition:opacity .18s ease}
+     .img-box img.loaded{opacity:1}
     .drawer{transform:translateX(100%);transition:transform .25s ease}
     .drawer.open{transform:translateX(0)}
     .overlay{position:fixed;inset:0;background:#0005;opacity:0;pointer-events:none;transition:.2s}
