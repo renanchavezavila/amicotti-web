@@ -283,25 +283,85 @@
   }
 
   /* ================ IMG FALLBACK ================ */
-  const swapExt = (url,ext)=>{ const i=url.lastIndexOf('.'); return i<0? url+ext : url.slice(0,i)+ext; };
-  function buildImgCandidates(p){
-    const brand=(p.marca||'').toLowerCase();
-    if(p.imagen_url && p.imagen_url.trim()){
-      const first=p.imagen_url.trim(); const alts=IMG_EXTS.map(e=>swapExt(first,e));
-      return [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
+  <!-- IMG FALLBACK (reemplazo) -->
+<script>
+// (ya existía arriba; si tu editor te muestra error por duplicado, borra la versión antigua de swapExt)
+const swapExt = (url,ext)=>{ const i=url.lastIndexOf('.'); return i<0? url+ext : url.slice(0,i)+ext; };
+
+// Alias de marcas -> carpeta base de imágenes
+const BRAND_ALIASES = {
+  'royal canin': 'royal',
+  'royal': 'royal',
+  'purina': 'purina',
+  'ferplast': 'ferplast',
+
+  // Grupo Catit / asociados
+  'catit': 'catit',
+  'dogit': 'catit',
+  'le salon': 'catit',
+  'nerf dog': 'catit',
+  'nerf': 'catit',
+  'nylabone': 'catit',
+  'odor defense': 'catit',
+  'petmate': 'catit',
+  'sentry': 'catit',
+  'zeus': 'catit'
+};
+
+// Slug para probar carpeta por marca si existiera (ej: assets/zeus/)
+const slugify = s => (s||'').toString().trim().toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+
+// Carpeta primaria a partir del alias
+function folderForBrand(brand){
+  const b = (brand||'').toLowerCase();
+  for (const key of Object.keys(BRAND_ALIASES)){
+    if (b.includes(key)) return BRAND_ALIASES[key];
+  }
+  const slug = slugify(brand);
+  return slug || 'catalog';
+}
+
+function buildImgCandidates(p){
+  const brand = p.marca || '';
+
+  // Si hay URL explícita en el CSV, úsala + prueba con otras extensiones
+  if (p.imagen_url && p.imagen_url.trim()){
+    const first=p.imagen_url.trim(); const alts=IMG_EXTS.map(e=>swapExt(first,e));
+    return [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
+  }
+
+  // Bases candidatas (prioridad)
+  const primary = `assets/${folderForBrand(brand)}/`; // por alias (Zeus/Dogit/etc → catit/)
+  const bySlug  = `assets/${slugify(brand)}/`;        // por si creas carpeta exacta (assets/zeus/)
+  const bases = [primary];
+  if (bySlug && !bases.includes(bySlug)) bases.push(bySlug);
+
+  // Fallbacks conocidos
+  ['catit','ferplast','purina','royal'].forEach(f=>{
+    const path = `assets/${f}/`;
+    if (!bases.includes(path)) bases.push(path);
+  });
+  if (!bases.includes('assets/catalog/')) bases.push('assets/catalog/');
+
+  // Combina bases con extensiones
+  const candidates = [];
+  for (const base of bases){
+    for (const ext of IMG_EXTS){
+      candidates.push(`${base}${p.id}${ext}`);
     }
-    const base = brand.includes('royal') ? 'assets/royal/'
-             : brand.includes('purina') ? 'assets/purina/'
-             : brand.includes('ferplast') ? 'assets/ferplast/'
-             : brand.includes('catit') ? 'assets/catit/'
-             : 'assets/catalog/';
-    return IMG_EXTS.map(ext => `${base}${p.id}${ext}`);
   }
-  function onImgError(el){
-    const rest=(el.dataset.alt||"").split("|").filter(Boolean);
-    if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); }
-    else { el.onerror=null; el.src="assets/logo.png"; }
-  }
+  return [...new Set(candidates)];
+}
+
+function onImgError(el){
+  const rest=(el.dataset.alt||"").split("|").filter(Boolean);
+  if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); }
+  else { el.onerror=null; el.src="assets/logo.png"; }
+}
+</script>
+
 
   /* ================ CSV / PRODUCTOS ================ */
   function mapSpeciesBrand(spec){
