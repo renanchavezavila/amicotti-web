@@ -544,7 +544,12 @@ function onImgError(el){
     const initialPrice=(p.variants && p.variants.length)? money(p.variants[0].price) : money(p.precio);
     return `<article class='border rounded-lg overflow-hidden bg-white'>
       <div class='img-box w-full bg-gray-50 grid place-items-center'>
-        <img src='${img}' data-alt='${altList}' alt='${p.nombre}' loading='lazy' onerror="onImgError(this)"/>
+     <img src='${img}'
+     data-alt='${altList}'
+     alt='${p.nombre}'
+     loading='lazy' decoding='async'
+     onload="onImgLoad(this)"
+     onerror="onImgError(this)"/> 
       </div>
       <div class='p-3 space-y-1'>
         <h3 class='font-medium leading-tight'>${p.nombre}</h3>
