@@ -582,6 +582,10 @@ function onImgLoad(el){ el.classList.add('loaded'); }
     items.forEach(p=>{ if(!(p.id in SELECTED)) SELECTED[p.id]=0; });
     grid.innerHTML = items.map(cardHTML).join('');
   }
+// Si el navegador sirve desde caché y no dispara onload, asegura visibilidad:
+document.querySelectorAll('#grid .img-box img').forEach(img=>{
+  if (img.complete && img.naturalWidth > 0) img.classList.add('loaded');
+});
 
   function goToCheckout(){
     if(!CART.length){ alert('Tu carrito está vacío.'); return; }
