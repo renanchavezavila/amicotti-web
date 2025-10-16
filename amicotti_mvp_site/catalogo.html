@@ -363,6 +363,7 @@ function onImgError(el){
   if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); }
   else { el.onerror=null; el.src="assets/logo.png"; }
 }
+function onImgLoad(el){ el.classList.add('loaded'); }
 
 
   /* ================ CSV / PRODUCTOS ================ */
