@@ -321,17 +321,27 @@ function folderForBrand(brand){
 function buildImgCandidates(p){
   const brand = p.marca || '';
 
-  // Si hay URL explícita en CSV
+  // Si el CSV trae URL explícita, úsala
   if (p.imagen_url && p.imagen_url.trim()){
-    const first=p.imagen_url.trim(); const alts=IMG_EXTS.map(e=>swapExt(first,e));
+    const first = p.imagen_url.trim();
+    const alts = IMG_EXTS.map(e=>swapExt(first,e));
     return [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
   }
 
-  // Bases candidatas
-  const primary = `assets/${folderForBrand(brand)}/`; // alias (Zeus/Dogit/etc → catit/)
-  const bySlug  = `assets/${slugify(brand)}/`;        // si creas carpeta exacta (assets/zeus/)
+  // Bases: alias (Zeus/Dogit/etc → catit/), slug (por si creas carpeta propia) y catálogo
+  const primary = `assets/${folderForBrand(brand)}/`;
+  const bySlug  = `assets/${slugify(brand)}/`;
   const bases = [primary];
-  if (bySlug && !bases.includes(bySlug)) bases.push(bySlug);
+  if (bySlug !== primary) bases.push(bySlug);
+  bases.push('assets/catalog/');
+
+  const out = [];
+  for (const base of bases){
+    for (const ext of IMG_EXTS) out.push(`${base}${p.id}${ext}`);
+  }
+  return [...new Set(out)];
+}
+
 
   // Fallbacks conocidos
   ['catit','ferplast','purina','royal'].forEach(f=>{
