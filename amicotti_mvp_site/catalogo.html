@@ -7,36 +7,35 @@
   <meta name="description" content="Catálogo de alimentos y accesorios para mascotas. Entrega en Quito y Valles. Compra por WhatsApp." />
   <link rel="icon" href="assets/logo.png" />
 
-  <!-- Tailwind + PapaParse -->
+  <!-- Tailwind y PapaParse -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <!-- Loader con fallback para Panzoom -->
   <script>
-  (function(){
-    function inject(src, ok, err){
-      var s=document.createElement('script');
-      s.src=src; s.async=true; s.onload=ok; s.onerror=err; document.head.appendChild(s);
-    }
-    window.__loadPanzoom = function(cb){
-      if (window.Panzoom) return cb();
-      if (window.__loadPanzoomQueue){ window.__loadPanzoomQueue.push(cb); return; }
-      window.__loadPanzoomQueue=[cb];
-      inject("https://cdn.jsdelivr.net/npm/@panzoom/panzoom@9.4.0/dist/panzoom.min.js",
-        function(){ window.__loadPanzoomQueue.splice(0).forEach(f=>f()); },
-        function(){ inject("https://unpkg.com/@panzoom/panzoom@9.4.0/dist/panzoom.min.js",
+    (function(){
+      function inject(src, ok, err){
+        var s=document.createElement('script');
+        s.src=src; s.async=true; s.onload=ok; s.onerror=err; document.head.appendChild(s);
+      }
+      window.__loadPanzoom = function(cb){
+        if (window.Panzoom) return cb();
+        if (window.__loadPanzoomQueue){ window.__loadPanzoomQueue.push(cb); return; }
+        window.__loadPanzoomQueue=[cb];
+        inject("https://cdn.jsdelivr.net/npm/@panzoom/panzoom@9.4.0/dist/panzoom.min.js",
           function(){ window.__loadPanzoomQueue.splice(0).forEach(f=>f()); },
-          function(){ console.error("No se pudo cargar Panzoom"); window.__loadPanzoomQueue.splice(0).forEach(f=>f()); }
-        ); }
-      );
-    };
-  })();
+          function(){ inject("https://unpkg.com/@panzoom/panzoom@9.4.0/dist/panzoom.min.js",
+            function(){ window.__loadPanzoomQueue.splice(0).forEach(f=>f()); },
+            function(){ console.error("No se pudo cargar Panzoom"); window.__loadPanzoomQueue.splice(0).forEach(f=>f()); }
+          ); }
+        );
+      };
+    })();
   </script>
 
   <style>
     :root{ --pastel:#F6F3E9; --pastel-2:#EFEAE0; }
     .img-box{height:12rem}
-    /* Fade-in y cursor lupa en cards */
     .img-box img{max-height:11rem;object-fit:contain;opacity:0;transition:opacity .18s ease;cursor:zoom-in}
     .img-box img.loaded{opacity:1}
     .drawer{transform:translateX(100%);transition:transform .25s ease}
@@ -47,7 +46,7 @@
     .hctrl{min-width:10rem}
     @media (max-width:1024px){ .hctrl{min-width:auto} }
 
-    /* Modal de Zoom */
+    /* Modal de zoom */
     .zoom-modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;z-index:60}
     .zoom-modal.show{display:flex}
     .zoom-frame{position:relative;width:min(92vw,1100px);height:min(92vh,800px);background:#111;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px #0006}
@@ -146,7 +145,7 @@
     <div class="zoom-frame">
       <div class="zoom-toolbar">
         <button type="button" id="zoomClose" title="Cerrar (Esc)">✕</button>
-        <button type="button" id="zoomReset" title="Restablecer">100%</button>
+        <button type="button" id="zoomReset" title="Ajustar">100%</button>
         <button type="button" id="zoomOut"   title="Alejar">−</button>
         <button type="button" id="zoomIn"    title="Acercar">＋</button>
       </div>
@@ -164,7 +163,7 @@
   /* ================ CONFIG ================ */
   const WA_PHONE = "593995315716";
 
-  /* CSVs (carga directa y estable) */
+  // CSVs (carga robusta con PapaParse)
   const CSV_URLS = [
     "data/purina.csv",
     "data/royal.csv",
@@ -172,7 +171,7 @@
     "data/catit.csv"
   ];
 
-  /* Extensiones de imagen a intentar (si todas son .webp, deja solo ".webp") */
+  // Extensiones a intentar (ajusta el orden si la mayoría son JPG)
   const IMG_EXTS = [".webp",".jpg",".jpeg",".png",".avif"];
 
   /* ================ ESTADO ================ */
@@ -183,7 +182,7 @@
   /* ============ HELPERS ============ */
   function loadCart(){ try{ return JSON.parse(localStorage.getItem('amicart'))||[] }catch{ return [] } }
   function saveCart(){ localStorage.setItem('amicart', JSON.stringify(CART)); updateCartBadge(); }
-  const money = (n) => { if(n===null||n===undefined||n==='') return 'Consultar'; const x=+n; return Number.isFinite(x)&&x>=0?('$'+x.toFixed(2)):'Consultar'; };
+  function money(n){ if(n===null||n===undefined||n==='') return 'Consultar'; const x=+n; return Number.isFinite(x)&&x>=0?('$'+x.toFixed(2)):'Consultar'; }
   const unique = (arr,key)=>[...new Set(arr.map(o => (o[key]||'').trim()).filter(Boolean))].sort();
   const cap = s => (s||'').toString().trim().replace(/\s+/g,' ').toLowerCase().replace(/^\w/, c=>c.toUpperCase());
 
@@ -253,17 +252,18 @@
 
   /* ================ IMÁGENES ================ */
   const swapExt = (url,ext)=>{ const i=url.lastIndexOf('.'); return i<0? url+ext : url.slice(0,i)+ext; };
-
-  /* Alias de marcas para decidir carpeta */
-  const BRAND_ALIASES = {
-    'royal canin':'royal','royal':'royal','purina':'purina','ferplast':'ferplast',
-    'catit':'catit','dogit':'catit','le salon':'catit','nerf dog':'catit','nerf':'catit',
-    'nylabone':'catit','odor defense':'catit','petmate':'catit','sentry':'catit','zeus':'catit'
-  };
   const slugify = s => (s||'').toString().trim().toLowerCase()
       .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
       .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 
+  // Alias de marcas -> carpeta
+  const BRAND_ALIASES = {
+    'royal canin':'royal','royal':'royal',
+    'purina':'purina',
+    'ferplast':'ferplast',
+    'catit':'catit','dogit':'catit','le salon':'catit','nerf dog':'catit','nerf':'catit',
+    'nylabone':'catit','odor defense':'catit','petmate':'catit','sentry':'catit','zeus':'catit'
+  };
   function folderForBrand(brand){
     const b=(brand||'').toLowerCase();
     for(const key of Object.keys(BRAND_ALIASES)){ if(b.includes(key)) return BRAND_ALIASES[key]; }
@@ -290,8 +290,6 @@
   }
   function onImgLoad(el){ el.classList.add('loaded'); }
 
-  /* ====== ZOOM ====== */
- <script>
   /* ====== ZOOM (auto-fit + centrado) ====== */
   let _pz = null;
   let _baseScale = 1;
@@ -300,65 +298,50 @@
     const b = document.getElementById('zoomReset');
     if (b) b.textContent = Math.round((scale||1)*100) + '%';
   }
-
   function startPanzoomFit(img, stage){
     __loadPanzoom(() => {
-      // Limpia instancia previa
       if (_pz){
         try{ stage.removeEventListener('wheel', _pz.zoomWithWheel); _pz.destroy(); }catch(e){}
         _pz = null;
       }
-      // Crea panzoom
       _pz = Panzoom(img, { maxScale: 6, minScale: 0.2, canvas: true, contain: 'outside' });
       stage.addEventListener('wheel', _pz.zoomWithWheel, { passive:false });
 
-      // Calcula escala para encajar
       const sw = stage.clientWidth || 1;
       const sh = stage.clientHeight || 1;
       const iw = img.naturalWidth || 1;
       const ih = img.naturalHeight || 1;
-      _baseScale = Math.max( Math.min(sw/iw, sh/ih), 0.2 ); // encaje, mínimo 0.2
+      _baseScale = Math.max( Math.min(sw/iw, sh/ih), 0.2 );
 
-      // Aplica escala base y centra
-      _pz.zoom(_baseScale, {
-        animate: false,
-        focal: { clientX: sw/2, clientY: sh/2 }
-      });
+      _pz.zoom(_baseScale, { animate:false, focal:{ clientX: sw/2, clientY: sh/2 } });
 
-      // Centrado visual (cuando el lienzo es mayor que la imagen escalada)
       const dx = (sw - iw*_baseScale)/2;
       const dy = (sh - ih*_baseScale)/2;
       _pz.pan(dx, dy, { animate:false });
 
       updateZoomLabel(_baseScale);
 
-      // Mantén etiqueta actualizada
       img.addEventListener('panzoomchange', (e)=>{
         updateZoomLabel(e.detail.scale || _baseScale);
       }, { once:false });
     });
   }
-
   function openZoomFromImg(el){
     const modal = document.getElementById('zoomModal');
     const img   = document.getElementById('zoomImg');
     const stage = document.getElementById('zoomStage');
 
-    // Fuentes: actual + alternativas (para fallback)
     const sources = [el.currentSrc || el.src, ...(el.dataset.alt||'').split('|').filter(Boolean)];
-    img.src       = sources[0] || el.src;
+    img.src         = sources[0] || el.src;
     img.dataset.alt = sources.slice(1).join('|');
     document.getElementById('zoomCaption').textContent = el.alt || '';
 
     modal.classList.add('show');
     document.body.classList.add('no-scroll');
 
-    // Espera a que la imagen esté lista para conocer naturalWidth/Height
     const run = () => startPanzoomFit(img, stage);
-    if (img.complete && img.naturalWidth) { run(); }
-    else { img.onload = run; }
+    if (img.complete && img.naturalWidth) { run(); } else { img.onload = run; }
   }
-
   function closeZoom(){
     const modal = document.getElementById('zoomModal');
     const stage = document.getElementById('zoomStage');
@@ -369,25 +352,20 @@
       _pz = null;
     }
   }
-
   function onZoomImgError(el){
     const rest=(el.dataset.alt||"").split("|").filter(Boolean);
     if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); return; }
     el.onerror=null; el.src="assets/logo.png";
   }
-
   (function bindZoomControls(){
     const modal = document.getElementById('zoomModal');
     const stage = document.getElementById('zoomStage');
-
     document.getElementById('zoomClose').onclick = closeZoom;
 
-    // Restablece al "encaje" (no a 1:1)
     document.getElementById('zoomReset').onclick = () => {
       if (!_pz) return;
       const sw = stage.clientWidth, sh = stage.clientHeight;
       _pz.zoom(_baseScale, { animate:true, focal:{ clientX: sw/2, clientY: sh/2 } });
-      // re-centra tras reset
       const img = document.getElementById('zoomImg');
       const iw = img.naturalWidth, ih = img.naturalHeight;
       const dx = (sw - iw*_baseScale)/2;
@@ -395,15 +373,12 @@
       _pz.pan(dx, dy, { animate:true });
       updateZoomLabel(_baseScale);
     };
-
     document.getElementById('zoomIn').onclick  = ()=> _pz && _pz.zoomIn();
     document.getElementById('zoomOut').onclick = ()=> _pz && _pz.zoomOut();
 
-    // Cierra con clic fuera o Esc
     modal.addEventListener('click', e => { if (e.target===modal) closeZoom(); });
     window.addEventListener('keydown', e => { if (e.key==='Escape') closeZoom(); });
   })();
-</script>
 
   /* ================ CSV / PRODUCTOS ================ */
   function mapSpeciesBrand(spec){
@@ -424,7 +399,6 @@
   }
 
   async function loadCSVs(){
-    // Carga directa y estable con PapaParse (como el flujo original)
     const loads = CSV_URLS.map((url, fileIdx) => new Promise((resolve) => {
       Papa.parse(url, {
         download: true, header: true, skipEmptyLines: true,
@@ -484,7 +458,6 @@
   const grid = document.getElementById('grid');
   const alertBox = document.getElementById('alertBox');
 
-  // DOM de filtros
   const fMarca = document.getElementById('fMarca');
   const fEspecie = document.getElementById('fEspecie');
   const fCategoria = document.getElementById('fCategoria');
@@ -598,7 +571,6 @@
     if(!items.length){ grid.innerHTML = `<div class='col-span-full p-6 text-center text-sm text-gray-500 border rounded'>No hay productos con esos filtros.</div>`; return; }
     items.forEach(p=>{ if(!(p.id in SELECTED)) SELECTED[p.id]=0; });
     grid.innerHTML = items.map(cardHTML).join('');
-    // Marca como cargadas si vienen de caché
     document.querySelectorAll('#grid .img-box img').forEach(img=>{
       if (img.complete && img.naturalWidth > 0) img.classList.add('loaded');
     });
@@ -610,8 +582,7 @@
   /* ============== EVENTOS ============== */
   const panel = document.getElementById('filtersPanel');
 
-  // header desktop
-  ;[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el =>
+  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el =>
     el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); mirrorMobileFromDesktop(); })
   );
   document.getElementById('clearFilters').addEventListener('click',()=>{
@@ -619,9 +590,8 @@
     render(); updateURLFromFilters(); mirrorMobileFromDesktop();
   });
 
-  // móvil
   document.getElementById('openFilters').addEventListener('click', ()=> panel.classList.toggle('hidden'));
-  ;[m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el =>
+  [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el =>
     el.addEventListener('input', ()=>{ mirrorDesktopFromMobile(); render(); updateURLFromFilters(); })
   );
   document.getElementById('m_clearFilters').addEventListener('click',()=>{
@@ -629,7 +599,6 @@
     mirrorDesktopFromMobile(); render(); updateURLFromFilters();
   });
 
-  // drawer / carrito
   document.getElementById('cartBtn').addEventListener('click', openCart);
   document.getElementById('closeCart').addEventListener('click', closeCart);
   document.getElementById('btnEmpty').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); } });
@@ -644,17 +613,17 @@
         alertBox.classList.remove('hidden');
         alertBox.textContent='No se cargaron productos. Revisa las rutas CSV.';
       }
-      // Normaliza formato de marca (capitalizada)
+      // Normaliza nombre de marca capitalizado
       PRODUCTS = PRODUCTS.map(p => ({...p, marca: cap(p.marca)}));
 
       fillFilters(); applyInitialFiltersFromURL(); render();
 
-      // Prefill buyer (no visible aquí, pero no molesta)
+      // Prefill (si existe checkout)
       try{
         const b=JSON.parse(localStorage.getItem('amicotti_buyer')||'{}');
-        const n=document.getElementById('bf_name'); if(n) n.value=b.name||'';
-        const a=document.getElementById('bf_address'); if(a) a.value=b.address||'';
-        const ph=document.getElementById('bf_phone'); if(ph) ph.value=b.phone||'';
+        ['bf_name','bf_address','bf_phone'].forEach(id=>{
+          const el=document.getElementById(id); if(el && b[id.slice(3)]) el.value=b[id.slice(3)];
+        });
       }catch(e){}
     }catch(e){
       console.error(e);
