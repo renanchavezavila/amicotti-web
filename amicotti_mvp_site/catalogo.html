@@ -366,6 +366,71 @@
   }
   function onImgLoad(el){ el.classList.add('loaded'); }
 
+   // Marca como cargada (fade-in)
+function onImgLoad(el){ el.classList.add('loaded'); }
+
+// Zoom — utilidades
+let _pz = null; // instancia Panzoom
+
+function openZoomFromImg(el){
+  const modal = document.getElementById('zoomModal');
+  const img   = document.getElementById('zoomImg');
+  const stage = document.getElementById('zoomStage');
+
+  // Fuente principal y alternas (mismas que usa el catálogo)
+  const sources = [el.currentSrc || el.src, ...(el.dataset.alt||'').split('|').filter(Boolean)];
+  img.src = sources[0] || el.src;
+  img.dataset.alt = sources.slice(1).join('|'); // por si falla, probamos las alternas
+  document.getElementById('zoomCaption').textContent = el.alt || '';
+
+  // Mostrar modal
+  modal.classList.add('show');
+  document.body.classList.add('no-scroll');
+
+  // Panzoom
+  if(_pz){ try{ stage.removeEventListener('wheel', _pz.zoomWithWheel); _pz.destroy(); }catch(e){} }
+  _pz = Panzoom(img, {
+    maxScale: 5,
+    minScale: 1,
+    contain: 'outside',
+    startScale: 1,
+    canvas: true
+  });
+  stage.addEventListener('wheel', _pz.zoomWithWheel);
+  _pz.reset();
+}
+
+function closeZoom(){
+  const modal = document.getElementById('zoomModal');
+  const stage = document.getElementById('zoomStage');
+  modal.classList.remove('show');
+  document.body.classList.remove('no-scroll');
+  if(_pz){
+    try{ stage.removeEventListener('wheel', _pz.zoomWithWheel); _pz.destroy(); }catch(e){}
+    _pz = null;
+  }
+}
+
+function onZoomImgError(el){
+  const rest=(el.dataset.alt||"").split("|").filter(Boolean);
+  if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); return; }
+  el.onerror=null; el.src="assets/logo.png";
+}
+
+// Botones / cierre
+(function bindZoomControls(){
+  const modal = document.getElementById('zoomModal');
+  document.getElementById('zoomClose').onclick = closeZoom;
+  document.getElementById('zoomReset').onclick = ()=> _pz && _pz.reset();
+  document.getElementById('zoomIn').onclick    = ()=> _pz && _pz.zoomIn();
+  document.getElementById('zoomOut').onclick   = ()=> _pz && _pz.zoomOut();
+
+  // Cerrar al hacer click fuera del marco
+  modal.addEventListener('click', (e)=>{ if(e.target===modal) closeZoom(); });
+  // Cerrar con ESC
+  window.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeZoom(); });
+})();
+ 
   /* ================ CSV / PRODUCTOS ================ */
   function mapSpeciesBrand(spec){
     const s = (spec||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
