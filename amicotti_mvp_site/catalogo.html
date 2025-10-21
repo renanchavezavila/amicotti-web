@@ -14,10 +14,27 @@
 
   <style>
     :root{ --pastel:#F6F3E9; --pastel-2:#EFEAE0; }
-    .img-box{height:12rem}
-    /* Fade-in suave: invisible hasta que cargue */
-    .img-box img{max-height:11rem;object-fit:contain;opacity:0;transition:opacity .18s ease}
-    .img-box img.loaded{opacity:1}
+   .img-box{height:12rem}
+.img-box img{
+  max-height:11rem;
+  object-fit:contain;
+  opacity:0;
+  transition:opacity .18s ease;
+  cursor:zoom-in;
+}
+.img-box img.loaded{opacity:1}
+
+/* Modal de zoom */
+.zoom-modal{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;z-index:60}
+.zoom-modal.show{display:flex}
+.zoom-frame{position:relative;width:min(92vw,1100px);height:min(92vh,800px);background:#111;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px #0006}
+.zoom-toolbar{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:2}
+.zoom-toolbar button{background:#fff;border:1px solid #ddd;border-radius:8px;padding:.4rem .6rem;font-size:.9rem}
+.zoom-stage{width:100%;height:100%;touch-action:none}
+.zoom-stage img{max-width:none;max-height:none;display:block;cursor:grab}
+.zoom-stage img:active{cursor:grabbing}
+.zoom-caption{position:absolute;left:12px;bottom:10px;color:#fff;font-size:.75rem;opacity:.85}
+
     .drawer{transform:translateX(100%);transition:transform .25s ease}
     .drawer.open{transform:translateX(0)}
     .overlay{position:fixed;inset:0;background:#0005;opacity:0;pointer-events:none;transition:.2s}
