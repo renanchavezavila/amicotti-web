@@ -617,6 +617,22 @@
   document.getElementById('btnEmpty').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); } });
   document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
   document.getElementById('buyerForm')?.addEventListener('submit', e => e.preventDefault());
+    
+<!-- Modal de Zoom -->
+<div id="zoomModal" class="zoom-modal" aria-hidden="true">
+  <div class="zoom-frame">
+    <div class="zoom-toolbar">
+      <button id="zoomClose" title="Cerrar (Esc)">✕</button>
+      <button id="zoomReset" title="Restablecer">100%</button>
+      <button id="zoomOut" title="Alejar">−</button>
+      <button id="zoomIn" title="Acercar">＋</button>
+    </div>
+    <div id="zoomStage" class="zoom-stage">
+      <img id="zoomImg" alt="Vista ampliada" onerror="onZoomImgError(this)"/>
+    </div>
+    <div id="zoomCaption" class="zoom-caption">Arrastra para mover • Rueda o pellizca para acercar</div>
+  </div>
+</div>
 
   /* ============== INIT ============== */
   (async function init(){
