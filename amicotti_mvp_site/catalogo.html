@@ -6,35 +6,37 @@
   <title>Amicotti — Catálogo</title>
   <meta name="description" content="Catálogo de alimentos y accesorios para mascotas. Entrega en Quito y Valles. Compra por WhatsApp." />
   <link rel="icon" href="assets/logo.png" />
+
   <!-- Tailwind + PapaParse -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <!-- Loader con fallback para Panzoom -->
   <script>
-/* Carga Panzoom con fallback a unpkg y cola de callbacks */
-(function(){
-  function inject(src, ok, err){
-    var s=document.createElement('script');
-    s.src=src; s.async=true; s.onload=ok; s.onerror=err; document.head.appendChild(s);
-  }
-  window.__loadPanzoom = function(cb){
-    if (window.Panzoom) return cb();
-    if (window.__loadPanzoomQueue){ window.__loadPanzoomQueue.push(cb); return; }
-    window.__loadPanzoomQueue=[cb];
-    inject("https://cdn.jsdelivr.net/npm/@panzoom/panzoom@9.4.0/dist/panzoom.min.js",
-      function(){ window.__loadPanzoomQueue.splice(0).forEach(f=>f()); },
-      function(){ inject("https://unpkg.com/@panzoom/panzoom@9.4.0/dist/panzoom.min.js",
+  (function(){
+    function inject(src, ok, err){
+      var s=document.createElement('script');
+      s.src=src; s.async=true; s.onload=ok; s.onerror=err; document.head.appendChild(s);
+    }
+    window.__loadPanzoom = function(cb){
+      if (window.Panzoom) return cb();
+      if (window.__loadPanzoomQueue){ window.__loadPanzoomQueue.push(cb); return; }
+      window.__loadPanzoomQueue=[cb];
+      inject("https://cdn.jsdelivr.net/npm/@panzoom/panzoom@9.4.0/dist/panzoom.min.js",
         function(){ window.__loadPanzoomQueue.splice(0).forEach(f=>f()); },
-        function(){ console.error("No se pudo cargar Panzoom"); window.__loadPanzoomQueue.splice(0).forEach(f=>f()); }
-      ); }
-    );
-  };
-})();
-</script>
+        function(){ inject("https://unpkg.com/@panzoom/panzoom@9.4.0/dist/panzoom.min.js",
+          function(){ window.__loadPanzoomQueue.splice(0).forEach(f=>f()); },
+          function(){ console.error("No se pudo cargar Panzoom"); window.__loadPanzoomQueue.splice(0).forEach(f=>f()); }
+        ); }
+      );
+    };
+  })();
+  </script>
 
   <style>
     :root{ --pastel:#F6F3E9; --pastel-2:#EFEAE0; }
     .img-box{height:12rem}
-    /* Fade-in y cursor lupa */
+    /* Fade-in y cursor lupa en cards */
     .img-box img{max-height:11rem;object-fit:contain;opacity:0;transition:opacity .18s ease;cursor:zoom-in}
     .img-box img.loaded{opacity:1}
     .drawer{transform:translateX(100%);transition:transform .25s ease}
@@ -50,21 +52,11 @@
     .zoom-modal.show{display:flex}
     .zoom-frame{position:relative;width:min(92vw,1100px);height:min(92vh,800px);background:#111;border-radius:12px;overflow:hidden;box-shadow:0 10px 30px #0006}
     .zoom-toolbar{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:2}
-    .zoom-toolbar button{background:#fff;border:1px solid #ddd;border-radius:8px;padding:.4rem .6rem;font-size:.9rem}
+    .zoom-toolbar button{background:#fff;border:1px solid #ddd;border-radius:8px;padding:.4rem .6rem;font-size:.9rem;cursor:pointer}
     .zoom-stage{width:100%;height:100%;touch-action:none}
-    .zoom-stage img{max-width:none;max-height:none;display:block;cursor:grab}
+    .zoom-stage img{max-width:none;max-height:none;display:block;cursor:grab;-webkit-user-drag:none;user-select:none;touch-action:none}
     .zoom-stage img:active{cursor:grabbing}
     .zoom-caption{position:absolute;left:12px;bottom:10px;color:#fff;font-size:.75rem;opacity:.85}
-    /* Evitar drag nativo y selección de texto en la imagen del zoom */
-   .zoom-stage img{
-   -webkit-user-drag: none;
-    user-select: none;
-    touch-action: none;   /* útil en móviles para permitir pan con el dedo */
-}
-
-/* Asegurar clic en toolbar */
-.zoom-toolbar button{ cursor: pointer }
-
   </style>
 </head>
 
@@ -153,13 +145,13 @@
   <div id="zoomModal" class="zoom-modal" aria-hidden="true">
     <div class="zoom-frame">
       <div class="zoom-toolbar">
-      <button type="button" id="zoomClose" title="Cerrar (Esc)">✕</button>
-      <button type="button" id="zoomReset" title="Restablecer">100%</button>
-      <button type="button" id="zoomOut"   title="Alejar">−</button>
-      <button type="button" id="zoomIn"    title="Acercar">＋</button>
+        <button type="button" id="zoomClose" title="Cerrar (Esc)">✕</button>
+        <button type="button" id="zoomReset" title="Restablecer">100%</button>
+        <button type="button" id="zoomOut"   title="Alejar">−</button>
+        <button type="button" id="zoomIn"    title="Acercar">＋</button>
       </div>
       <div id="zoomStage" class="zoom-stage">
-      <img id="zoomImg" alt="Vista ampliada" draggable="false" onerror="onZoomImgError(this)"/>
+        <img id="zoomImg" alt="Vista ampliada" draggable="false" onerror="onZoomImgError(this)"/>
       </div>
       <div id="zoomCaption" class="zoom-caption">Arrastra para mover • Rueda o pellizca para acercar</div>
     </div>
@@ -171,12 +163,15 @@
   <script>
   /* ================ CONFIG ================ */
   const WA_PHONE = "593995315716";
+
   const CSV_SOURCES = [
     { name: "purina",    paths: ["data/purina.csv","assets/data/purina.csv","assets/purina.csv","purina.csv"] },
     { name: "royal",     paths: ["data/royal.csv", "assets/data/royal.csv", "assets/royal.csv", "royal.csv"] },
     { name: "ferplast",  paths: ["data/ferplast.csv","assets/data/ferplast.csv","assets/ferplast.csv","ferplast.csv"] },
     { name: "catit",     paths: ["data/catit.csv","assets/data/catit.csv","assets/catit.csv","catit.csv"] }
   ];
+
+  /* Intenta varias extensiones (puedes reducir a solo .webp si todo tu repo es webp) */
   const IMG_EXTS = [".webp",".jpg",".jpeg",".png",".avif"];
 
   /* ================ ESTADO ================ */
@@ -191,8 +186,12 @@
   const unique = (arr,key)=>[...new Set(arr.map(o => (o[key]||'').trim()).filter(Boolean))].sort();
   const cap = s => (s||'').toString().trim().replace(/\s+/g,' ').toLowerCase().replace(/^\w/, c=>c.toUpperCase());
 
-  /* ===== variantes/peso ===== */
-  function gramsFromLabel(lbl){ if(!lbl) return null; if(/unidad/i.test(lbl)) return null; let m=lbl.match(/([\d.,]+)\s*kg/i); if(m){const v=parseFloat(m[1].replace(',','.')); return isNaN(v)?null:Math.round(v*1000);} m=lbl.match(/([\d.,]+)\s*g/i); if(m){const v=parseFloat(m[1].replace(',','.')); return isNaN(v)?null:Math.round(v);} return null; }
+  function gramsFromLabel(lbl){
+    if(!lbl) return null; if(/unidad/i.test(lbl)) return null;
+    let m=lbl.match(/([\d.,]+)\s*kg/i); if(m){const v=parseFloat(m[1].replace(',','.')); return isNaN(v)?null:Math.round(v*1000);}
+    m=lbl.match(/([\d.,]+)\s*g/i); if(m){const v=parseFloat(m[1].replace(',','.')); return isNaN(v)?null:Math.round(v);}
+    return null;
+  }
   function parseVariants(str){
     if(!str) return [];
     return String(str).split('|').map(s=>{
@@ -251,8 +250,10 @@
     const sub = cartSubtotal(); subEl.textContent = money(sub); totEl.textContent = money(sub);
   }
 
-  /* ================ IMG FALLBACK ================ */
+  /* ================ IMÁGENES ================ */
   const swapExt = (url,ext)=>{ const i=url.lastIndexOf('.'); return i<0? url+ext : url.slice(0,i)+ext; };
+
+  /* Alias de marcas para decidir carpeta */
   const BRAND_ALIASES = {
     'royal canin':'royal','royal':'royal','purina':'purina','ferplast':'ferplast',
     'catit':'catit','dogit':'catit','le salon':'catit','nerf dog':'catit','nerf':'catit',
@@ -302,23 +303,17 @@
 
     modal.classList.add('show'); document.body.classList.add('no-scroll');
 
-    if(_pz){ try{ stage.removeEventListener('wheel', _pz.zoomWithWheel); _pz.destroy(); }catch(e){} }
-  _pz = Panzoom(img, {
-  maxScale: 5,
-  minScale: 1,
-  contain: 'outside',
-  startScale: 1,
-  canvas: true
-});
-stage.addEventListener('wheel', _pz.zoomWithWheel);
-_pz.reset();
-
-// Mostrar porcentaje dinámico en el botón "100%"
-img.addEventListener('panzoomchange', (e)=>{
-  const pct = Math.round(e.detail.scale * 100);
-  const b = document.getElementById('zoomReset');
-  if(b) b.textContent = pct + '%';
-}); 
+    __loadPanzoom(() => {
+      if(_pz){ try{ stage.removeEventListener('wheel', _pz.zoomWithWheel); _pz.destroy(); }catch(e){} _pz=null; }
+      _pz = Panzoom(img, { maxScale:5, minScale:1, contain:'outside', startScale:1, canvas:true });
+      stage.addEventListener('wheel', _pz.zoomWithWheel, {passive:false});
+      img.addEventListener('panzoomchange', (e)=>{
+        const pct = Math.round(e.detail.scale * 100);
+        const b = document.getElementById('zoomReset');
+        if(b) b.textContent = pct + '%';
+      });
+      _pz.reset();
+    });
   }
   function closeZoom(){
     const modal=document.getElementById('zoomModal'); const stage=document.getElementById('zoomStage');
@@ -334,17 +329,41 @@ img.addEventListener('panzoomchange', (e)=>{
     const modal=document.getElementById('zoomModal');
     document.getElementById('zoomClose').onclick=closeZoom;
     document.getElementById('zoomReset').onclick=()=>_pz&&_pz.reset();
-    document.getElementById('zoomIn').onclick=()=>_pz&&_pz.zoomIn();
-    document.getElementById('zoomOut').onclick=()=>_pz&&_pz.zoomOut();
+    document.getElementById('zoomIn').onclick = ()=>_pz&&_pz.zoomIn();
+    document.getElementById('zoomOut').onclick= ()=>_pz&&_pz.zoomOut();
     modal.addEventListener('click',e=>{ if(e.target===modal) closeZoom(); });
     window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeZoom(); });
   })();
 
   /* ================ CSV / PRODUCTOS ================ */
-  function mapSpeciesBrand(spec){ const s=(spec||'').toString().trim().toLowerCase().replace(/\s+/g,' '); if(s==='cat')return'Gato'; if(s==='dog')return'Perro'; if(s==='cat dog'||s==='dog cat'||(s.includes('cat')&&s.includes('dog')))return'Ambos'; if(!s)return'Accesorios'; return cap(s); }
-  function mapCategoryBrand(cat){ const c=(cat||'').toString().trim().toLowerCase(); const dict={ dry:'Seco', wet:'Húmedo', veterinary:'Veterinario', treats:'Snack', treat:'Snack', snacks:'Snack', snack:'Snack', carrier:'Transportadoras', carriers:'Transportadoras', bowl:'Platos', bowls:'Platos', feeder:'Bebederos', feeders:'Bebederos', bed:'Camas', beds:'Camas', toy:'Juguetes', toys:'Juguetes', leash:'Correas', harness:'Arnés', harnesses:'Arnés', litter:'Arena', grooming:'Cuidado', cleaning:'Limpieza', cage:'Jaulas', cages:'Jaulas' }; return dict[c] || (c?cap(c):''); }
-  async function fetchCsvText(paths){ for(const url of paths){ try{ const resp=await fetch(url,{cache:'no-store'}); if(resp.ok){ const text=await resp.text(); if(!/^<!doctype\s+html/i.test(text.trim())) return {url,text}; } }catch(e){} } return null; }
-
+  function mapSpeciesBrand(spec){
+    const s=(spec||'').toString().trim().toLowerCase().replace(/\s+/g,' ');
+    if(s==='cat')return'Gato'; if(s==='dog')return'Perro';
+    if(s==='cat dog'||s==='dog cat'||(s.includes('cat')&&s.includes('dog')))return'Ambos';
+    if(!s) return 'Accesorios';
+    return cap(s);
+  }
+  function mapCategoryBrand(cat){
+    const c=(cat||'').toString().trim().toLowerCase();
+    const dict={ dry:'Seco', wet:'Húmedo', veterinary:'Veterinario', treats:'Snack', treat:'Snack',
+      carrier:'Transportadoras', carriers:'Transportadoras', bowl:'Platos', bowls:'Platos',
+      feeder:'Bebederos', feeders:'Bebederos', bed:'Camas', beds:'Camas', toy:'Juguetes', toys:'Juguetes',
+      leash:'Correas', harness:'Arnés', harnesses:'Arnés', litter:'Arena', grooming:'Cuidado',
+      cleaning:'Limpieza', cage:'Jaulas', cages:'Jaulas' };
+    return dict[c] || (c?cap(c):'');
+  }
+  async function fetchCsvText(paths){
+    for(const url of paths){
+      try{
+        const resp=await fetch(url,{cache:'no-store'});
+        if(resp.ok){
+          const text=await resp.text();
+          if(!/^<!doctype\s+html/i.test(text.trim())) return {url,text};
+        }
+      }catch(e){}
+    }
+    return null;
+  }
   async function loadCSVs(){
     const arrays=[];
     for(const src of CSV_SOURCES){
@@ -376,11 +395,14 @@ img.addEventListener('panzoomchange', (e)=>{
   /* ================ FILTROS + RENDER ================ */
   const grid = document.getElementById('grid');
   const alertBox = document.getElementById('alertBox');
+
+  // DOM de filtros
   const fMarca = document.getElementById('fMarca');
   const fEspecie = document.getElementById('fEspecie');
   const fCategoria = document.getElementById('fCategoria');
   const fSearch = document.getElementById('fSearch');
   const fSort = document.getElementById('fSort');
+
   const m_fMarca = document.getElementById('m_fMarca');
   const m_fEspecie = document.getElementById('m_fEspecie');
   const m_fCategoria = document.getElementById('m_fCategoria');
@@ -389,8 +411,15 @@ img.addEventListener('panzoomchange', (e)=>{
 
   const urlParams = new URLSearchParams(location.search);
   const norm = v => (v||'').toString().trim().toLowerCase();
-  function mapEspecie(v){ v=norm(v); if(v==='cat'||v==='gato')return'Gato'; if(v==='dog'||v==='perro')return'Perro'; if(v==='ambos'||v==='both')return'Ambos'; if(v==='accesorios'||v==='accesorio')return'Accesorios'; return ''; }
-  function mapCategoria(v){ v=norm(v); if(v==='dry'||v==='seco')return'Seco'; if(v==='wet'||v==='húmedo'||v==='humedo')return'Húmedo'; if(v==='veterinary'||v==='veterinario'||v==='vet')return'Veterinario'; if(v==='snack'||v==='treats'||v==='treat')return'Snack'; if(v==='carrier')return'Transportadoras'; return v?cap(v):''; }
+  function mapEspecieParam(v){ v=norm(v); if(v==='cat'||v==='gato')return'Gato'; if(v==='dog'||v==='perro')return'Perro'; if(v==='ambos'||v==='both')return'Ambos'; if(v==='accesorios'||v==='accesorio')return'Accesorios'; return ''; }
+  function mapCategoriaParam(v){ v=norm(v);
+    if(v==='dry'||v==='seco')return'Seco';
+    if(v==='wet'||v==='húmedo'||v==='humedo')return'Húmedo';
+    if(v==='veterinary'||v==='veterinario'||v==='vet')return'Veterinario';
+    if(v==='snack'||v==='treats'||v==='treat')return'Snack';
+    if(v==='carrier')return'Transportadoras';
+    return v?cap(v):'';
+  }
 
   function updateURLFromFilters(){
     const params = new URLSearchParams();
@@ -408,8 +437,7 @@ img.addEventListener('panzoomchange', (e)=>{
 
   function fillFilters(){
     const marcas=['Marca…', ...unique(PRODUCTS,'marca')];
-    const especiesSet = [...new Set(PRODUCTS.map(p=>p.especie).filter(Boolean))].sort();
-    const especies = ['Especie…', ...especiesSet];
+    const especies=['Especie…', ...[...new Set(PRODUCTS.map(p=>p.especie).filter(Boolean))].sort()];
     const cats=['Categoría…', ...unique(PRODUCTS,'categoria')];
     fillSelect(fMarca,marcas); fillSelect(fEspecie,especies); fillSelect(fCategoria,cats);
     fillSelect(m_fMarca,marcas); fillSelect(m_fEspecie,especies); fillSelect(m_fCategoria,cats);
@@ -417,8 +445,8 @@ img.addEventListener('panzoomchange', (e)=>{
 
   function applyInitialFiltersFromURL(){
     const marcaParam=urlParams.get('marca'); if(marcaParam){ fMarca.value=marcaParam; }
-    const espParam=urlParams.get('especie'); if(espParam){ fEspecie.value=mapEspecie(espParam); }
-    const catParam=urlParams.get('categoria'); if(catParam){ fCategoria.value=mapCategoria(catParam); }
+    const espParam=urlParams.get('especie'); if(espParam){ fEspecie.value=mapEspecieParam(espParam); }
+    const catParam=urlParams.get('categoria'); if(catParam){ fCategoria.value=mapCategoriaParam(catParam); }
     const qParam=urlParams.get('q'); if(qParam){ fSearch.value=qParam; }
     const sortParam=urlParams.get('orden'); if(sortParam){ fSort.value=sortParam; }
     mirrorMobileFromDesktop();
@@ -426,7 +454,10 @@ img.addEventListener('panzoomchange', (e)=>{
 
   function getFiltered(){
     const m=fMarca.value, e=fEspecie.value, c=fCategoria.value, q=(fSearch.value||'').trim().toLowerCase();
-    let out = PRODUCTS.filter(p=> (!m||p.marca===m) && (!e||p.especie===e) && (!c||p.categoria===c) && (!q||p.nombre.toLowerCase().includes(q)||p.linea.toLowerCase().includes(q)||(p.sku||'').toLowerCase().includes(q)) );
+    let out = PRODUCTS.filter(p=>
+      (!m || p.marca===m) && (!e || p.especie===e) && (!c || p.categoria===c) &&
+      (!q || p.nombre.toLowerCase().includes(q) || p.linea.toLowerCase().includes(q) || (p.sku||'').toLowerCase().includes(q))
+    );
     switch(fSort.value){
       case 'precio-asc': out.sort((a,b)=>((a.variants?.[0]?.price ?? a.precio ?? 1e9) - (b.variants?.[0]?.price ?? b.precio ?? 1e9))); break;
       case 'precio-desc': out.sort((a,b)=>((b.variants?.[0]?.price ?? b.precio ?? -1) - (a.variants?.[0]?.price ?? a.precio ?? -1))); break;
@@ -476,7 +507,6 @@ img.addEventListener('panzoomchange', (e)=>{
 
   function render(){
     const items=getFiltered();
-    const grid=document.getElementById('grid');
     if(!items.length){ grid.innerHTML = `<div class='col-span-full p-6 text-center text-sm text-gray-500 border rounded'>No hay productos con esos filtros.</div>`; return; }
     items.forEach(p=>{ if(!(p.id in SELECTED)) SELECTED[p.id]=0; });
     grid.innerHTML = items.map(cardHTML).join('');
@@ -489,50 +519,33 @@ img.addEventListener('panzoomchange', (e)=>{
   /* ======== CHECKOUT ======== */
   function goToCheckout(){ if(!CART.length){ alert('Tu carrito está vacío.'); return; } localStorage.setItem('amicotti_checkout_source','catalog'); location.href = 'checkout.html'; }
 
- /* ============== EVENTOS ============== */
-const panel = document.getElementById('filtersPanel');
+  /* ============== EVENTOS ============== */
+  const panel = document.getElementById('filtersPanel');
 
-// header desktop
-[fMarca, fEspecie, fCategoria, fSearch, fSort].forEach(el => {
-  el.addEventListener('input', () => {
-    render();
-    updateURLFromFilters();
-    mirrorMobileFromDesktop();
+  // header desktop
+  ;[fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el =>
+    el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); mirrorMobileFromDesktop(); })
+  );
+  document.getElementById('clearFilters').addEventListener('click',()=>{
+    [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value='');
+    render(); updateURLFromFilters(); mirrorMobileFromDesktop();
   });
-});
 
-document.getElementById('clearFilters').addEventListener('click', () => {
-  [fMarca, fEspecie, fCategoria, fSearch, fSort].forEach(el => el.value = '');
-  render();
-  updateURLFromFilters();
-  mirrorMobileFromDesktop();
-});
-
-// móvil
-document.getElementById('openFilters').addEventListener('click', () => panel.classList.toggle('hidden'));
-
-[m_fMarca, m_fEspecie, m_fCategoria, m_fSearch, m_fSort].forEach(el => {
-  el.addEventListener('input', () => {
-    mirrorDesktopFromMobile();
-    render();
-    updateURLFromFilters();
+  // móvil
+  document.getElementById('openFilters').addEventListener('click', ()=> panel.classList.toggle('hidden'));
+  ;[m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el =>
+    el.addEventListener('input', ()=>{ mirrorDesktopFromMobile(); render(); updateURLFromFilters(); })
+  );
+  document.getElementById('m_clearFilters').addEventListener('click',()=>{
+    [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el=> el.value='');
+    mirrorDesktopFromMobile(); render(); updateURLFromFilters();
   });
-});
 
-document.getElementById('m_clearFilters').addEventListener('click', () => {
-  [m_fMarca, m_fEspecie, m_fCategoria, m_fSearch, m_fSort].forEach(el => el.value = '');
-  mirrorDesktopFromMobile();
-  render();
-  updateURLFromFilters();
-});
-
-// drawer / carrito
-document.getElementById('cartBtn').addEventListener('click', openCart);
-document.getElementById('overlay').addEventListener('click', closeCart);
-document.getElementById('btnEmpty').addEventListener('click', () => {
-  if (confirm('¿Vaciar carrito?')) { CART = []; saveCart(); drawCart(); }
-});
-document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
+  // drawer / carrito
+  document.getElementById('cartBtn').addEventListener('click', openCart);
+  document.getElementById('closeCart').addEventListener('click', closeCart);
+  document.getElementById('btnEmpty').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); } });
+  document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
 
   /* ============== INIT ============== */
   (async function init(){
@@ -543,45 +556,18 @@ document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
         alertBox.classList.remove('hidden');
         alertBox.textContent='No se cargaron productos. Revisa las rutas CSV.';
       }
+      // Normaliza formato de marca (capitalizada)
       PRODUCTS = PRODUCTS.map(p => ({...p, marca: cap(p.marca)}));
-      // Filtros + render
-      const marcas=['Marca…', ...unique(PRODUCTS,'marca')];
-      const especies=['Especie…', ...[...new Set(PRODUCTS.map(p=>p.especie).filter(Boolean))].sort()];
-      const cats=['Categoría…', ...unique(PRODUCTS,'categoria')];
-      function fillSelect(sel, values){ sel.innerHTML = values.map((v,i)=>`<option value="${i===0?'':v}">${v}</option>`).join(''); }
-      fillSelect(fMarca,marcas); fillSelect(fEspecie,especies); fillSelect(fCategoria,cats);
-      fillSelect(m_fMarca,marcas); fillSelect(m_fEspecie,especies); fillSelect(m_fCategoria,cats);
-      function mirrorMobileFromDesktop(){ m_fMarca.value=fMarca.value; m_fEspecie.value=fEspecie.value; m_fCategoria.value=fCategoria.value; m_fSearch.value=fSearch.value; m_fSort.value=fSort.value; }
-      function mirrorDesktopFromMobile(){ fMarca.value=m_fMarca.value; fEspecie.value=m_fEspecie.value; fCategoria.value=m_fCategoria.value; fSearch.value=m_fSearch.value; fSort.value=m_fSort.value; }
-      window.mirrorMobileFromDesktop = mirrorMobileFromDesktop;
-      window.mirrorDesktopFromMobile = mirrorDesktopFromMobile;
 
-      // Query params
-      const urlParams = new URLSearchParams(location.search);
-      const norm = v => (v||'').toString().trim().toLowerCase();
-      function mapEspecie(v){ v=norm(v); if(v==='cat'||v==='gato') return 'Gato'; if(v==='dog'||v==='perro') return 'Perro'; if(v==='ambos'||v==='both') return 'Ambos'; if(v==='accesorios'||v==='accesorio') return 'Accesorios'; return ''; }
-      function mapCategoria(v){ v=norm(v); if(v==='dry'||v==='seco') return 'Seco'; if(v==='wet'||v==='húmedo'||v==='humedo') return 'Húmedo'; if(v==='veterinary'||v==='veterinario'||v==='vet') return 'Veterinario'; if(v==='snack'||v==='treats'||v==='treat') return 'Snack'; if(v==='carrier') return 'Transportadoras'; return v ? cap(v) : ''; }
-      function applyInitialFiltersFromURL(){
-        const marcaParam=urlParams.get('marca'); if(marcaParam){ fMarca.value=marcaParam; }
-        const espParam=urlParams.get('especie'); if(espParam){ fEspecie.value=mapEspecie(espParam); }
-        const catParam=urlParams.get('categoria'); if(catParam){ fCategoria.value=mapCategoria(catParam); }
-        const qParam=urlParams.get('q'); if(qParam){ fSearch.value=qParam; }
-        const sortParam=urlParams.get('orden'); if(sortParam){ fSort.value=sortParam; }
-        mirrorMobileFromDesktop();
-      }
-      window.updateURLFromFilters = function(){
-        const params = new URLSearchParams();
-        if(fMarca.value) params.set('marca', fMarca.value);
-        if(fEspecie.value) params.set('especie', fEspecie.value);
-        if(fCategoria.value) params.set('categoria', fCategoria.value);
-        if(fSearch.value.trim()) params.set('q', fSearch.value.trim());
-        if(fSort.value) params.set('orden', fSort.value);
-        const qs=params.toString();
-        history.replaceState(null,'',window.location.pathname+(qs?('?'+qs):'')); 
-      };
+      fillFilters(); applyInitialFiltersFromURL(); render();
 
-      applyInitialFiltersFromURL();
-      render();
+      // Prefill buyer (no visible aquí, pero no molesta):
+      try{
+        const b=JSON.parse(localStorage.getItem('amicotti_buyer')||'{}');
+        if(b.name) document.getElementById('bf_name')?.value=b.name;
+        if(b.address) document.getElementById('bf_address')?.value=b.address;
+        if(b.phone) document.getElementById('bf_phone')?.value=b.phone;
+      }catch(e){}
     }catch(e){
       console.error(e);
       alertBox.classList.remove('hidden');
@@ -591,4 +577,3 @@ document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
   </script>
 </body>
 </html>
-
