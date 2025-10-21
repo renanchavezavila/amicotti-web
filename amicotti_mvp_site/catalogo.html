@@ -284,9 +284,22 @@
     modal.classList.add('show'); document.body.classList.add('no-scroll');
 
     if(_pz){ try{ stage.removeEventListener('wheel', _pz.zoomWithWheel); _pz.destroy(); }catch(e){} }
-    _pz = Panzoom(img, { maxScale:5, minScale:1, contain:'outside', startScale:1, canvas:true });
-    stage.addEventListener('wheel', _pz.zoomWithWheel);
-    _pz.reset();
+  _pz = Panzoom(img, {
+  maxScale: 5,
+  minScale: 1,
+  contain: 'outside',
+  startScale: 1,
+  canvas: true
+});
+stage.addEventListener('wheel', _pz.zoomWithWheel);
+_pz.reset();
+
+// Mostrar porcentaje dinámico en el botón "100%"
+img.addEventListener('panzoomchange', (e)=>{
+  const pct = Math.round(e.detail.scale * 100);
+  const b = document.getElementById('zoomReset');
+  if(b) b.textContent = pct + '%';
+}); 
   }
   function closeZoom(){
     const modal=document.getElementById('zoomModal'); const stage=document.getElementById('zoomStage');
