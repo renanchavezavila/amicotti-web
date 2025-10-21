@@ -164,14 +164,15 @@
   /* ================ CONFIG ================ */
   const WA_PHONE = "593995315716";
 
-  const CSV_SOURCES = [
-    { name: "purina",    paths: ["data/purina.csv","assets/data/purina.csv","assets/purina.csv","purina.csv"] },
-    { name: "royal",     paths: ["data/royal.csv", "assets/data/royal.csv", "assets/royal.csv", "royal.csv"] },
-    { name: "ferplast",  paths: ["data/ferplast.csv","assets/data/ferplast.csv","assets/ferplast.csv","ferplast.csv"] },
-    { name: "catit",     paths: ["data/catit.csv","assets/data/catit.csv","assets/catit.csv","catit.csv"] }
+  /* CSVs (carga directa y estable) */
+  const CSV_URLS = [
+    "data/purina.csv",
+    "data/royal.csv",
+    "data/ferplast.csv",
+    "data/catit.csv"
   ];
 
-  /* Intenta varias extensiones (puedes reducir a solo .webp si todo tu repo es webp) */
+  /* Extensiones de imagen a intentar (si todas son .webp, deja solo ".webp") */
   const IMG_EXTS = [".webp",".jpg",".jpeg",".png",".avif"];
 
   /* ================ ESTADO ================ */
@@ -341,7 +342,7 @@
     if(s==='cat')return'Gato'; if(s==='dog')return'Perro';
     if(s==='cat dog'||s==='dog cat'||(s.includes('cat')&&s.includes('dog')))return'Ambos';
     if(!s) return 'Accesorios';
-    return cap(s);
+    return s.replace(/^\w/,c=>c.toUpperCase());
   }
   function mapCategoryBrand(cat){
     const c=(cat||'').toString().trim().toLowerCase();
@@ -350,46 +351,64 @@
       feeder:'Bebederos', feeders:'Bebederos', bed:'Camas', beds:'Camas', toy:'Juguetes', toys:'Juguetes',
       leash:'Correas', harness:'Arnés', harnesses:'Arnés', litter:'Arena', grooming:'Cuidado',
       cleaning:'Limpieza', cage:'Jaulas', cages:'Jaulas' };
-    return dict[c] || (c?cap(c):'');
+    return dict[c] || (c?c.replace(/^\w/,x=>x.toUpperCase()):'');
   }
-  async function fetchCsvText(paths){
-    for(const url of paths){
-      try{
-        const resp=await fetch(url,{cache:'no-store'});
-        if(resp.ok){
-          const text=await resp.text();
-          if(!/^<!doctype\s+html/i.test(text.trim())) return {url,text};
-        }
-      }catch(e){}
-    }
-    return null;
-  }
+
   async function loadCSVs(){
-    const arrays=[];
-    for(const src of CSV_SOURCES){
-      const got=await fetchCsvText(src.paths); if(!got) continue;
-      const parsed=Papa.parse(got.text,{header:true,skipEmptyLines:true});
-      const rows=parsed.data||[];
-      const normalized = rows.map((r,idx)=>{
-        const hasBrandSchema=('brand' in r)||('name' in r)||('species' in r);
-        if(hasBrandSchema){
-          const especie=mapSpeciesBrand(r.species);
-          const categoria=mapCategoryBrand(r.category);
-          const variants=parseVariants(r.variants||''); const first=variants[0]||null;
-          return { id:(r.id||('row'+idx)).toString().trim(), marca:(r.brand||src.name||'').toString().trim().replace(/\s+/g,' ').replace(/^\w/,c=>c.toUpperCase()),
-            linea:'', especie, categoria, nombre:(r.name||'').toString().trim(), peso_g:first?first.grams:null, sku:'', precio:first?first.price:null,
-            imagen_url:(r.image_url||'').toString().trim(), descripcion:'', disponible:true, variants };
-        }else{
-          const variants=parseVariants(r.variants||''); const first=variants[0]||null;
-          return { id:(r.id||('row'+idx)).toString().trim(), marca:(r.marca||src.name||'').toString().trim(), linea:(r.linea||'').toString().trim(),
-            especie:(r.especie||'').toString().trim(), categoria:(r.categoria||'').toString().trim(), nombre:(r.nombre||'').toString().trim(),
-            peso_g:r.peso_g?Number(r.peso_g):(first?first.grams:null), sku:(r.sku||'').toString().trim(), precio:(r.precio!==''&&r.precio!=null)?Number(r.precio):(first?first.price:null),
-            imagen_url:(r.imagen_url||'').toString().trim(), descripcion:(r.descripcion||'').toString().trim(), disponible:String(r.disponible||'1')==='1', variants };
-        }
-      }).filter(p=>p.disponible);
-      arrays.push(normalized);
-    }
-    PRODUCTS = arrays.flat();
+    // Carga directa y estable con PapaParse (como el flujo original)
+    const loads = CSV_URLS.map((url, fileIdx) => new Promise((resolve) => {
+      Papa.parse(url, {
+        download: true, header: true, skipEmptyLines: true,
+        complete: r => resolve({ url, data: r.data||[], fileIdx }),
+        error: () => resolve({ url, data: [], fileIdx })
+      });
+    }));
+
+    const results = await Promise.all(loads);
+
+    const arrays = results.map(({url, data, fileIdx}) => data.map((r, idx) => {
+      const hasBrandSchema = ('brand' in r) || ('name' in r) || ('species' in r);
+      const brandDefault =
+        url.includes('purina')   ? 'Purina' :
+        url.includes('royal')    ? 'Royal canin' :
+        url.includes('ferplast') ? 'Ferplast' :
+        url.includes('catit')    ? 'Catit' : '';
+
+      if(hasBrandSchema){
+        const especie   = mapSpeciesBrand(r.species);
+        const categoria = mapCategoryBrand(r.category);
+        const variants  = parseVariants(r.variants||''); const first=variants[0]||null;
+        return {
+          id: (r.id||(`row${fileIdx}_${idx}`)).toString().trim(),
+          marca: (r.brand||brandDefault).toString().trim(),
+          linea:'', especie, categoria,
+          nombre:(r.name||'').toString().trim(),
+          peso_g:first?first.grams:null, sku:'',
+          precio:first?first.price:null,
+          imagen_url:(r.image_url||'').toString().trim(),
+          descripcion:'', disponible:true, variants
+        };
+      } else {
+        const variants=parseVariants(r.variants||''); const first=variants[0]||null;
+        return {
+          id:(r.id||(`row${fileIdx}_${idx}`)).toString().trim(),
+          marca:(r.marca||brandDefault).toString().trim(),
+          linea:(r.linea||'').toString().trim(),
+          especie:(r.especie||'').toString().trim(),
+          categoria:(r.categoria||'').toString().trim(),
+          nombre:(r.nombre||'').toString().trim(),
+          peso_g:r.peso_g?Number(r.peso_g):(first?first.grams:null),
+          sku:(r.sku||'').toString().trim(),
+          precio:(r.precio!==''&&r.precio!=null)?Number(r.precio):(first?first.price:null),
+          imagen_url:(r.imagen_url||'').toString().trim(),
+          descripcion:(r.descripcion||'').toString().trim(),
+          disponible:String(r.disponible||'1')==='1',
+          variants
+        };
+      }
+    }));
+
+    PRODUCTS = arrays.flat().filter(p=>p.disponible);
   }
 
   /* ================ FILTROS + RENDER ================ */
@@ -561,12 +580,12 @@
 
       fillFilters(); applyInitialFiltersFromURL(); render();
 
-      // Prefill buyer (no visible aquí, pero no molesta):
+      // Prefill buyer (no visible aquí, pero no molesta)
       try{
         const b=JSON.parse(localStorage.getItem('amicotti_buyer')||'{}');
-        if(b.name) document.getElementById('bf_name')?.value=b.name;
-        if(b.address) document.getElementById('bf_address')?.value=b.address;
-        if(b.phone) document.getElementById('bf_phone')?.value=b.phone;
+        const n=document.getElementById('bf_name'); if(n) n.value=b.name||'';
+        const a=document.getElementById('bf_address'); if(a) a.value=b.address||'';
+        const ph=document.getElementById('bf_phone'); if(ph) ph.value=b.phone||'';
       }catch(e){}
     }catch(e){
       console.error(e);
