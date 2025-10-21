@@ -291,50 +291,119 @@
   function onImgLoad(el){ el.classList.add('loaded'); }
 
   /* ====== ZOOM ====== */
-  let _pz=null;
-  function openZoomFromImg(el){
-    const modal=document.getElementById('zoomModal');
-    const img=document.getElementById('zoomImg');
-    const stage=document.getElementById('zoomStage');
+ <script>
+  /* ====== ZOOM (auto-fit + centrado) ====== */
+  let _pz = null;
+  let _baseScale = 1;
 
-    const sources=[el.currentSrc||el.src, ...(el.dataset.alt||'').split('|').filter(Boolean)];
-    img.src=sources[0] || el.src;
-    img.dataset.alt = sources.slice(1).join('|');
-    document.getElementById('zoomCaption').textContent = el.alt||'';
+  function updateZoomLabel(scale){
+    const b = document.getElementById('zoomReset');
+    if (b) b.textContent = Math.round((scale||1)*100) + '%';
+  }
 
-    modal.classList.add('show'); document.body.classList.add('no-scroll');
-
+  function startPanzoomFit(img, stage){
     __loadPanzoom(() => {
-      if(_pz){ try{ stage.removeEventListener('wheel', _pz.zoomWithWheel); _pz.destroy(); }catch(e){} _pz=null; }
-      _pz = Panzoom(img, { maxScale:5, minScale:1, contain:'outside', startScale:1, canvas:true });
-      stage.addEventListener('wheel', _pz.zoomWithWheel, {passive:false});
-      img.addEventListener('panzoomchange', (e)=>{
-        const pct = Math.round(e.detail.scale * 100);
-        const b = document.getElementById('zoomReset');
-        if(b) b.textContent = pct + '%';
+      // Limpia instancia previa
+      if (_pz){
+        try{ stage.removeEventListener('wheel', _pz.zoomWithWheel); _pz.destroy(); }catch(e){}
+        _pz = null;
+      }
+      // Crea panzoom
+      _pz = Panzoom(img, { maxScale: 6, minScale: 0.2, canvas: true, contain: 'outside' });
+      stage.addEventListener('wheel', _pz.zoomWithWheel, { passive:false });
+
+      // Calcula escala para encajar
+      const sw = stage.clientWidth || 1;
+      const sh = stage.clientHeight || 1;
+      const iw = img.naturalWidth || 1;
+      const ih = img.naturalHeight || 1;
+      _baseScale = Math.max( Math.min(sw/iw, sh/ih), 0.2 ); // encaje, mínimo 0.2
+
+      // Aplica escala base y centra
+      _pz.zoom(_baseScale, {
+        animate: false,
+        focal: { clientX: sw/2, clientY: sh/2 }
       });
-      _pz.reset();
+
+      // Centrado visual (cuando el lienzo es mayor que la imagen escalada)
+      const dx = (sw - iw*_baseScale)/2;
+      const dy = (sh - ih*_baseScale)/2;
+      _pz.pan(dx, dy, { animate:false });
+
+      updateZoomLabel(_baseScale);
+
+      // Mantén etiqueta actualizada
+      img.addEventListener('panzoomchange', (e)=>{
+        updateZoomLabel(e.detail.scale || _baseScale);
+      }, { once:false });
     });
   }
-  function closeZoom(){
-    const modal=document.getElementById('zoomModal'); const stage=document.getElementById('zoomStage');
-    modal.classList.remove('show'); document.body.classList.remove('no-scroll');
-    if(_pz){ try{ stage.removeEventListener('wheel', _pz.zoomWithWheel); _pz.destroy(); }catch(e){} _pz=null; }
+
+  function openZoomFromImg(el){
+    const modal = document.getElementById('zoomModal');
+    const img   = document.getElementById('zoomImg');
+    const stage = document.getElementById('zoomStage');
+
+    // Fuentes: actual + alternativas (para fallback)
+    const sources = [el.currentSrc || el.src, ...(el.dataset.alt||'').split('|').filter(Boolean)];
+    img.src       = sources[0] || el.src;
+    img.dataset.alt = sources.slice(1).join('|');
+    document.getElementById('zoomCaption').textContent = el.alt || '';
+
+    modal.classList.add('show');
+    document.body.classList.add('no-scroll');
+
+    // Espera a que la imagen esté lista para conocer naturalWidth/Height
+    const run = () => startPanzoomFit(img, stage);
+    if (img.complete && img.naturalWidth) { run(); }
+    else { img.onload = run; }
   }
+
+  function closeZoom(){
+    const modal = document.getElementById('zoomModal');
+    const stage = document.getElementById('zoomStage');
+    modal.classList.remove('show');
+    document.body.classList.remove('no-scroll');
+    if (_pz){
+      try{ stage.removeEventListener('wheel', _pz.zoomWithWheel); _pz.destroy(); }catch(e){}
+      _pz = null;
+    }
+  }
+
   function onZoomImgError(el){
     const rest=(el.dataset.alt||"").split("|").filter(Boolean);
     if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); return; }
     el.onerror=null; el.src="assets/logo.png";
   }
+
   (function bindZoomControls(){
-    const modal=document.getElementById('zoomModal');
-    document.getElementById('zoomClose').onclick=closeZoom;
-    document.getElementById('zoomReset').onclick=()=>_pz&&_pz.reset();
-    document.getElementById('zoomIn').onclick = ()=>_pz&&_pz.zoomIn();
-    document.getElementById('zoomOut').onclick= ()=>_pz&&_pz.zoomOut();
-    modal.addEventListener('click',e=>{ if(e.target===modal) closeZoom(); });
-    window.addEventListener('keydown',e=>{ if(e.key==='Escape') closeZoom(); });
+    const modal = document.getElementById('zoomModal');
+    const stage = document.getElementById('zoomStage');
+
+    document.getElementById('zoomClose').onclick = closeZoom;
+
+    // Restablece al "encaje" (no a 1:1)
+    document.getElementById('zoomReset').onclick = () => {
+      if (!_pz) return;
+      const sw = stage.clientWidth, sh = stage.clientHeight;
+      _pz.zoom(_baseScale, { animate:true, focal:{ clientX: sw/2, clientY: sh/2 } });
+      // re-centra tras reset
+      const img = document.getElementById('zoomImg');
+      const iw = img.naturalWidth, ih = img.naturalHeight;
+      const dx = (sw - iw*_baseScale)/2;
+      const dy = (sh - ih*_baseScale)/2;
+      _pz.pan(dx, dy, { animate:true });
+      updateZoomLabel(_baseScale);
+    };
+
+    document.getElementById('zoomIn').onclick  = ()=> _pz && _pz.zoomIn();
+    document.getElementById('zoomOut').onclick = ()=> _pz && _pz.zoomOut();
+
+    // Cierra con clic fuera o Esc
+    modal.addEventListener('click', e => { if (e.target===modal) closeZoom(); });
+    window.addEventListener('keydown', e => { if (e.key==='Escape') closeZoom(); });
   })();
+</script>
 
   /* ================ CSV / PRODUCTOS ================ */
   function mapSpeciesBrand(spec){
