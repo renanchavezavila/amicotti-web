@@ -447,22 +447,50 @@
   /* ======== CHECKOUT ======== */
   function goToCheckout(){ if(!CART.length){ alert('Tu carrito está vacío.'); return; } localStorage.setItem('amicotti_checkout_source','catalog'); location.href = 'checkout.html'; }
 
-  /* ============== EVENTOS ============== */
-  const panel=document.getElementById('filtersPanel');
-  const fMarca=document.getElementById('fMarca'), fEspecie=document.getElementById('fEspecie'), fCategoria=document.getElementById('fCategoria'), fSearch=document.getElementById('fSearch'), fSort=document.getElementById('fSort');
-  const m_fMarca=document.getElementById('m_fMarca'), m_fEspecie=document.getElementById('m_fEspecie'), m_fCategoria=document.getElementById('m_fCategoria'), m_fSearch=document.getElementById('m_fSearch'), m_fSort=document.getElementById('m_fSort');
+ /* ============== EVENTOS ============== */
+const panel = document.getElementById('filtersPanel');
 
-  [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el => el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); mirrorMobileFromDesktop(); }));
-  document.getElementById('clearFilters').addEventListener('click',()=>{ [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); render(); updateURLFromFilters(); mirrorMobileFromDesktop(); });
+// header desktop
+[fMarca, fEspecie, fCategoria, fSearch, fSort].forEach(el => {
+  el.addEventListener('input', () => {
+    render();
+    updateURLFromFilters();
+    mirrorMobileFromDesktop();
+  });
+});
 
-  document.getElementById('openFilters').addEventListener('click', ()=> panel.classList.toggle('hidden'));
-  [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el => el.addEventListener('input', ()=>{ mirrorDesktopFromMobile(); render(); updateURLFromFilters(); }));
-  document.getElementById('m_clearFilters').addEventListener('click',()=>{ [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el=> el.value=''); mirrorDesktopFromMobile(); render(); updateURLFromFilters(); });
+document.getElementById('clearFilters').addEventListener('click', () => {
+  [fMarca, fEspecie, fCategoria, fSearch, fSort].forEach(el => el.value = '');
+  render();
+  updateURLFromFilters();
+  mirrorMobileFromDesktop();
+});
 
-  document.getElementById('cartBtn').addEventListener('click', openCart);
-  document.getElementById('overlay').addEventListener('click', closeCart);
-  document.getElementById('btnEmpty').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); } });
-  document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
+// móvil
+document.getElementById('openFilters').addEventListener('click', () => panel.classList.toggle('hidden'));
+
+[m_fMarca, m_fEspecie, m_fCategoria, m_fSearch, m_fSort].forEach(el => {
+  el.addEventListener('input', () => {
+    mirrorDesktopFromMobile();
+    render();
+    updateURLFromFilters();
+  });
+});
+
+document.getElementById('m_clearFilters').addEventListener('click', () => {
+  [m_fMarca, m_fEspecie, m_fCategoria, m_fSearch, m_fSort].forEach(el => el.value = '');
+  mirrorDesktopFromMobile();
+  render();
+  updateURLFromFilters();
+});
+
+// drawer / carrito
+document.getElementById('cartBtn').addEventListener('click', openCart);
+document.getElementById('overlay').addEventListener('click', closeCart);
+document.getElementById('btnEmpty').addEventListener('click', () => {
+  if (confirm('¿Vaciar carrito?')) { CART = []; saveCart(); drawCart(); }
+});
+document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
 
   /* ============== INIT ============== */
   (async function init(){
