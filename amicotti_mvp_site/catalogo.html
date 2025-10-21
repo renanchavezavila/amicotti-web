@@ -6,17 +6,14 @@
   <title>Amicotti — Catálogo</title>
   <meta name="description" content="Catálogo de alimentos y accesorios para mascotas. Entrega en Quito y Valles. Compra por WhatsApp." />
   <link rel="icon" href="assets/logo.png" />
-
-  <!-- Tailwind + PapaParse -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
     :root{ --pastel:#F6F3E9; --pastel-2:#EFEAE0; }
     .img-box{height:12rem}
-    /* Fade-in suave: invisible hasta que cargue */
     .img-box img{max-height:11rem;object-fit:contain;opacity:0;transition:opacity .18s ease}
-    .img-box img.loaded{opacity:1}
+     .img-box img.loaded{opacity:1}
     .drawer{transform:translateX(100%);transition:transform .25s ease}
     .drawer.open{transform:translateX(0)}
     .overlay{position:fixed;inset:0;background:#0005;opacity:0;pointer-events:none;transition:.2s}
@@ -28,7 +25,6 @@
 </head>
 
 <body class="bg-white text-gray-900">
-  <!-- HEADER -->
   <header class="sticky top-0 z-40 border-b bg-[color:var(--pastel)]/90 backdrop-blur">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
       <a href="index.html" class="flex items-center gap-2 shrink-0">
@@ -36,7 +32,6 @@
         <span class="font-semibold">Amicotti</span>
       </a>
 
-      <!-- Controles (desktop) -->
       <div class="hidden lg:flex items-center gap-2 flex-1">
         <select id="fMarca" class="hctrl border rounded px-2 py-2 text-sm bg-white"></select>
         <select id="fEspecie" class="hctrl border rounded px-2 py-2 text-sm bg-white"></select>
@@ -52,10 +47,8 @@
         <button id="clearFilters" class="ml-1 px-3 py-2 text-sm border rounded bg-white">Limpiar</button>
       </div>
 
-      <!-- Botón filtros (móvil) -->
       <button id="openFilters" class="lg:hidden ml-auto px-3 py-2 border rounded bg-white">Filtros</button>
 
-      <!-- Acciones -->
       <div class="flex items-center gap-2">
         <a id="waTop" target="_blank" class="hidden md:inline-flex items-center gap-2 px-3 py-2 bg-green-600 text-white rounded">WhatsApp</a>
         <button id="cartBtn" class="relative inline-flex items-center gap-2 px-3 py-2 border rounded bg-white">
@@ -64,7 +57,6 @@
       </div>
     </div>
 
-    <!-- Panel filtros móvil -->
     <div id="filtersPanel" class="lg:hidden border-t bg-[color:var(--pastel-2)] py-3 hidden">
       <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
         <select id="m_fMarca" class="border rounded px-2 py-2 text-sm bg-white"></select>
@@ -83,16 +75,13 @@
     </div>
   </header>
 
-  <!-- GRID -->
   <main class="max-w-7xl mx-auto p-4">
     <div id="alertBox" class="hidden mb-3 p-3 rounded bg-yellow-50 border text-sm text-yellow-900"></div>
     <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
   </main>
 
-  <!-- OVERLAY -->
   <div id="overlay" class="overlay"></div>
 
-  <!-- DRAWER CARRITO -->
   <div id="cartDrawer" class="drawer fixed top-0 right-0 w-[420px] max-w-full h-full bg-white border-l shadow-xl z-50 flex flex-col">
     <div class="p-4 flex items-center justify-between border-b">
       <h2 class="text-lg font-semibold">Tu pedido</h2>
@@ -102,10 +91,8 @@
       </div>
     </div>
 
-    <!-- Items -->
     <div id="cartItems" class="p-4 space-y-3 overflow-y-auto" style="height:calc(100% - 20rem)"></div>
 
-    <!-- Datos del cliente (OCULTO EN CATALOGO) -->
     <div id="buyerBlock" class="p-4 border-t space-y-3 hidden">
       <form id="buyerForm" class="space-y-3" autocomplete="on">
         <div>
@@ -142,7 +129,6 @@
       </form>
     </div>
 
-    <!-- Totales + CTA -->
     <div class="p-4 border-t space-y-2">
       <div class="flex items-center justify-between text-sm text-gray-600">
         <span>Subtotal</span><strong id="cartSubtotal">$0.00</strong>
@@ -159,17 +145,15 @@
     </div>
   </div>
 
-  <!-- BOTÓN WA FLOTANTE -->
   <a id="waFloat" target="_blank" class="fixed bottom-4 right-4 md:hidden w-12 h-12 rounded-full bg-green-600 text-white grid place-items-center shadow-lg">WA</a>
 
   <footer class="border-t text-center text-xs text-gray-500 p-6">© Amicotti — Quito & Valles</footer>
 
-  <!-- === JS ÚNICO === -->
   <script>
   /* ================ CONFIG ================ */
   const WA_PHONE = "593995315716";
 
-  /* CSVs (con rutas alternativas por si cambian de carpeta) */
+  /* Nuevo: agregamos catit.csv a las fuentes */
   const CSV_SOURCES = [
     { name: "purina",    paths: ["data/purina.csv","assets/data/purina.csv","assets/purina.csv","purina.csv"] },
     { name: "royal",     paths: ["data/royal.csv", "assets/data/royal.csv", "assets/royal.csv", "royal.csv"] },
@@ -204,14 +188,13 @@
     return raw;
   }
 
-  /* Dinero: vacío => "Consultar" */
+  /* Ajuste: cuando no hay precio => "Consultar" (evita $0.00) */
   const money = (n) => {
     if (n === null || n === undefined || n === '') return 'Consultar';
     const num = +n;
     return (Number.isFinite(num) && num >= 0) ? ('$' + num.toFixed(2)) : 'Consultar';
   };
 
-  /* ===== Parsing de variantes/peso ===== */
   function gramsFromLabel(lbl){
     if(!lbl) return null; if(/unidad/i.test(lbl)) return null;
     let m = lbl.match(/([\d.,]+)\s*kg/i);
@@ -224,7 +207,7 @@
     if(!str) return [];
     return String(str).split('|').map(s=>{
       const raw = s.trim();
-      const parts = raw.split(/[:\-—]+/);
+      const parts = raw.split(/[:\-—]+/);   // etiqueta : $precio  |  etiqueta — texto
       const label = (parts[0]||'').trim();
       const grams = gramsFromLabel(label);
       let price = null;
@@ -301,52 +284,87 @@
   }
 
   /* ================ IMG FALLBACK ================ */
-  const swapExt = (url,ext)=>{ const i=url.lastIndexOf('.'); return i<0? url+ext : url.slice(0,i)+ext; };
+/* ================ IMG FALLBACK (reemplazo) ================ */
+const swapExt = (url,ext)=>{ const i=url.lastIndexOf('.'); return i<0? url+ext : url.slice(0,i)+ext; };
 
-  // Alias de marcas → carpeta de imágenes
-  const BRAND_ALIASES = {
-    'royal canin':'royal','royal':'royal','purina':'purina','ferplast':'ferplast',
-    // Grupo Catit y asociados:
-    'catit':'catit','dogit':'catit','le salon':'catit','nerf dog':'catit','nerf':'catit',
-    'nylabone':'catit','odor defense':'catit','petmate':'catit','sentry':'catit','zeus':'catit'
-  };
-  const slugify = s => (s||'').toString().trim().toLowerCase()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-      .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+const BRAND_ALIASES = {
+  'royal canin': 'royal',
+  'royal': 'royal',
+  'purina': 'purina',
+  'ferplast': 'ferplast',
+  // Grupo Catit / asociados
+  'catit': 'catit',
+  'dogit': 'catit',
+  'le salon': 'catit',
+  'nerf dog': 'catit',
+  'nerf': 'catit',
+  'nylabone': 'catit',
+  'odor defense': 'catit',
+  'petmate': 'catit',
+  'sentry': 'catit',
+  'zeus': 'catit'
+};
 
-  function folderForBrand(brand){
-    const b=(brand||'').toLowerCase();
-    for(const key of Object.keys(BRAND_ALIASES)){ if(b.includes(key)) return BRAND_ALIASES[key]; }
-    const slug = slugify(brand); return slug || 'catalog';
+const slugify = s => (s||'').toString().trim().toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+
+function folderForBrand(brand){
+  const b = (brand||'').toLowerCase();
+  for (const key of Object.keys(BRAND_ALIASES)){
+    if (b.includes(key)) return BRAND_ALIASES[key];
+  }
+  const slug = slugify(brand);
+  return slug || 'catalog';
+}
+
+function buildImgCandidates(p){
+  const brand = p.marca || '';
+
+  // Si el CSV trae URL explícita, úsala
+  if (p.imagen_url && p.imagen_url.trim()){
+    const first = p.imagen_url.trim();
+    const alts = IMG_EXTS.map(e=>swapExt(first,e));
+    return [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
   }
 
-  function buildImgCandidates(p){
-    const brand = p.marca || '';
+  // Bases: alias (Zeus/Dogit/etc → catit/), slug (por si creas carpeta propia) y catálogo
+  const primary = `assets/${folderForBrand(brand)}/`;
+  const bySlug  = `assets/${slugify(brand)}/`;
+  const bases = [primary];
+  if (bySlug !== primary) bases.push(bySlug);
+  bases.push('assets/catalog/');
 
-    // URL explícita del CSV
-    if(p.imagen_url && p.imagen_url.trim()){
-      const first=p.imagen_url.trim(); const alts=IMG_EXTS.map(e=>swapExt(first,e));
-      return [first, ...alts].filter((v,i,a)=>a.indexOf(v)===i);
-    }
-
-    // Bases: alias (ej. Zeus→catit), slug por si creas carpeta, y catálogo genérico
-    const primary = `assets/${folderForBrand(brand)}/`;
-    const bySlug  = `assets/${slugify(brand)}/`;
-    const bases = [primary];
-    if (bySlug !== primary) bases.push(bySlug);
-    bases.push('assets/catalog/');
-
-    const out=[];
-    for(const base of bases){ for(const ext of IMG_EXTS){ out.push(`${base}${p.id}${ext}`); } }
-    return [...new Set(out)];
+  const out = [];
+  for (const base of bases){
+    for (const ext of IMG_EXTS) out.push(`${base}${p.id}${ext}`);
   }
+  return [...new Set(out)];
+}
 
-  function onImgError(el){
-    const rest=(el.dataset.alt||"").split("|").filter(Boolean);
-    if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); return; }
-    el.onerror=null; el.src="assets/logo.png";
+
+  // Fallbacks conocidos
+  ['catit','ferplast','purina','royal'].forEach(f=>{
+    const path = `assets/${f}/`;
+    if (!bases.includes(path)) bases.push(path);
+  });
+  if (!bases.includes('assets/catalog/')) bases.push('assets/catalog/');
+
+  // Combina bases + extensiones
+  const candidates = [];
+  for (const base of bases){
+    for (const ext of IMG_EXTS){ candidates.push(`${base}${p.id}${ext}`); }
   }
-  function onImgLoad(el){ el.classList.add('loaded'); }
+  return [...new Set(candidates)];
+}
+
+function onImgError(el){
+  const rest=(el.dataset.alt||"").split("|").filter(Boolean);
+  if(rest.length){ el.src=rest.shift(); el.dataset.alt=rest.join("|"); }
+  else { el.onerror=null; el.src="assets/logo.png"; }
+}
+function onImgLoad(el){ el.classList.add('loaded'); }
+
 
   /* ================ CSV / PRODUCTOS ================ */
   function mapSpeciesBrand(spec){
@@ -366,8 +384,7 @@
       bowl:'Platos', bowls:'Platos', feeder:'Bebederos', feeders:'Bebederos',
       bed:'Camas', beds:'Camas', toy:'Juguetes', toys:'Juguetes',
       leash:'Correas', harness:'Arnés', harnesses:'Arnés',
-      litter:'Arena', grooming:'Cuidado', cleaning:'Limpieza',
-      cage:'Jaulas', cages:'Jaulas'
+      litter:'Arena', grooming:'Cuidado', cleaning:'Limpieza', cage:'Jaulas', cages:'Jaulas'
     };
     return dict[c] || (c ? cap(c) : '');
   }
@@ -378,7 +395,9 @@
         const resp = await fetch(url, {cache:'no-store'});
         if(resp.ok){
           const text = await resp.text();
-          if(!/^<!doctype\s+html/i.test(text.trim())) return { url, text };
+          if(!/^<!doctype\s+html/i.test(text.trim())){
+            return { url, text };
+          }
         }
       }catch(e){}
     }
@@ -436,15 +455,11 @@
   /* ================ FILTROS + RENDER ================ */
   const grid = document.getElementById('grid');
   const alertBox = document.getElementById('alertBox');
-
-  // header (desktop)
   const fMarca = document.getElementById('fMarca');
   const fEspecie = document.getElementById('fEspecie');
   const fCategoria = document.getElementById('fCategoria');
   const fSearch = document.getElementById('fSearch');
   const fSort = document.getElementById('fSort');
-
-  // móvil
   const m_fMarca = document.getElementById('m_fMarca');
   const m_fEspecie = document.getElementById('m_fEspecie');
   const m_fCategoria = document.getElementById('m_fCategoria');
@@ -541,7 +556,12 @@
     const initialPrice=(p.variants && p.variants.length)? money(p.variants[0].price) : money(p.precio);
     return `<article class='border rounded-lg overflow-hidden bg-white'>
       <div class='img-box w-full bg-gray-50 grid place-items-center'>
-        <img src='${img}' data-alt='${altList}' alt='${p.nombre}' loading='lazy' decoding='async' onload="onImgLoad(this)" onerror="onImgError(this)"/>
+     <img src='${img}'
+     data-alt='${altList}'
+     alt='${p.nombre}'
+     loading='lazy' decoding='async'
+     onload="onImgLoad(this)"
+     onerror="onImgError(this)"/> 
       </div>
       <div class='p-3 space-y-1'>
         <h3 class='font-medium leading-tight'>${p.nombre}</h3>
@@ -561,21 +581,18 @@
     if(!items.length){ grid.innerHTML = `<div class='col-span-full p-6 text-center text-sm text-gray-500 border rounded'>No hay productos con esos filtros.</div>`; return; }
     items.forEach(p=>{ if(!(p.id in SELECTED)) SELECTED[p.id]=0; });
     grid.innerHTML = items.map(cardHTML).join('');
-
-    // Si el navegador sirvió desde caché y no disparó onload:
-    document.querySelectorAll('#grid .img-box img').forEach(img=>{
-      if (img.complete && img.naturalWidth > 0) img.classList.add('loaded');
-    });
   }
+// Si el navegador sirve desde caché y no dispara onload, asegura visibilidad:
+document.querySelectorAll('#grid .img-box img').forEach(img=>{
+  if (img.complete && img.naturalWidth > 0) img.classList.add('loaded');
+});
 
-  /* ======== CHECKOUT ======== */
   function goToCheckout(){
     if(!CART.length){ alert('Tu carrito está vacío.'); return; }
     localStorage.setItem('amicotti_checkout_source','catalog');
     location.href = 'checkout.html';
   }
 
-  /* ============== EVENTOS ============== */
   [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el =>
     el.addEventListener('input', ()=>{ render(); updateURLFromFilters(); mirrorMobileFromDesktop(); })
   );
@@ -583,7 +600,6 @@
     [fMarca,fEspecie,fCategoria,fSearch,fSort].forEach(el=> el.value=''); render(); updateURLFromFilters(); mirrorMobileFromDesktop();
   });
 
-  // móvil
   const panel=document.getElementById('filtersPanel');
   document.getElementById('openFilters').addEventListener('click', ()=> panel.classList.toggle('hidden'));
   [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el =>
@@ -593,16 +609,17 @@
     [m_fMarca,m_fEspecie,m_fCategoria,m_fSearch,m_fSort].forEach(el=> el.value=''); mirrorDesktopFromMobile(); render(); updateURLFromFilters();
   });
 
-  // drawer / carrito
   document.getElementById('cartBtn').addEventListener('click', openCart);
   document.getElementById('closeCart').addEventListener('click', closeCart);
   document.getElementById('btnEmpty').addEventListener('click', ()=>{ if(confirm('¿Vaciar carrito?')){ CART=[]; saveCart(); drawCart(); } });
   document.getElementById('btnCheckout').addEventListener('click', goToCheckout);
   document.getElementById('buyerForm')?.addEventListener('submit', e => e.preventDefault());
 
-  /* ============== INIT ============== */
   (async function init(){
-    setWALinks(); updateCartBadge(); drawCart();
+    const top = document.getElementById('waTop'), flo = document.getElementById('waFloat');
+    if(top){ top.href=`https://wa.me/${WA_PHONE}`; top.textContent=`WhatsApp ${WA_PHONE}`; }
+    if(flo){ flo.href=`https://wa.me/${WA_PHONE}`; }
+    updateCartBadge(); drawCart();
     try{
       await loadCSVs();
       if(!PRODUCTS.length){
@@ -611,7 +628,6 @@
       }
       PRODUCTS = PRODUCTS.map(p => ({...p, marca: cap(p.marca)}));
       fillFilters(); applyInitialFiltersFromURL(); render();
-      // Prefill buyer (aunque esté oculto)
       try{
         const b=JSON.parse(localStorage.getItem('amicotti_buyer')||'{}');
         if(b.name) document.getElementById('bf_name').value=b.name;
