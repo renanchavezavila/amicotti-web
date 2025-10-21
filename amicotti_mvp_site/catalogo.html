@@ -36,6 +36,16 @@
     .zoom-stage img{max-width:none;max-height:none;display:block;cursor:grab}
     .zoom-stage img:active{cursor:grabbing}
     .zoom-caption{position:absolute;left:12px;bottom:10px;color:#fff;font-size:.75rem;opacity:.85}
+    /* Evitar drag nativo y selección de texto en la imagen del zoom */
+   .zoom-stage img{
+   -webkit-user-drag: none;
+    user-select: none;
+    touch-action: none;   /* útil en móviles para permitir pan con el dedo */
+}
+
+/* Asegurar clic en toolbar */
+.zoom-toolbar button{ cursor: pointer }
+
   </style>
 </head>
 
